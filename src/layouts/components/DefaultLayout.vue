@@ -289,7 +289,7 @@ function confirm() {
             <img src="../../assets//images/svg/telegram.svg" alt="telegram" />
           </a>
           <a
-            href="https://twitter.com/oraichain"
+            href="https://twitter.com/orai_us"
             target="_blank"
             rel="noopener noreferrer"
             class="filter hover:brightness-150"

@@ -3126,10 +3126,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/semantic-conventions/-/semantic-conventions-1.21.0.tgz#83f7479c524ab523ac2df702ade30b9724476c72"
   integrity sha512-lkC8kZYntxVKr7b8xmjCVUgE0a8xgDakPyDo9uSWavXPyYqLgYYGdEd2j8NxihRyb6UwpX3G/hFUF4/9q2V+/g==
 
-"@oraichain/oraiscan-widget@0.2.12-1":
-  version "0.2.12-1"
-  resolved "https://registry.yarnpkg.com/@oraichain/oraiscan-widget/-/oraiscan-widget-0.2.12-1.tgz#fcee14cbc1e26b7b522ce44dcfcdf04345f76c52"
-  integrity sha512-6EJc2sISbtj2h1zmR95wv22nAvjeiVb8Nk5J4JQw3kngstCHFhVSf4M1mctYVkqaqtlo7m9L/ZaRax8TrH0ObA==
+"@oraichain/oraiscan-widget@^0.2.13":
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/@oraichain/oraiscan-widget/-/oraiscan-widget-0.2.13.tgz#6accdc899a0586863a03bf3c7f7255b3dc103e68"
+  integrity sha512-pkLl6hgfhoVHjplz1tsd+uEU/Yvmc+RGy5+DVYhaEtTyO05f3PkrmHjL9qJWiiyqwL2WuBXey8as5uA6MkAoWg==
   dependencies:
     "@cosmjs/amino" "^0.32.0"
     "@cosmjs/cosmwasm-stargate" "^0.32.0"
