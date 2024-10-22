@@ -5,6 +5,8 @@ import '@/style.css';
 import { createApp, ref } from 'vue';
 import { createPinia } from 'pinia';
 import LazyLoad from 'lazy-load-vue3';
+import VueAwesomePaginate from "vue-awesome-paginate";
+import "vue-awesome-paginate/dist/style.css";
 
 import router from './router';
 import { useBaseStore } from './stores/useBaseStore';
@@ -16,6 +18,7 @@ app.use(i18n);
 app.use(createPinia());
 app.use(router);
 app.use(LazyLoad, { component: true });
+app.use(VueAwesomePaginate as any);
 // Mount vue app
 app.mount('#app');
 

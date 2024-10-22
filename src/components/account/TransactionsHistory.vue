@@ -1,16 +1,28 @@
 <script lang="ts" setup>
 import { TxsHistory } from '@/libs/client';
 import { useFormatter } from '@/stores';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { getHistoryTxs } from '@/service/transactionsService';
+import Pagination from '../pagination/Pagination.vue';
+
+const TRANSACTION_TYPE = {
+  ALL: "tx-all",
+  CW20: "cw20",
+}
 
 const props = defineProps(['address', 'chain']);
 const txsHistory = ref({} as TxsHistory[]);
 const txs = ref({} as TxsHistory[]);
 const format = useFormatter();
-const txType = ref("tx-all");
+const txType = ref(TRANSACTION_TYPE.ALL);
+const txTotal = ref(0)
 
-onMounted(()=>{
+const pagination = reactive({
+  limit: 1,
+  offset: 0
+})
+
+onMounted(() => {
   fetchTransaction()
 })
 
@@ -18,13 +30,14 @@ async function fetchTransaction() {
   try {
     const params = {
       addrByNetworks: `${props?.chain}+${props?.address}`,
-      limit: 10, 
-      offset: 0
+      limit: pagination.limit,
+      offset: pagination.offset
     }
     const response = await getHistoryTxs(params)
     if (!!response) {
       txsHistory.value = response.data;
       txs.value = response.data;
+      txTotal.value = response.totalRecord;
     }
   } catch (error) {
     txs.value = []
@@ -33,8 +46,12 @@ async function fetchTransaction() {
 
 function changeTypeTx(tx: string) {
   txType.value = tx
-  if (tx === "tx-cw-20") txs.value = txsHistory.value.filter(tx => tx.transactionType === "cw20")
+  if (tx === TRANSACTION_TYPE.CW20) txs.value = txsHistory.value.filter(tx => tx.transactionType === TRANSACTION_TYPE.CW20)
   else txs.value = txsHistory.value
+}
+
+function handlePagination(page: number) {
+  pagination.offset = page
 }
 </script>
 
@@ -44,10 +61,12 @@ function changeTypeTx(tx: string) {
       {{ $t('account.transactions') }}
     </h2>
     <div class="flex gap-2 mb-4">
-      <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === 'tx-all' }" v-on:click="changeTypeTx('tx-all')">
+      <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === TRANSACTION_TYPE.ALL }"
+        v-on:click="changeTypeTx(TRANSACTION_TYPE.ALL)">
         {{ $t('account.transactions') }}
       </button>
-      <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === 'tx-cw-20' }" v-on:click="changeTypeTx('tx-cw-20')">
+      <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === TRANSACTION_TYPE.CW20 }"
+        v-on:click="changeTypeTx(TRANSACTION_TYPE.CW20)">
         CW-20 Token Transactions
       </button>
     </div>
@@ -95,9 +114,13 @@ function changeTypeTx(tx: string) {
         </tbody>
       </table>
     </div>
+
+    <div class="mt-4 text-center">
+      <Pagination :totalItems="txTotal" :limit="pagination.limit" :onPagination="handlePagination" />
+    </div>
+
   </div>
 </template>
-
 
 <script lang="ts">
 export default {
