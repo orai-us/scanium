@@ -140,6 +140,39 @@ export type ExtraTxResponse = Omit<TxResponse, 'result'> & {
     readonly events: readonly Event[];
   };
 };
+
+export type TokenInfos = {
+  uniqueKey: string;
+  network: string;
+  abbr: string;
+  contractAddress: string;
+  contractAddressLower: string;
+  decimal: number;
+  imgUrl: string;
+  name: string;
+  tokenId: number;
+  denom: string;
+  coingeckoId: string;
+  tokenType: string;
+};
+export type TxsHistory = {
+  uniqKey: string;
+  network: string;
+  height: string;
+  txhash: string;
+  status: number;
+  timestamp: number;
+  transactionType: string;
+  userAddress: string;
+  fromAddress: string;
+  toAddress: string;
+  amount: Array<string>;
+  fee: Array<string>;
+  tokenInfos: Array<TokenInfos>;
+  energyUsage: string;
+  netFee: string;
+  explorer: string;
+};
 export interface ExtraTxSearchResponse {
   readonly txs: ExtraTxResponse[];
   readonly totalCount: number;
