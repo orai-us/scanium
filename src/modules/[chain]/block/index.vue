@@ -77,12 +77,12 @@ onBeforeRouteUpdate(async (to, from, next) => {
         @click="tab = 'future'"
         >{{ $t('block.future') }}</a
       >
-      <a
+      <!-- <a
         class="tab text-gray-400 capitalize !pb-2"
         :class="{ 'tab-active': tab === 'transactions' }"
         @click="tab = 'transactions'"
         >{{ $t('account.transactions') }}</a
-      >
+      > -->
     </div>
 
     <div v-show="tab === 'blocks'" class="grid grid-cols-1 gap-3">

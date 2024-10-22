@@ -8,7 +8,6 @@ import { createPinia } from 'pinia';
 import LazyLoad from 'lazy-load-vue3';
 import VueAwesomePaginate from 'vue-awesome-paginate';
 import 'vue-awesome-paginate/dist/style.css';
-
 import router from './router';
 import { useBaseStore } from './stores/useBaseStore';
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
