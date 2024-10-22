@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
 import TxsElement from '@/components/dynamic/TxsElement.vue';
 import { computed } from '@vue/reactivity';
@@ -15,7 +15,7 @@ const store = useBaseStore();
 const format = useFormatter();
 const current = ref({} as BlockResponse);
 const target = ref(Number(props.height || 0));
-
+const blockInformation = ref();
 const height = computed(() => {
   return Number(current.value.block?.header?.height || props.height || 0);
 });
@@ -60,7 +60,7 @@ const estimateDate = computed(() => {
   return new Date(new Date().getTime() + estimateTime.value);
 });
 
-const blockInformation=computed(()=>{
+watch((current), () => {
   const block = current.value?.block;
   const blockId = current.value?.blockId;
   const headerBlock = block?.header;
@@ -72,8 +72,8 @@ const blockInformation=computed(()=>{
   const txCount = block?.txs?.length;
   const proposerAddress = headerBlock?.proposerAddress;
   const proposer = format.validator(proposerAddress && toBase64(proposerAddress))
-  return {
-    'Time': format.toLocaleDate(time.toString()) ,
+  blockInformation.value = {
+    'Time': format.toLocaleDate(time.toString()),
     'Chain': chainId,
     'Block Hash': blockHash,
     'Round': round,
@@ -108,7 +108,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
           {{ $t('block.estimated_time') }}:
           <span class="text-xl font-normal">{{
             format.toLocaleDate(estimateDate)
-            }}</span>
+          }}</span>
         </div>
         <div class="pt-10 flex justify-center">
           <div class="box-content !p-6 rounded-2xl !bg-base">
