@@ -2,7 +2,6 @@
 import { useTxDialog, useBlockchain } from '@/stores';
 const store = useTxDialog();
 const chainStore = useBlockchain()
-console.log({ store })
 </script>
 <template>
   <ping-tx-dialog
