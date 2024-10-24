@@ -527,7 +527,7 @@ function changeStatusSupported(supported: boolean) {
     <TransactionsHistory :address="address" :chain="chain" />
 
     <!-- Received -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
+    <!-- <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
       <h2 class="card-title mb-4 text-white">{{ $t('account.received') }}</h2>
       <div class="overflow-x-auto">
         <table class="table w-full text-sm">
@@ -571,13 +571,13 @@ function changeStatusSupported(supported: boolean) {
           </tbody>
         </table>
       </div>
-    </div>
+    </div> -->
 
     <!-- Account -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
+    <!-- <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
       <h2 class="card-title mb-4 text-white">{{ $t('account.acc') }}</h2>
       <DynamicComponent :value="account" />
-    </div>
+    </div> -->
   </div>
   <div v-else class="text-no text-sm">{{ $t('account.error') }}</div>
 </template>
