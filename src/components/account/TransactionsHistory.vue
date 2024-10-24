@@ -46,7 +46,7 @@ async function fetchTransaction() {
 
 function changeTypeTx(tx: string) {
   txType.value = tx
-  if (tx === TRANSACTION_TYPE.CW20) txs.value = txsHistory.value.filter(tx => tx.transactionType === TRANSACTION_TYPE.CW20)
+  if (tx === TRANSACTION_TYPE.CW20) txs.value = txsHistory.value?.filter(tx => tx.transactionType === TRANSACTION_TYPE.CW20)
   else txs.value = txsHistory.value
 }
 
@@ -82,7 +82,7 @@ function handlePagination(page: number) {
           </tr>
         </thead>
         <tbody class="text-sm">
-          <tr v-if="txs.length === 0">
+          <tr v-if="txs?.length === 0">
             <td colspan="10">
               <div class="text-center">
                 {{ $t('account.no_transactions') }}
@@ -115,7 +115,7 @@ function handlePagination(page: number) {
       </table>
     </div>
 
-    <div class="mt-4 text-center">
+    <div class="mt-4 text-center" v-if="txTotal">
       <Pagination :totalItems="txTotal" :limit="pagination.limit" :onPagination="handlePagination" />
     </div>
 
