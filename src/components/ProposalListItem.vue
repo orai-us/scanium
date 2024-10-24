@@ -10,6 +10,7 @@ import ProposalProcess from './ProposalProcess.vue';
 import type { PropType } from 'vue';
 import { computed, ref } from 'vue';
 import {
+  ProposalStatus,
   VoteOption,
   voteOptionToJSON,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
@@ -120,7 +121,7 @@ function metaItem(metadata: string | undefined): {
             </div>
           </td>
 
-          <td v-if="statusMap?.[item?.status] === 'VOTING'" class="w-40">
+          <td v-if="statusMap?.[ProposalStatus[item?.status]] === 'VOTING'" class="w-40">
             <div class="">
               <label
                 for="vote"
@@ -131,7 +132,7 @@ function metaItem(metadata: string | undefined): {
                   })
                 "
               >
-                <span
+                <!-- <span
                   v-if="
                     item?.voterStatus !== VoteOption.VOTE_OPTION_NO_WITH_VETO
                   "
@@ -144,7 +145,8 @@ function metaItem(metadata: string | undefined): {
                   }}</span
                 >
 
-                <span v-else>Vote</span>
+                <span v-else>Vote</span> -->
+                <span>Vote</span>
               </label>
             </div>
           </td>
