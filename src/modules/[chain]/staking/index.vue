@@ -17,6 +17,9 @@ import type { Params } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
 import { fromAscii, toBase64 } from '@cosmjs/encoding';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { decodeKey } from '@/libs';
+import Uptime from "../uptime/index.vue"
+
+const props = defineProps(['chain']);
 
 const staking = useStakingStore();
 const base = useBaseStore();
@@ -243,14 +246,10 @@ loadAvatars();
     <div class="rounded-lg grid sm:grid-cols-1 md:grid-cols-4 p-4 md:p-6 gap-4">
       <div class="box-border p-4">
         <span>
-          <div
-            class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2"
-          >
+          <div class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2">
             <!-- <Icon class="text-[#B4B7BB]" icon="mdi:trending-up" size="32" /> -->
             <img src="../../../assets/images/svg/dup-chart.svg" alt="" />
-            <div
-              class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"
-            ></div>
+            <div class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"></div>
           </div>
         </span>
         <span class="text-center">
@@ -264,18 +263,14 @@ loadAvatars();
       </div>
       <div class="box-border p-4">
         <span>
-          <div
-            class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2"
-          >
+          <div class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2">
             <!-- <Icon
               class="text-[#B4B7BB]"
               icon="mdi:lock-open-outline"
               size="32"
             /> -->
             <img src="../../../assets/images/svg/lock.svg" alt="" />
-            <div
-              class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"
-            ></div>
+            <div class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"></div>
           </div>
         </span>
         <span class="text-center">
@@ -289,9 +284,7 @@ loadAvatars();
       </div>
       <div class="box-border p-4">
         <span>
-          <div
-            class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2"
-          >
+          <div class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2">
             <!-- <Icon
               class="text-[#B4B7BB]"
               icon="mdi:alert-octagon-outline"
@@ -299,9 +292,7 @@ loadAvatars();
             /> -->
 
             <img src="../../../assets/images/svg/warning.svg" alt="" />
-            <div
-              class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"
-            ></div>
+            <div class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"></div>
           </div>
         </span>
         <span class="text-center">
@@ -315,15 +306,11 @@ loadAvatars();
       </div>
       <div class="box-border p-4">
         <span>
-          <div
-            class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2"
-          >
+          <div class="relative w-9 h-9 rounded overflow-hidden flex items-center justify-center mr-2">
             <!-- <Icon class="text-[#B4B7BB]" icon="mdi:pause" size="32" /> -->
 
             <img src="../../../assets/images/svg/pause.svg" alt="" />
-            <div
-              class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"
-            ></div>
+            <div class="absolute top-0 left-0 bottom-0 right-0 bg-[rgba(180,183,187,0.10)]"></div>
           </div>
         </span>
         <span class="text-center">
@@ -337,46 +324,34 @@ loadAvatars();
       </div>
     </div>
 
-    <div
-      class="pt-6 bg-[#141416] border border-[#242627] rounded-2xl mx-4 md:mx-6"
-    >
+    <div class="pt-6 bg-[#141416] border border-[#242627] rounded-2xl mx-4 md:mx-6">
       <div class="flex items-center justify-between py-1 px-2">
         <div class="customTab tabs tabs-boxed bg-transparent">
-          <a
+          <!-- <a
             class="tab text-gray-400"
             :class="{ 'tab-active': tab === 'featured' }"
             @click="tab = 'featured'"
             >{{ $t('staking.popular') }}</a
-          >
-          <a
-            class="tab text-gray-400"
-            :class="{ 'tab-active': tab === 'active' }"
-            @click="tab = 'active'"
-            >{{ $t('staking.active') }}</a
-          >
-          <a
-            class="tab text-gray-400"
-            :class="{ 'tab-active': tab === 'inactive' }"
-            @click="tab = 'inactive'"
-            >{{ $t('staking.inactive') }}</a
-          >
+          > -->
+          <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'active' }" @click="tab = 'active'">{{
+            $t('staking.active') }}</a>
+          <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'inactive' }" @click="tab = 'inactive'">{{
+            $t('staking.inactive') }}</a>
+          <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'uptime' }" @click="tab = 'uptime'">Uptime</a>
         </div>
 
         <!-- <div class="text-lg font-semibold pr-4">
           {{ list.length }}/{{ staking.params.maxValidators }}
         </div> -->
       </div>
+      <div class="w-full h-[1px] bg-[#242627] my-2"></div>
 
-      <div class="px-4 pt-3 pb-4 rounded shadow">
+      <div class="px-4 pt-3 pb-4 rounded shadow" v-show="tab!=='uptime'">
         <div class="overflow-x-auto">
           <table class="table staking-table w-full">
             <thead>
               <tr>
-                <th
-                  scope="col"
-                  class="uppercase"
-                  style="width: 3rem; position: relative"
-                >
+                <th scope="col" class="uppercase" style="width: 3rem; position: relative">
                   {{ $t('staking.rank') }}
                 </th>
                 <th scope="col" class="uppercase">
@@ -397,73 +372,45 @@ loadAvatars();
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="({ v, rank, logo }, i) in list"
-                :key="v.operatorAddress"
-                class="hover:bg-gray-100 dark:hover:bg-base-300"
-              >
+              <tr v-for="({ v, rank, logo }, i) in list" :key="v.operatorAddress"
+                class="hover:bg-gray-100 dark:hover:bg-base-300">
                 <!-- 👉 rank -->
                 <td>
-                  <div
-                    class="text-xs truncate relative px-2 py-1 rounded-full w-fit"
-                    :class="`text-${rank}`"
-                  >
-                    <span
-                      class="inset-x-0 inset-y-0 opacity-10 absolute"
-                      :class="`bg-${rank}`"
-                    ></span>
+                  <div class="text-xs truncate relative px-2 py-1 rounded-full w-fit" :class="`text-${rank}`">
+                    <span class="inset-x-0 inset-y-0 opacity-10 absolute" :class="`bg-${rank}`"></span>
                     {{ i + 1 }}
                   </div>
                 </td>
                 <!-- 👉 Validator -->
                 <td>
-                  <div
-                    class="flex items-center overflow-hidden"
-                    style="max-width: 300px"
-                  >
+                  <div class="flex items-center overflow-hidden" style="max-width: 300px">
                     <div class="avatar mr-4 relative w-8 h-8 rounded-full">
-                      <div
-                        class="w-8 h-8 rounded-full bg-gray-400 absolute opacity-10"
-                      ></div>
+                      <div class="w-8 h-8 rounded-full bg-gray-400 absolute opacity-10"></div>
                       <div class="w-8 h-8 rounded-full">
-                        <img
-                          v-if="logo"
-                          :src="logo"
-                          class="object-contain"
-                          @error="
+                        <img v-if="logo" :src="logo" class="object-contain" @error="
                             (e) => {
                               const identity = v.description?.identity;
                               if (identity) loadAvatar(identity);
                             }
-                          "
-                        />
-                        <Icon
-                          v-else
-                          class="text-3xl"
-                          :icon="`mdi-help-circle-outline`"
-                        />
+                          " />
+                        <Icon v-else class="text-3xl" :icon="`mdi-help-circle-outline`" />
                       </div>
                     </div>
 
                     <div class="flex flex-col">
-                      <span
-                        class="text-sm text-primary dark:text-link whitespace-nowrap overflow-hidden"
-                      >
-                        <RouterLink
-                          :to="{
+                      <span class="text-sm text-primary dark:text-link whitespace-nowrap overflow-hidden">
+                        <RouterLink :to="{
                             name: 'chain-staking-validator',
                             params: {
                               validator: v.operatorAddress,
                             },
-                          }"
-                          class="font-weight-medium"
-                        >
+                          }" class="font-weight-medium">
                           {{ v.description?.moniker }}
                         </RouterLink>
                       </span>
                       <span class="text-xs">{{
                         v.description?.website || v.description?.identity || '-'
-                      }}</span>
+                        }}</span>
                     </div>
                   </div>
                 </td>
@@ -473,60 +420,48 @@ loadAvatars();
                   <div class="flex flex-col">
                     <h6 class="text-sm font-weight-medium whitespace-nowrap">
                       {{
-                        format.formatToken(
-                          {
-                            amount: parseInt(v.tokens).toString(),
-                            denom: staking.params.bondDenom,
-                          },
-                          true,
-                          '0,0'
-                        )
+                      format.formatToken(
+                      {
+                      amount: parseInt(v.tokens).toString(),
+                      denom: staking.params.bondDenom,
+                      },
+                      true,
+                      '0,0'
+                      )
                       }}
                     </h6>
                     <span class="text-xs">{{
                       format.calculatePercent(
-                        v.delegatorShares,
-                        staking.totalPower
+                      v.delegatorShares,
+                      staking.totalPower
                       )
-                    }}</span>
+                      }}</span>
                   </div>
                 </td>
                 <!-- 👉 24h Changes -->
-                <td
-                  class="text-right text-xs"
-                  :class="change24Color(v.consensusPubkey)"
-                >
+                <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
                   {{ change24Text(v.consensusPubkey) }}
                 </td>
                 <!-- 👉 commission -->
                 <td class="text-right text-xs">
                   {{
-                    format.formatCommissionRate(
-                      v.commission?.commissionRates?.rate,
-                      1e18
-                    )
+                  format.formatCommissionRate(
+                  v.commission?.commissionRates?.rate,
+                  1e18
+                  )
                   }}
                 </td>
                 <!-- 👉 Action -->
                 <td class="text-center">
                   <div class="flex items-center justify-center">
-                    <div
-                      v-if="v.jailed"
-                      class="badge badge-error gap-2 text-white"
-                    >
+                    <div v-if="v.jailed" class="badge badge-error gap-2 text-white">
                       {{ $t('staking.jailed') }}
                     </div>
-                    <label
-                      v-else
-                      for="delegate"
-                      class="btn-third !py-1 !px-3 capitalize !h-[unset]"
-                      @click="
+                    <label v-else for="delegate" class="btn-third !py-1 !px-3 capitalize !h-[unset]" @click="
                         dialog.open('delegate', {
                           validator_address: v.operatorAddress,
                         })
-                      "
-                      >{{ $t('account.btn_delegate') }}</label
-                    >
+                      ">{{ $t('account.btn_delegate') }}</label>
                   </div>
                 </td>
               </tr>
@@ -536,26 +471,21 @@ loadAvatars();
 
         <div class="divider"></div>
         <div class="flex flex-row items-center">
-          <div
-            class="text-xs truncate relative py-2 px-4 rounded-md w-fit text-error mr-2"
-          >
-            <span
-              class="inset-x-0 inset-y-0 opacity-10 absolute bg-error"
-            ></span>
+          <div class="text-xs truncate relative py-2 px-4 rounded-md w-fit text-error mr-2">
+            <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-error"></span>
             {{ $t('staking.top') }} 33%
           </div>
-          <div
-            class="text-xs truncate relative py-2 px-4 rounded-md w-fit text-warning"
-          >
-            <span
-              class="inset-x-0 inset-y-0 opacity-10 absolute bg-warning"
-            ></span>
+          <div class="text-xs truncate relative py-2 px-4 rounded-md w-fit text-warning">
+            <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-warning"></span>
             {{ $t('staking.top') }} 67%
           </div>
           <div class="text-xs hidden md:!block pl-2">
             {{ $t('staking.description') }}
           </div>
         </div>
+      </div>
+      <div v-show="tab === 'uptime'">
+        <Uptime :chain="chain" />
       </div>
     </div>
   </div>
