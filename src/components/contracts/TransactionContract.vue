@@ -5,6 +5,7 @@ import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
 import Pagination from "../pagination/Pagination.vue";
+import { shortenTxHash } from "@/utils";
 
 const props = defineProps(['txs', 'chain'])
 const format = useFormatter();
@@ -19,11 +20,6 @@ const TRANSACTION_TYPE = {
 
 const tabTransaction = ref(TRANSACTION_TYPE.ALL);
 
-const shortenTxHash = (txHash: string) => {
-  const prefixHash = txHash.slice(0, 6);
-  const suffixHash = txHash.slice(-6);
-  return `${prefixHash} . . . ${suffixHash}`
-}
 // Transaction in contract
 const transactions = ref([
           {

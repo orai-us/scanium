@@ -4,6 +4,7 @@ import {
   useFormatter,
   useStakingStore,
   useTxDialog,
+  useWalletStore,
 } from '@/stores';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import DonutChart from '@/components/charts/DonutChart.vue';
@@ -30,6 +31,7 @@ import TransactionsHistory from '@/components/account/TransactionsHistory.vue';
 
 const props = defineProps(['address', 'chain']);
 
+const walletStore = useWalletStore();
 const blockchain = useBlockchain();
 const stakingStore = useStakingStore();
 const dialog = useTxDialog();
@@ -318,13 +320,13 @@ function changeStatusSupported(supported: boolean) {
               <div class="flex-1">
                 <div class="text-sm font-semibold">
                   {{
-                    format.formatToken2(
-                      {
-                        amount: String(unbondingTotal),
-                        denom: stakingStore.params.bondDenom,
-                      },
-                      1e18
-                    )
+                  format.formatToken2(
+                  {
+                  amount: String(unbondingTotal),
+                  denom: stakingStore.params.bondDenom,
+                  },
+                  1e18
+                  )
                   }}
                 </div>
                 <div class="text-xs">
@@ -334,13 +336,13 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)]"></span>
                 ${{
-                  format.tokenValue(
-                    {
-                      amount: String(unbondingTotal),
-                      denom: stakingStore.params.bondDenom,
-                    },
-                    1e18
-                  )
+                format.tokenValue(
+                {
+                amount: String(unbondingTotal),
+                denom: stakingStore.params.bondDenom,
+                },
+                1e18
+                )
                 }}
               </div>
             </div>
@@ -360,11 +362,15 @@ function changeStatusSupported(supported: boolean) {
         <h2 class="card-title mb-4 text-white">
           {{ $t('account.delegations') }}
         </h2>
-        <div class="flex justify-end mb-4">
+        <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
           <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
             @click="dialog.open('delegate', {}, updateEvent)">{{ $t('account.btn_delegate') }}</label>
-          <label for="withdraw" class="btn btn-third-sm btn-sm" @click="dialog.open('withdraw', {}, updateEvent)">{{
-            $t('account.btn_withdraw') }}</label>
+          <label for="withdraw" class="btn btn-third-sm btn-sm" @click="dialog.open('withdraw', {}, updateEvent)">Claim Reward</label>
+        </div>
+        <div v-if="!walletStore.currentAddress">
+          <label
+            class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm"
+            :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''">Connect wallet</label>
         </div>
       </div>
       <div class="overflow-x-auto">
@@ -410,7 +416,7 @@ function changeStatusSupported(supported: boolean) {
                 }}
               </td>
               <td class="py-3">
-                <div v-if="v.balance" class="flex justify-end">
+                <div v-if="v.balance && walletStore.currentAddress" class="flex justify-end">
                   <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2" @click="
                       dialog.open(
                         'delegate',
@@ -439,6 +445,11 @@ function changeStatusSupported(supported: boolean) {
                         updateEvent
                       )
                     ">{{ $t('account.btn_unbond') }}</label>
+                </div>
+                <div v-if="!walletStore.currentAddress">
+                  <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
+                    class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Connect
+                    wallet</label>
                 </div>
               </td>
             </tr>
