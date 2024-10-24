@@ -180,7 +180,7 @@ function mapAmount(events: readonly Event[]) {
           <span class="truncate text-lg text-white"> {{ address }}</span>
         </div>
         <!-- button -->
-        <div class="flex justify-end mb-4 pr-5">
+        <!-- <div class="flex justify-end mb-4 pr-5">
           <label for="send" class="btn btn-third-sm btn-sm mr-2" @click="dialog.open('send', {}, updateEvent)">{{
             $t('account.btn_send') }}</label>
           <label for="transfer" class="btn btn-third-sm btn-sm" @click="
@@ -192,7 +192,7 @@ function mapAmount(events: readonly Event[]) {
                 updateEvent
               )
             ">{{ $t('account.btn_transfer') }}</label>
-        </div>
+        </div> -->
       </div>
     </div>
 
