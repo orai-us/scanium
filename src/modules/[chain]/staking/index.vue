@@ -7,17 +7,16 @@ import {
   useStakingStore,
   useTxDialog,
 } from '@/stores';
-import { computed } from '@vue/reactivity';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
-import type { Key, SlashingParam } from '@/types';
+import type { Key } from '@/types';
 import { formatSeconds } from '@/libs/utils';
 import type { Validator } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import type { Params } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
-import { fromAscii, toBase64 } from '@cosmjs/encoding';
+import { toBase64 } from '@cosmjs/encoding';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { decodeKey } from '@/libs';
-import Uptime from "../uptime/index.vue"
+import UptimeStaking from "../../../components/staking/uptime.vue"
 
 const props = defineProps(['chain']);
 
@@ -35,6 +34,7 @@ const yesterday = ref({} as Record<string, number>);
 const tab = ref('active');
 const unbondList = ref([] as Validator[]);
 const slashing = ref({} as Params);
+const keywordSearchValidator = ref("")
 
 onMounted(() => {
   staking.fetchUnbondingValdiators().then((res) => {
@@ -174,6 +174,14 @@ const list = computed(() => {
     logo: logo(x.description.identity),
   }));
 });
+
+const validators = computed(()=>{
+  return list.value.filter(item => item.v.description.moniker.toLowerCase().includes(keywordSearchValidator.value.toLowerCase()))
+})
+
+watch(tab, () => {
+  keywordSearchValidator.value = ""
+})
 
 const fetchAvatar = (identity: string) => {
   // fetch avatar from keybase
@@ -339,7 +347,8 @@ loadAvatars();
             $t('staking.inactive') }}</a>
           <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'uptime' }" @click="tab = 'uptime'">Uptime</a>
         </div>
-
+        <input class="input w-[30%] !input-bordered" v-model="keywordSearchValidator"
+          placeholder="Search validators name" />
         <!-- <div class="text-lg font-semibold pr-4">
           {{ list.length }}/{{ staking.params.maxValidators }}
         </div> -->
@@ -372,7 +381,7 @@ loadAvatars();
               </tr>
             </thead>
             <tbody>
-              <tr v-for="({ v, rank, logo }, i) in list" :key="v.operatorAddress"
+              <tr v-for="({ v, rank, logo }, i) in validators" :key="v.operatorAddress"
                 class="hover:bg-gray-100 dark:hover:bg-base-300">
                 <!-- 👉 rank -->
                 <td>
@@ -484,8 +493,8 @@ loadAvatars();
           </div>
         </div>
       </div>
-      <div v-show="tab === 'uptime'">
-        <Uptime :chain="chain" />
+      <div v-if="tab === 'uptime'">
+        <UptimeStaking :keyword="keywordSearchValidator"/>
       </div>
     </div>
   </div>
