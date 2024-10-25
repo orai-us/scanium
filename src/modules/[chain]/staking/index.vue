@@ -189,7 +189,6 @@ const list = computed(() => {
       )
     }));
   }
-  console.log({ result: result[0] })
   const resultSort = handleSortList(result, sortDes)
   return resultSort
   // else if (tab.value === 'featured') {
@@ -410,7 +409,6 @@ function handleChangeSort(field: string) {
 }
 
 function handleSortList(validator: any[], sortDescription: any){
-  console.log({ sortDescription })
   let result: any[] = [];
   switch (sortDescription.field) {
     case "voting_power":
