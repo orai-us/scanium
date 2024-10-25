@@ -334,14 +334,19 @@ function fetchAllKeyRotation() {
     </div>
   </div>
 </template>
-<route>
+<!-- <route>
   {
     meta: {
       i18n: 'uptime',
       order: 8
     }
   }
-</route>
+</route> -->
+<script lang="ts">
+export default {
+  name: 'Uptime',
+};
+</script>
 
 <style lang="scss">
 .v-field--variant-outlined .v-field__outline__notch {
