@@ -3,8 +3,7 @@ import Countdown from '@/components/Countdown.vue';
 import { useBaseStore, useFormatter } from '@/stores';
 import { toBase64 } from '@cosmjs/encoding';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
-import { computed, ref } from '@vue/reactivity';
-import { watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 const props = defineProps(['chain']);
 
@@ -71,12 +70,12 @@ onBeforeRouteUpdate(async (to, from, next) => {
       >
       <!-- <RouterLink class="tab text-gray-400 capitalize" :to="`/${chain}/block/${Number(base.latest?.block?.header.height || 0) + 10000
         }`">{{ $t('block.future') }}</RouterLink> -->
-      <a
+      <!-- <a
         class="tab text-gray-400 capitalize !pb-2"
         :class="{ 'tab-active': tab === 'future' }"
         @click="tab = 'future'"
         >{{ $t('block.future') }}</a
-      >
+      > -->
       <!-- <a
         class="tab text-gray-400 capitalize !pb-2"
         :class="{ 'tab-active': tab === 'transactions' }"
