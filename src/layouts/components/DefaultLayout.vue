@@ -78,8 +78,13 @@ function confirm() {
   }
   const height = /^\d+$/;
   const txhash = /^[A-Z\d]{64}$/;
-  const addr = /^[a-z\d]+1[a-z\d]{38,58}$/;
+  const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
+  const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
 
+  console.log({ contract: contract.test(key) })
+  console.log({ addr: addr.test(key) })
+
+  debugger;
   const current = blockchain?.current?.chainName || '';
   const routeParams = vueRouters?.currentRoute?.value;
 
@@ -92,7 +97,9 @@ function confirm() {
       //     this.$router.push({ name: 'transaction', params: { chain: c.chain_name, hash: key } })
     } else if (addr.test(key)) {
       vueRouters.push({ path: `/${current}/account/${key}` });
-    } else {
+    } else if(contract.test(key)){
+      vueRouters.push({ path: `/${current}/contracts/${key}` });
+    }else{
       errorMessage.value = 'The input not recognized';
     }
   }
