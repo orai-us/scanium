@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import { reactive } from "vue";
 import Pagination from "../pagination/Pagination.vue";
 
-const props = defineProps(['txs', 'chain'])
+const props = defineProps(['txs', 'chain','address'])
 const format = useFormatter();
 
 const TRANSACTION_TYPE = {
@@ -158,7 +158,7 @@ const variables = computed(() => {
       messages: {
         some: {
           contract: {
-            equalTo: "orai19a5y29zj8qhvgew9e7vrgamzfjf63tpdrwr6545l568dd40q9c9s78fk36",
+            equalTo: props.address,
           },
         },
       },
