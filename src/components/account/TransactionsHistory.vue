@@ -21,9 +21,9 @@ function changeTypeTx(tx: string) {
 
 <template>
   <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
-    <h2 class="card-title mb-4 text-white">
+    <!-- <h2 class="card-title mb-4 text-white">
       {{ $t('account.transactions') }}
-    </h2>
+    </h2> -->
     <div class="flex gap-2 mb-4">
       <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === TRANSACTION_TYPE.ALL }"
         v-on:click="changeTypeTx(TRANSACTION_TYPE.ALL)">
