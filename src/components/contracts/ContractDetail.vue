@@ -1,8 +1,14 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import type { ContractInfo } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import { Icon } from '@iconify/vue';
+import { useWasmStore } from '@/modules/[chain]/cosmwasm/WasmStore';
+
+const props = defineProps(['chain', 'address']);
+const wasmStore = useWasmStore();
 
 let showCopyToast = ref(0);
+const info = ref({} as ContractInfo | undefined);
 
 const tipMsg = computed(() => {
   return showCopyToast.value === 2
@@ -27,6 +33,16 @@ const copyWebsite = async (url: string) => {
     }, 1000);
   }
 };
+
+onMounted(() => {
+  const address = props.address;
+  console.log({ address: props.address })
+  wasmStore.wasmClient.getWasmContractInfo(address).then((x) => {
+    console.log({data:x})
+    info.value = x;
+  });
+});
+
 </script>
 
 <template>
@@ -40,7 +56,7 @@ const copyWebsite = async (url: string) => {
               Label
             </td>
             <td class="w-4/5">
-              <p>Levana Perps Market</p>
+              <p>{{ info?.label }}</p>
             </td>
           </tr>
           <tr>
@@ -48,7 +64,7 @@ const copyWebsite = async (url: string) => {
               Contract Address
             </td>
             <td class="w-4/5 flex gap-1">
-              <p>orai12349824573489533ftt4565r</p>
+              <p>{{ address }}</p>
               <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" @click="copyWebsite('12312312')" />
             </td>
           </tr>
@@ -57,7 +73,7 @@ const copyWebsite = async (url: string) => {
               Creator Account
             </td>
             <td class="w-4/5 flex gap-1">
-              <p>orai12349824573489533ftt4565r</p>
+              <p>{{ info?.creator }}</p>
               <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" @click="copyWebsite('12312312')" />
             </td>
           </tr>
@@ -66,7 +82,7 @@ const copyWebsite = async (url: string) => {
               Initial Block
             </td>
             <td class="w-4/5">
-              <p>10408015</p>
+              <p>{{ info?.created?.blockHeight }}</p>
             </td>
           </tr>
           <tr>
@@ -74,7 +90,7 @@ const copyWebsite = async (url: string) => {
               Admin Account
             </td>
             <td class="w-4/5 flex gap-1">
-              <p>orai12349824573489533ftt4565r</p>
+              <p>{{ info?.admin }}</p>
               <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" @click="copyWebsite('12312312')" />
             </td>
           </tr>
@@ -83,10 +99,10 @@ const copyWebsite = async (url: string) => {
               Code ID
             </td>
             <td class="w-4/5">
-              <p>1064</p>
+              <p>{{ info?.codeId }}</p>
             </td>
           </tr>
-          <tr>
+          <!-- <tr>
             <td class="capitalize whitespace-break-spaces min-w-max">
               Code Checksum
             </td>
@@ -94,7 +110,7 @@ const copyWebsite = async (url: string) => {
               <p>orai12349824573489533ftt4565r</p>
               <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" @click="copyWebsite('12312312')" />
             </td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
     </div>
