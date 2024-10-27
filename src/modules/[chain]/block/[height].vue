@@ -8,6 +8,7 @@ import { useBaseStore, useFormatter } from '@/stores';
 import Countdown from '@/components/Countdown.vue';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
 import { toBase64 } from '@cosmjs/encoding';
+import TransactionBlock from '@/components/blocks/TransactionBlock.vue';
 
 const props = defineProps(['height', 'chain']);
 
@@ -108,7 +109,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
           {{ $t('block.estimated_time') }}:
           <span class="text-xl font-normal">{{
             format.toLocaleDate(estimateDate)
-          }}</span>
+            }}</span>
         </div>
         <div class="pt-10 flex justify-center">
           <div class="box-content !p-6 rounded-2xl !bg-base">
@@ -212,7 +213,8 @@ onBeforeRouteUpdate(async (to, from, next) => {
           {{ $t('account.transactions') }}
         </h2>
         <div class="w-full h-[1px] bg-[#242627] my-2"></div>
-        <TxsElement :value="current.block" />
+        <!-- <TxsElement :value="current.block" /> -->
+        <TransactionBlock />
       </div>
 
       <!-- <div class="box-content">
