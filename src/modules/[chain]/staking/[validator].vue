@@ -18,9 +18,9 @@ import {
   useTxDialog,
 } from '@/stores';
 import { PageRequest } from '@/types';
-import { fromAscii, fromBech32, toBase64, toHex } from '@cosmjs/encoding';
+import { toHex } from '@cosmjs/encoding';
 import type { Coin } from '@cosmjs/stargate';
-import type { Event, EventAttribute } from 'cosmjs-types/tendermint/abci/types';
+import type { Event } from 'cosmjs-types/tendermint/abci/types';
 import { Icon } from '@iconify/vue';
 import type { QueryValidatorDelegationsResponse } from 'cosmjs-types/cosmos/staking/v1beta1/query';
 import {

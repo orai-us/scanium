@@ -6,9 +6,8 @@ import {
   useTxDialog,
   useWalletStore,
 } from '@/stores';
-import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import DonutChart from '@/components/charts/DonutChart.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { Icon } from '@iconify/vue';
 
 import {
@@ -17,7 +16,6 @@ import {
 
 import type { Coin } from '@cosmjs/amino';
 import Countdown from '@/components/Countdown.vue';
-import { toHex } from '@cosmjs/encoding';
 import type {
   DelegationResponse,
   UnbondingDelegation,

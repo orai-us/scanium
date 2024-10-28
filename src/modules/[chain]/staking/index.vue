@@ -18,7 +18,6 @@ import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { consensusPubkeyToHexAddress, decodeKey, valconsToBase64 } from '@/libs';
 import { Commit } from '@cosmjs/tendermint-rpc';
 import UptimeBar from '@/components/UptimeBar.vue';
-import { toRaw } from 'vue';
 
 enum SORT_TYPE {
   ASC = "asc",

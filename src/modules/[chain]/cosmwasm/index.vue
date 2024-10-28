@@ -3,7 +3,7 @@ import PaginationBar from '@/components/PaginationBar.vue';
 import router from '@/router';
 import { useTxDialog, useWalletStore } from '@/stores';
 import { PageRequest } from '@/types';
-import { toBase64, toHex } from '@cosmjs/encoding';
+import { toHex } from '@cosmjs/encoding';
 import type { QueryCodesResponse } from 'cosmjs-types/cosmwasm/wasm/v1/query';
 import { accessTypeToJSON } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import { ref, toRaw, watch, watchEffect } from 'vue';
