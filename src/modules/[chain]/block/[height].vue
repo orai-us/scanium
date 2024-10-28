@@ -214,7 +214,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
         </h2>
         <div class="w-full h-[1px] bg-[#242627] my-2"></div>
         <!-- <TxsElement :value="current.block" /> -->
-        <TransactionBlock />
+        <TransactionBlock :height="height"/>
       </div>
 
       <!-- <div class="box-content">

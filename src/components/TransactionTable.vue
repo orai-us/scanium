@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { shortenTxHash } from '@/utils';
 import Pagination from './pagination/Pagination.vue';
 
 const props = defineProps(['transaction', 'chain', 'txTotal', 'pagination', 'handlePagination']);
@@ -34,14 +33,10 @@ const props = defineProps(['transaction', 'chain', 'txTotal', 'pagination', 'han
             </RouterLink>
           </td>
           <td class="text-sm py-3">
-            {{ v.status ? "Success" : "Failed" }}
+            {{ v.result }}
           </td>
           <td class="flex items-center py-3">
-            <!-- <div class="mr-2">
-                      {{ format.messages(v.txRaw.body.messages) }}
-                    </div>
-                    <Icon v-if="v.result.code === 0" icon="mdi-check" class="text-success text-lg" />
-                    <Icon v-else icon="mdi-multiply" class="text-error text-lg" /> -->
+            <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">{{ v.message }}</span>
           </td>
           <td class="text-sm py-3">
             <RouterLink :to="`/${chain}/block/${v.height}`" class="text-primary dark:text-link">{{
@@ -49,7 +44,7 @@ const props = defineProps(['transaction', 'chain', 'txTotal', 'pagination', 'han
             </RouterLink>
           </td>
           <td class="py-3">
-            <span v-if="v.timestamp" class="text-xs">{{ v.amount}}</span>
+            <span v-if="v.timestamp" class="text-xs">{{ v.amount }}</span>
           </td>
 
           <td class="py-3">

@@ -35,7 +35,7 @@ function changeTypeTx(tx: string) {
       </button>
     </div>
     <div v-show="txType === TRANSACTION_TYPE.ALL">
-      <TransactionAll :chain="chain" />
+      <TransactionAll :chain="chain" :address="address" />
     </div>
     <div v-show="txType === TRANSACTION_TYPE.TRANSFERS">
       <TransactionsTransfers :address="address" :chain="chain" />
