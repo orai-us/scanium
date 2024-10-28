@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { reactive } from "vue";
 import Pagination from "../pagination/Pagination.vue";
 import { shortenTxHash } from "@/utils";
+import TransactionTable from "../TransactionTable.vue";
 
 const props = defineProps(['txs', 'chain', 'address'])
 const format = useFormatter();
@@ -153,8 +154,18 @@ const { result, refetch } = useQuery(query, variables);
 
 watchEffect(() => {
   if (result.value) {
-    console.log({data: result.value.transactions.results})
-    transactions.value = result.value.transactions.results;
+    const data = result.value.transactions.results;
+    transactions.value = data.map((item: any) => ({
+      txhash: shortenTxHash(item?.id),
+      result: "Success",
+      message: format.messages(item.messages?.nodes.map((item: any) =>
+        ({ "@type": item.type, typeUrl: item.type })
+      )),
+      height: item.blockNumber,
+      amount: 0,
+      fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
+      timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
+    }));
     totalCount.value = result.value.transactions.totalCount;
   }
 })
@@ -167,47 +178,6 @@ function handlePagination(page: number) {
 </script>
 
 <template>
-  <div>
-    <table class="table table-compact w-full text-sm">
-      <thead>
-        <tr>
-          <th>Tx Hash</th>
-          <th>Result</th>
-          <th>Message</th>
-          <th>Height</th>
-          <th>Amount</th>
-          <th>Fee</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(tx) in transactions" :key="tx.id">
-          <td class="truncate text-link">
-            <RouterLink :to="`/${props.chain}/tx/${tx.id}`">
-              {{ shortenTxHash(tx.id) }}
-            </RouterLink>
-          </td>
-          <td>Success</td>
-          <td>
-            <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">{{
-              format.messages(tx.messages?.nodes.map((item: any) =>
-                ({ "@type": item.type, typeUrl: item.type })
-              )) }}</span>
-          </td>
-          <td class="truncate text-link">
-            <RouterLink :to="`/${props.chain}/block/${tx.blockNumber}`">
-              {{ tx.blockNumber }}
-            </RouterLink>
-          </td>
-          <td>{{ tx.gasUsed }}</td>
-          <!-- <td>{{ tx.fee[0]?.amount/10e6 }} {{ tx.fee[0]?.denom?.toUpperCase()}}</td> -->
-          <td>0.000076 ORAI</td>
-          <td>{{ format.toLocaleDate(new Date(Number(tx.timestamp))) }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="text-center mt-4">
-      <Pagination :totalItems="totalCount" :limit="pagination.limit" :onPagination="handlePagination" />
-    </div>
-  </div>
+  <TransactionTable :transaction="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
+    :handlePagination="handlePagination" />
 </template>

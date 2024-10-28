@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import Pagination from './pagination/Pagination.vue';
 
-const props = defineProps(['transaction', 'chain', 'txTotal', 'pagination', 'handlePagination']);
+const props = defineProps(['transactions', 'chain', 'txTotal', 'pagination', 'handlePagination']);
 </script>
 
 <template>
   <div class="overflow-x-auto">
-    <table class="table w-full text-sm">
+    <table class="table w-full text-sm" v-if="transactions?.length > 0">
       <thead>
         <tr>
           <th>Tx Hash</th>
@@ -19,14 +19,14 @@ const props = defineProps(['transaction', 'chain', 'txTotal', 'pagination', 'han
         </tr>
       </thead>
       <tbody class="text-sm">
-        <tr v-if="transaction?.length === 0">
+        <tr v-if="transactions?.length === 0">
           <td colspan="10">
             <div class="text-center">
               {{ $t('account.no_transactions') }}
             </div>
           </td>
         </tr>
-        <tr v-for="(v, index) in transaction" :key="index">
+        <tr v-for="(v, index) in transactions" :key="index">
           <td class="truncate py-3" style="max-width: 200px">
             <RouterLink :to="`/${chain}/tx/${v.txhash}`" class="text-primary dark:text-link">
               {{ v.txhash }}
@@ -54,6 +54,9 @@ const props = defineProps(['transaction', 'chain', 'txTotal', 'pagination', 'han
         </tr>
       </tbody>
     </table>
+    <div v-else class="flex items-center justify-center w-full h-full">
+      <td>No Transactions</td>
+    </div>
   </div>
 
   <div class="mt-4 text-center" v-if="txTotal">
