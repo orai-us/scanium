@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import { useFormatter } from "@/stores";
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
-import Pagination from "../pagination/Pagination.vue";
 import { shortenTxHash } from "@/utils";
 import TransactionTable from "../TransactionTable.vue";
 
-const props = defineProps(['txs', 'chain','address'])
+const props = defineProps(['txs', 'chain', 'address'])
 const format = useFormatter();
 
 const TRANSACTION_TYPE = {
@@ -66,7 +65,7 @@ const variables = computed(() => {
     first: pagination.limit,
     offset: pagination.offset
   }
-}) 
+})
 
 const { result, refetch } = useQuery(query, variables);
 
@@ -77,8 +76,8 @@ watchEffect(() => {
       txhash: shortenTxHash(item?.id),
       result: "Success",
       message: format.messages(item.messages?.nodes.map((item: any) =>
-                ({ "@type": item.type, typeUrl: item.type })
-              )),
+        ({ "@type": item.type, typeUrl: item.type })
+      )),
       height: item.blockNumber,
       amount: 0,
       fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
@@ -97,11 +96,15 @@ function handlePagination(page: number) {
 
 <template>
   <div class="box-content flex flex-col gap-4">
-    <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
+    <!-- <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
       <a v-for="(value) of TRANSACTION_TYPE" class="tab text-gray-400 capitalize !pb-3" :key="value"
         :class="{ 'tab-active': tabTransaction === value }" @click="tabTransaction = value">{{ value }}</a>
-    </div>
+    </div> -->
 
-    <TransactionTable :transaction="transactions" :chain="chain" :txTotal="txTotal" :pagination="pagination" :handlePagination="handlePagination" />
+    <h2 class="card-title truncate w-full">
+      Transaction
+    </h2>
+    <TransactionTable :transaction="transactions" :chain="chain" :txTotal="txTotal" :pagination="pagination"
+      :handlePagination="handlePagination" />
   </div>
 </template>

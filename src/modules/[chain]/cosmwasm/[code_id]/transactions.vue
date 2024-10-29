@@ -22,7 +22,9 @@ import type { Coin } from '@cosmjs/stargate';
 import type { QueryAllContractStateResponse } from 'cosmjs-types/cosmwasm/wasm/v1/query';
 import type { ContractInfo } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import 'vue3-json-viewer/dist/index.css';
+import TransactionContract from '@/components/contracts/TransactionContract.vue';
 
+const props = defineProps(['chain'])
 const chainStore = useBlockchain();
 const baseStore = useBaseStore();
 const format = useFormatter();
@@ -152,7 +154,7 @@ const query = ref('');
 const result = ref({});
 </script>
 <template>
-  <div>
+  <div class="p-5">
     <div class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4 shadow">
       <h2 class="card-title truncate w-full">
         {{ $t('cosmwasm.contract_detail') }}
@@ -221,7 +223,9 @@ const result = ref({});
       </label>
     </div>
 
-    <div class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4 shadow">
+    <TransactionContract :chain="chain" :address="String(route.query.contract)"/>
+
+    <!-- <div class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4 shadow">
       <h2 class="card-title truncate w-full mt-4">Transactions</h2>
       <table class="table">
         <thead>
@@ -263,11 +267,11 @@ const result = ref({});
         :total="txs.totalCount.toString()"
         :callback="pageload"
       />
-    </div>
+    </div> -->
 
-    <WasmVerification :contract="contractAddress" />
+    <!-- <WasmVerification :contract="contractAddress" /> -->
 
-    <div>
+    <!-- <div>
       <input type="checkbox" id="modal-contract-funds" class="modal-toggle" />
       <label for="modal-contract-funds" class="modal cursor-pointer">
         <label class="modal-box relative p-2" for="">
@@ -401,6 +405,6 @@ const result = ref({});
           </div>
         </label>
       </label>
-    </div>
+    </div> -->
   </div>
 </template>
