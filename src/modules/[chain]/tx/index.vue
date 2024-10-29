@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import { shortenTxHash } from '@/utils';
+import { Icon } from '@iconify/vue';
 import { computed, ref, toRaw, watch, watchEffect } from 'vue';
 const props = defineProps(['chain']);
 
@@ -25,7 +26,7 @@ watch(transactions, () => {
 
 <template>
   <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl">
-    <div class="bg-base-100 overflow-x-auto rounded-2xl px-5">
+    <div class="bg-base-100 overflow-x-auto rounded-2xl px-5 pt-5">
       <table class="table w-full table-compact">
         <thead class="border border-base-200">
           <tr>
@@ -56,14 +57,12 @@ watch(transactions, () => {
               }}</RouterLink>
             </td>
             <td>
-              <span class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center" :class="`${detailTxs[item.hash]?.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
-                }`">
-                <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
+              <span class="text-xs truncate relative py-2 w-fit rounded inline-flex items-center" :class="`${detailTxs[item.hash]?.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
+                }`" v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
+                <!-- <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp; -->
                 {{ detailTxs[item.hash]?.txResponse.code === 0 ? 'Success' : 'Failed' }}
               </span>
-              <span>
-                {{ detailTxs[item.hash]?.txResponse.code === 0 ? '' : detailTxs[item.hash]?.txResponse?.rawLog }}
-              </span>
+              <span v-else>-</span>
             </td>
             <td>
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">
@@ -78,9 +77,12 @@ watch(transactions, () => {
               }}</RouterLink>
             </td>
             <td>
+             <span v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
               {{ format.toLocaleDate(detailTxs[item.hash]?.txResponse?.timestamp) }} ({{
                 format.toDay(detailTxs[item.hash]?.txResponse?.timestamp, 'from')
               }})
+             </span> 
+             <span v-else>-</span>
             </td>
           </tr>
         </tbody>
