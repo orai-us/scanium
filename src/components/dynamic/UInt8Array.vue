@@ -1,16 +1,15 @@
 <script lang="ts" setup>
 import { useBaseStore } from '@/stores';
 import { JsonViewer } from 'vue3-json-viewer';
-import { fromAscii, toBase64, toHex } from '@cosmjs/encoding';
-import { computed } from '@vue/reactivity';
-import { ref } from 'vue';
+import { toBase64, toHex } from '@cosmjs/encoding';
 import { parseJSONRecursive } from '@/libs/utils';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
+import { computed, ref } from 'vue';
 
 const baseStore = useBaseStore();
 
 const props = defineProps(['value']);
-const format = ref('base64');
+const format = ref('utf8');
 const text = computed(() => {
   switch (format.value) {
     case 'hex':
