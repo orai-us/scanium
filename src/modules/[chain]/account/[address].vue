@@ -7,7 +7,7 @@ import {
   useWalletStore,
 } from '@/stores';
 import DonutChart from '@/components/charts/DonutChart.vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
 import { Icon } from '@iconify/vue';
 
 import {
@@ -44,10 +44,18 @@ const unbonding = ref([] as UnbondingDelegation[]);
 const unbondingTotal = ref(0);
 const supportedAssets = ref(true)
 
+
+watch(unbonding, ()=>{
+  console.log({ unbonding: toRaw(unbonding) })
+})
+
 const chart = {};
 onMounted(() => {
   loadAccount(props.address);
 });
+watchEffect(() => {
+  loadAccount(props.address);
+})
 const totalAmountByCategory = computed(() => {
   let sumDel = 0;
   delegations.value?.forEach((x) => {
@@ -149,7 +157,6 @@ function loadAccount(address: string) {
   });
   blockchain.rpc.getStakingDelegations(address).then((x) => {
     delegations.value = x.delegationResponses;
-    console.log({ delegations: x.delegationResponses })
   });
   blockchain.rpc.getBankBalances(address).then((x) => {
     balances.value = x;
@@ -291,10 +298,10 @@ function changeStatusSupported(supported: boolean) {
                 </div>
                 <div class="text-xs">
                   {{
-                    format.calculatePercent(
-                      delegationItem?.balance?.amount,
-                      totalAmount
-                    )
+                  format.calculatePercent(
+                  delegationItem?.balance?.amount,
+                  totalAmount
+                  )
                   }}
                 </div>
               </div>
@@ -321,7 +328,7 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span
                   class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)] text-sm"></span>${{
-                    format.tokenValue(rewardItem, 1e18) }}
+                format.tokenValue(rewardItem, 1e18) }}
               </div>
             </div>
             <!-- mdi-account-arrow-right -->
@@ -333,13 +340,13 @@ function changeStatusSupported(supported: boolean) {
               <div class="flex-1">
                 <div class="text-sm font-semibold">
                   {{
-                    format.formatToken2(
-                      {
-                        amount: String(unbondingTotal),
-                        denom: stakingStore.params.bondDenom,
-                      },
-                      1e18
-                    )
+                  format.formatToken2(
+                  {
+                  amount: String(unbondingTotal),
+                  denom: stakingStore.params.bondDenom,
+                  },
+                  1e18
+                  )
                   }}
                 </div>
                 <div class="text-xs">
@@ -349,20 +356,20 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)]"></span>
                 ${{
-                  format.tokenValue(
-                    {
-                      amount: String(unbondingTotal),
-                      denom: stakingStore.params.bondDenom,
-                    },
-                    1e18
-                  )
+                format.tokenValue(
+                {
+                amount: String(unbondingTotal),
+                denom: stakingStore.params.bondDenom,
+                },
+                1e18
+                )
                 }}
               </div>
             </div>
           </div>
           <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
             {{ $t('account.total_value') }}: ${{
-              totalValue ? totalValue : 0
+            totalValue ? totalValue : 0
             }}
           </div>
         </div>
@@ -375,17 +382,21 @@ function changeStatusSupported(supported: boolean) {
         <h2 class="card-title mb-4 text-white">
           {{ $t('account.delegations') }}
         </h2>
-        <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
-          <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
-            @click="dialog.open('delegate', {}, updateEvent)">{{ $t('account.btn_delegate') }}</label>
-          <label for="withdraw" class="btn btn-third-sm btn-sm" @click="dialog.open('withdraw', {}, updateEvent)">Claim
-            Reward</label>
+        <div>
+          <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
+            <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
+              @click="dialog.open('delegate', {}, updateEvent)">{{ $t('account.btn_delegate') }}</label>
+            <label for="withdraw" class="btn btn-third-sm btn-sm"
+              @click="dialog.open('withdraw', {}, updateEvent)">Claim
+              Reward</label>
+          </div>
+          <div v-if="!walletStore.currentAddress">
+            <label
+              class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm"
+              :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''">Connect wallet</label>
+          </div>
         </div>
-        <div v-if="!walletStore.currentAddress">
-          <label
-            class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm"
-            :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''">Connect wallet</label>
-        </div>
+
       </div>
       <div class="overflow-x-auto">
         <table class="table w-full text-sm table-zebra">
@@ -417,54 +428,58 @@ function changeStatusSupported(supported: boolean) {
               </td>
               <td class="py-3">
                 {{
-                  format.formatTokens(
-                    rewards?.rewards?.find(
-                      (x) =>
-                        x.validatorAddress === v.delegation.validatorAddress
-                    )?.reward,
-                    undefined,
-                    undefined,
-                    undefined,
-                    1e18
-                  )
+                format.formatTokens(
+                rewards?.rewards?.find(
+                (x) =>
+                x.validatorAddress === v.delegation.validatorAddress
+                )?.reward,
+                undefined,
+                undefined,
+                undefined,
+                1e18
+                )
                 }}
               </td>
               <td class="py-3">
-                <div v-if="v.balance && walletStore.currentAddress" class="flex justify-end">
-                  <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2" @click="
-                    dialog.open(
-                      'delegate',
-                      {
-                        validator_address: v.delegation.validatorAddress,
-                      },
-                      updateEvent
-                    )
-                    ">{{ $t('account.btn_delegate') }}</label>
-                  <label for="redelegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
-                    @click="
+                <div v-if="walletStore.currentAddress === address">
+                  <div v-if="v.balance && walletStore.currentAddress" class="flex justify-start">
+                    <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
+                      @click="
+                        dialog.open(
+                          'delegate',
+                          {
+                            validator_address: v.delegation.validatorAddress,
+                          },
+                          updateEvent
+                        )
+                        ">{{ $t('account.btn_delegate') }}</label>
+                    <label for="redelegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
+                      @click="
+                        dialog.open(
+                          'redelegate',
+                          {
+                            validator_address: v.delegation.validatorAddress,
+                          },
+                          updateEvent
+                        )
+                        ">{{ $t('account.btn_redelegate') }}</label>
+                    <label for="unbond" class="text-link cursor-pointer hover:brightness-150 font-semibold" @click="
                       dialog.open(
-                        'redelegate',
+                        'unbond',
                         {
                           validator_address: v.delegation.validatorAddress,
                         },
                         updateEvent
                       )
-                      ">{{ $t('account.btn_redelegate') }}</label>
-                  <label for="unbond" class="text-link cursor-pointer hover:brightness-150 font-semibold" @click="
-                    dialog.open(
-                      'unbond',
-                      {
-                        validator_address: v.delegation.validatorAddress,
-                      },
-                      updateEvent
-                    )
-                    ">{{ $t('account.btn_unbond') }}</label>
+                      ">{{ $t('account.btn_unbond') }}</label>
+                  </div>
+                  <div v-if="!walletStore.currentAddress">
+                    <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
+                      class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Connect
+                      wallet</label>
+                  </div>
                 </div>
-                <div v-if="!walletStore.currentAddress">
-                  <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
-                    class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Connect
-                    wallet</label>
-                </div>
+
               </td>
             </tr>
           </tbody>
@@ -482,27 +497,23 @@ function changeStatusSupported(supported: boolean) {
         <table class="table text-sm w-full">
           <thead>
             <tr>
-              <th class="py-3">{{ $t('account.creation_height') }}</th>
-              <th class="py-3">{{ $t('account.initial_balance') }}</th>
-              <th class="py-3">{{ $t('account.balance') }}</th>
-              <th class="py-3">{{ $t('account.completion_time') }}</th>
+              <th class="py-3">Validator</th>
+              <th class="py-3">Amount</th>
+              <th class="py-3">Unbond Completed By</th>
             </tr>
           </thead>
           <tbody class="text-sm" v-for="(v, index) in unbonding" :key="index">
             <tr>
-              <td class="text-caption text-primary py-3 bg-slate-200" colspan="10">
+              <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
                   v.validatorAddress
                   }}</RouterLink>
               </td>
-            </tr>
-            <tr v-for="entry in v.entries">
-              <td class="py-3">{{ entry.creationHeight }}</td>
-              <td class="py-3">
+              <td class="text-caption py-3">
                 {{
                   format.formatToken(
                     {
-                      amount: entry.initialBalance,
+                      amount: v.entries[0]?.initialBalance,
                       denom: stakingStore.params.bondDenom,
                     },
                     true,
@@ -510,18 +521,36 @@ function changeStatusSupported(supported: boolean) {
                   )
                 }}
               </td>
+              <td class="text-caption py-3">
+                {{ new Date(Number(v.entries[0]?.completionTime?.seconds)  * 1000).toISOString() }}
+              </td>
+            </tr>
+            <!-- <tr v-for="entry in v.entries">
+              <td class="py-3">{{ entry.creationHeight }}</td>
               <td class="py-3">
                 {{
-                  format.formatToken(
-                    {
-                      amount: entry.balance,
-                      denom: stakingStore.params.bondDenom,
-                    },
-                    true,
-                    '0,0.[00]',
-                    undefined,
-                    1e18
-                  )
+                format.formatToken(
+                {
+                amount: entry.initialBalance,
+                denom: stakingStore.params.bondDenom,
+                },
+                true,
+                '0,0.[00]'
+                )
+                }}
+              </td>
+              <td class="py-3">
+                {{
+                format.formatToken(
+                {
+                amount: entry.balance,
+                denom: stakingStore.params.bondDenom,
+                },
+                true,
+                '0,0.[00]',
+                undefined,
+                1e18
+                )
                 }}
               </td>
               <td class="py-3">
@@ -530,7 +559,7 @@ function changeStatusSupported(supported: boolean) {
                   new Date().getTime()
                   " />
               </td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </div>

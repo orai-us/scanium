@@ -3,7 +3,6 @@ import { TxsHistory } from '@/libs/client';
 import { useFormatter } from '@/stores';
 import { onMounted, reactive, ref, watch } from 'vue';
 import { getHistoryTxs } from '@/service/transactionsService';
-import Pagination from '../pagination/Pagination.vue';
 import { shortenTxHash } from '@/utils';
 import TransactionTable from '../TransactionTable.vue';
 
