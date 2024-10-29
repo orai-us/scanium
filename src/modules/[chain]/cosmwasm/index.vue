@@ -30,9 +30,6 @@ function pageload(pageNum: number, nextKey?: Uint8Array) {
     codeIds.value = x?.codeInfos.map(item => item.codeId.toString())
   });
 }
-watchEffect(() => {
-  console.log({ contracts: toRaw(contracts.value) })
-})
 
 watch(codeIds, () => {
   for (let codeId of codeIds.value) {
