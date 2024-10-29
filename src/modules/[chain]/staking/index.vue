@@ -438,7 +438,7 @@ function handleSortList(validator: any[], sortDescription: any){
           change24hSort
         }
       }).sort((a, b) => {
-        if (a.change24hSort > b.change24hSort) return sortDescription.type === SORT_TYPE.ASC ? -1 : 1
+        if (Number(a.change24hSort) > Number(b.change24hSort)) return sortDescription.type === SORT_TYPE.ASC ? -1 : 1
         return sortDescription.type === SORT_TYPE.ASC ? 1 : -1
       })
       break;
@@ -648,22 +648,22 @@ function handleSortList(validator: any[], sortDescription: any){
                   <div class="flex flex-col">
                     <h6 class="text-sm font-weight-medium whitespace-nowrap">
                       {{
-                        format.formatToken(
-                          {
-                            amount: parseInt(v.tokens).toString(),
-                            denom: staking.params.bondDenom,
-                          },
-                          true,
-                          '0,0'
-                        )
+                      format.formatToken(
+                      {
+                      amount: parseInt(v.tokens).toString(),
+                      denom: staking.params.bondDenom,
+                      },
+                      true,
+                      '0,0'
+                      )
                       }}
                     </h6>
                     <span class="text-xs">{{
                       format.calculatePercent(
-                        v.delegatorShares,
-                        staking.totalPower
+                      v.delegatorShares,
+                      staking.totalPower
                       )
-                    }}</span>
+                      }}</span>
                   </div>
                 </td>
                 <!-- 👉 Uptime  -->
@@ -677,7 +677,7 @@ function handleSortList(validator: any[], sortDescription: any){
                 </td>
                 <!-- 👉 24h Changes -->
                 <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
-                  {{change24h }}-{{ change24Text(v.consensusPubkey) }}
+                  {{ change24h }}
                 </td>
                 <!-- 👉 commission -->
                 <td class="text-right text-xs">
