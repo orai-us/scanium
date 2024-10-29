@@ -223,7 +223,7 @@ const result = ref({});
       </label>
     </div>
 
-    <TransactionContract :chain="chain" :address="String(route.query.contract)"/>
+    <TransactionContract :chain="chain" :address="contractAddress"/>
 
     <!-- <div class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4 shadow">
       <h2 class="card-title truncate w-full mt-4">Transactions</h2>

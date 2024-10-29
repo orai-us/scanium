@@ -87,7 +87,7 @@ function myContracts() {
             <th>{{ $t('cosmwasm.code_id') }}</th>
             <th>{{ $t('cosmwasm.code_hash') }}</th>
             <th>{{ $t('cosmwasm.creator') }}</th>
-            <th>Contract</th>
+            <th>Contracts</th>
             <th class="text-right">{{ $t('cosmwasm.permissions') }}</th>
             <th>Action</th>
           </tr>

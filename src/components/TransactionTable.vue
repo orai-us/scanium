@@ -13,7 +13,6 @@ const props = defineProps(['transactions', 'chain', 'txTotal', 'pagination', 'ha
           <th>Result</th>
           <th>Message</th>
           <th>Height</th>
-          <th>Amount</th>
           <th>Fee</th>
           <th>Time</th>
         </tr>
@@ -43,10 +42,6 @@ const props = defineProps(['transactions', 'chain', 'txTotal', 'pagination', 'ha
               v.height }}
             </RouterLink>
           </td>
-          <td class="py-3">
-            <span v-if="v.timestamp" class="text-xs">{{ v.amount }}</span>
-          </td>
-
           <td class="py-3">
             <span v-if="v.timestamp" class="text-xs">{{ v.fee }}</span>
           </td>
