@@ -13,7 +13,6 @@ import {
 } from '@/stores';
 import { PageRequest } from '@/types';
 import { fromBech32, toHex } from '@cosmjs/encoding';
-import { computed } from '@vue/reactivity';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 import type { Params } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import type { Proposal, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
@@ -29,7 +28,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
@@ -421,7 +420,7 @@ function metaItem(metadata: string | undefined): {
               <td v-if="item.options" class="py-2 text-sm">
                 {{
                   item.options
-                    .map((x) => {
+                    .map((x:any) => {
                       const result = `${voteOptionToJSON(x.option)
                         .toLowerCase()
                         .replace(/^vote_option/, '')

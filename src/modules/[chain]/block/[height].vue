@@ -1,8 +1,6 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
-import TxsElement from '@/components/dynamic/TxsElement.vue';
-import { computed } from '@vue/reactivity';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useBaseStore, useFormatter } from '@/stores';
 import Countdown from '@/components/Countdown.vue';

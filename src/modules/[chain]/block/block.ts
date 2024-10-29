@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { decodeTxRaw, type DecodedTxRaw } from '@cosmjs/proto-signing';
 import { useBlockchain } from '@/stores';
 import { hashTx } from '@/libs';
-import type { Block } from '@/types';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
 
 export const useBlockModule = defineStore('blockModule', {

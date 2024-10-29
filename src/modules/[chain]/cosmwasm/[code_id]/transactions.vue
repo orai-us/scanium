@@ -8,7 +8,7 @@ import {
   useTxDialog,
 } from '@/stores';
 import { PageRequest } from '@/types';
-import { toBase64, toHex } from '@cosmjs/encoding';
+import { toHex } from '@cosmjs/encoding';
 import { Icon } from '@iconify/vue';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';

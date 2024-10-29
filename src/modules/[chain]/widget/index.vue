@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
-import type { Connection } from '@/types';
 import { computed } from 'vue';
-import { onMounted } from 'vue';
 import { ref } from 'vue';
 
 const props = defineProps(['chain']);
