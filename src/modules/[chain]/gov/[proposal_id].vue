@@ -13,7 +13,6 @@ import {
 } from '@/stores';
 import { PageRequest } from '@/types';
 import { fromBech32, toHex } from '@cosmjs/encoding';
-import { computed } from '@vue/reactivity';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 import type { Params } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import type { Proposal, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
@@ -29,7 +28,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
@@ -208,7 +207,7 @@ const processList = computed(() => {
     { name: 'Turnout', value: turnout.value, class: 'bg-info' },
     { name: 'Yes', value: yes.value, class: 'bg-success' },
     { name: 'No', value: no.value, class: 'bg-error' },
-    { name: 'Vote', value: veto.value, class: 'bg-red-800' },
+    { name: 'Veto', value: veto.value, class: 'bg-red-800' },
     { name: 'Abstain', value: abstain.value, class: 'bg-warning' },
   ];
 });
@@ -275,12 +274,21 @@ function metaItem(metadata: string | undefined): {
         </h2>
         <div class="mb-1" v-for="(item, index) of processList" :key="index">
           <label class="block text-sm mb-1">{{ item.name }}</label>
-          <div class="h-5 w-full relative mb-3">
-            <div class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm" :class="`${item.class}`"></div>
-            <div class="absolute inset-x-0 inset-y-0 rounded-sm" :class="`${item.class}`" :style="`width: ${item.value === '-' || item.value === 'NaN%' ? '0%' : item.value
-              }, max-width: 100%`"></div>
+          <div class="h-5 w-full relative">
+            <div
+              class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm"
+              :class="`${item.class}`"
+            ></div>
+            <div
+              class="absolute inset-x-0 inset-y-0 rounded-sm"
+              :class="`${item.class}`"
+              :style="`width: ${
+                item.value === '-' || item.value === 'NaN%' ? '0%' : item.value
+              }`"
+            ></div>
             <p
-              class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center">
+              class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center"
+            >
               {{ item.value }}
             </p>
           </div>
@@ -421,7 +429,7 @@ function metaItem(metadata: string | undefined): {
               <td v-if="item.options" class="py-2 text-sm">
                 {{
                   item.options
-                    .map((x) => {
+                    .map((x:any) => {
                       const result = `${voteOptionToJSON(x.option)
                         .toLowerCase()
                         .replace(/^vote_option/, '')
