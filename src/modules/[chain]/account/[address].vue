@@ -77,8 +77,18 @@ const totalAmount = computed(() => {
 });
 
 const balanceResult = computed(() => {
-  if (supportedAssets.value) return balances.value.filter(item => item.denom.length < 10 && item)
-  return balances.value.filter(item => item.denom.length >= 10 && item)
+  const balancesNew = balances.value.map((item) => {
+    const denom = format.formatToken(item).split(" ")[1];
+    let amount = (Number(item.amount) / 1e6).toString();
+    if (denom === "ORAI") amount = (Number(item.amount)).toString();
+    return { ...item, denom: denom.toLowerCase(), amount }
+  })
+  if (supportedAssets.value) return balancesNew.filter(item => {
+    return item.denom.length < 8
+  })
+  return balancesNew.filter(item => {
+    return item.denom.length >= 8
+  })
 })
 
 const delegationResult = computed(() => {
@@ -91,25 +101,28 @@ const rewardTotal = computed(() => {
   return rewards.value.total?.filter(item => item.denom.length >= 10 && item)
 })
 
-const unbondingTotalDisplay = computed(()=>{
+const unbondingTotalDisplay = computed(() => {
   return (supportedAssets.value && stakingStore.params.bondDenom?.length < 10) || (!supportedAssets.value && stakingStore.params.bondDenom?.length > 10)
 })
 
 
 const totalValue = computed(() => {
-  let value = 0;
+  let value1 = 0;
+  let value2 = 0;
+  let value3 = 0;
+  let value4 = 0;
   delegationResult.value?.forEach((x) => {
-    value += format.tokenValueNumber(x.balance, 1e18);
+    value1 += format.tokenValueNumber(x.balance, 1e0);
   });
   rewardTotal.value?.forEach((x) => {
-    value += format.tokenValueNumber(x, 1e18);
+    value2 += format.tokenValueNumber(x, 1e18);
   });
   balanceResult.value?.forEach((x) => {
-    value += format.tokenValueNumber(x, 1e18);
+    value3 += format.tokenValueNumber(x, 1e0);
   });
   unbonding.value?.forEach((x) => {
     x.entries?.forEach((y) => {
-      value += format.tokenValueNumber(
+      value4 += format.tokenValueNumber(
         {
           amount: y.balance,
           denom: stakingStore.params.bondDenom,
@@ -118,7 +131,10 @@ const totalValue = computed(() => {
       );
     });
   });
-  return format.formatNumber(value, '0,0.00');
+  let value = value1 + value2 + value3 + value4;
+
+  return format.formatNumber(value, '0,0.00')
+    ;
 });
 
 function loadAccount(address: string) {
@@ -130,7 +146,6 @@ function loadAccount(address: string) {
   });
   blockchain.rpc.getDistributionDelegatorRewards(address).then((x) => {
     rewards.value = x;
-    console.log({ rewards: x })
   });
   blockchain.rpc.getStakingDelegations(address).then((x) => {
     delegations.value = x.delegationResponses;
@@ -276,10 +291,10 @@ function changeStatusSupported(supported: boolean) {
                 </div>
                 <div class="text-xs">
                   {{
-                  format.calculatePercent(
-                  delegationItem?.balance?.amount,
-                  totalAmount
-                  )
+                    format.calculatePercent(
+                      delegationItem?.balance?.amount,
+                      totalAmount
+                    )
                   }}
                 </div>
               </div>
@@ -306,7 +321,7 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span
                   class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)] text-sm"></span>${{
-                format.tokenValue(rewardItem, 1e18) }}
+                    format.tokenValue(rewardItem, 1e18) }}
               </div>
             </div>
             <!-- mdi-account-arrow-right -->
@@ -318,13 +333,13 @@ function changeStatusSupported(supported: boolean) {
               <div class="flex-1">
                 <div class="text-sm font-semibold">
                   {{
-                  format.formatToken2(
-                  {
-                  amount: String(unbondingTotal),
-                  denom: stakingStore.params.bondDenom,
-                  },
-                  1e18
-                  )
+                    format.formatToken2(
+                      {
+                        amount: String(unbondingTotal),
+                        denom: stakingStore.params.bondDenom,
+                      },
+                      1e18
+                    )
                   }}
                 </div>
                 <div class="text-xs">
@@ -334,20 +349,20 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)]"></span>
                 ${{
-                format.tokenValue(
-                {
-                amount: String(unbondingTotal),
-                denom: stakingStore.params.bondDenom,
-                },
-                1e18
-                )
+                  format.tokenValue(
+                    {
+                      amount: String(unbondingTotal),
+                      denom: stakingStore.params.bondDenom,
+                    },
+                    1e18
+                  )
                 }}
               </div>
             </div>
           </div>
           <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
             {{ $t('account.total_value') }}: ${{
-            totalValue && !isNaN(Number(totalValue)) ? totalValue : 0
+              totalValue ? totalValue : 0
             }}
           </div>
         </div>
@@ -363,7 +378,8 @@ function changeStatusSupported(supported: boolean) {
         <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
           <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
             @click="dialog.open('delegate', {}, updateEvent)">{{ $t('account.btn_delegate') }}</label>
-          <label for="withdraw" class="btn btn-third-sm btn-sm" @click="dialog.open('withdraw', {}, updateEvent)">Claim Reward</label>
+          <label for="withdraw" class="btn btn-third-sm btn-sm" @click="dialog.open('withdraw', {}, updateEvent)">Claim
+            Reward</label>
         </div>
         <div v-if="!walletStore.currentAddress">
           <label
@@ -401,28 +417,28 @@ function changeStatusSupported(supported: boolean) {
               </td>
               <td class="py-3">
                 {{
-                format.formatTokens(
-                rewards?.rewards?.find(
-                (x) =>
-                x.validatorAddress === v.delegation.validatorAddress
-                )?.reward,
-                undefined,
-                undefined,
-                undefined,
-                1e18
-                )
+                  format.formatTokens(
+                    rewards?.rewards?.find(
+                      (x) =>
+                        x.validatorAddress === v.delegation.validatorAddress
+                    )?.reward,
+                    undefined,
+                    undefined,
+                    undefined,
+                    1e18
+                  )
                 }}
               </td>
               <td class="py-3">
                 <div v-if="v.balance && walletStore.currentAddress" class="flex justify-end">
                   <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2" @click="
-                      dialog.open(
-                        'delegate',
-                        {
-                          validator_address: v.delegation.validatorAddress,
-                        },
-                        updateEvent
-                      )
+                    dialog.open(
+                      'delegate',
+                      {
+                        validator_address: v.delegation.validatorAddress,
+                      },
+                      updateEvent
+                    )
                     ">{{ $t('account.btn_delegate') }}</label>
                   <label for="redelegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
                     @click="
@@ -433,15 +449,15 @@ function changeStatusSupported(supported: boolean) {
                         },
                         updateEvent
                       )
-                    ">{{ $t('account.btn_redelegate') }}</label>
+                      ">{{ $t('account.btn_redelegate') }}</label>
                   <label for="unbond" class="text-link cursor-pointer hover:brightness-150 font-semibold" @click="
-                      dialog.open(
-                        'unbond',
-                        {
-                          validator_address: v.delegation.validatorAddress,
-                        },
-                        updateEvent
-                      )
+                    dialog.open(
+                      'unbond',
+                      {
+                        validator_address: v.delegation.validatorAddress,
+                      },
+                      updateEvent
+                    )
                     ">{{ $t('account.btn_unbond') }}</label>
                 </div>
                 <div v-if="!walletStore.currentAddress">
@@ -484,35 +500,34 @@ function changeStatusSupported(supported: boolean) {
               <td class="py-3">{{ entry.creationHeight }}</td>
               <td class="py-3">
                 {{
-                format.formatToken(
-                {
-                amount: entry.initialBalance,
-                denom: stakingStore.params.bondDenom,
-                },
-                true,
-                '0,0.[00]'
-                )
+                  format.formatToken(
+                    {
+                      amount: entry.initialBalance,
+                      denom: stakingStore.params.bondDenom,
+                    },
+                    true,
+                    '0,0.[00]'
+                  )
                 }}
               </td>
               <td class="py-3">
                 {{
-                format.formatToken(
-                {
-                amount: entry.balance,
-                denom: stakingStore.params.bondDenom,
-                },
-                true,
-                '0,0.[00]',
-                undefined,
-                1e18
-                )
+                  format.formatToken(
+                    {
+                      amount: entry.balance,
+                      denom: stakingStore.params.bondDenom,
+                    },
+                    true,
+                    '0,0.[00]',
+                    undefined,
+                    1e18
+                  )
                 }}
               </td>
               <td class="py-3">
-                <Countdown :time="
-                    entry.completionTime &&
-                    fromTimestamp(entry.completionTime).getTime() -
-                      new Date().getTime()
+                <Countdown :time="entry.completionTime &&
+                  fromTimestamp(entry.completionTime).getTime() -
+                  new Date().getTime()
                   " />
               </td>
             </tr>
