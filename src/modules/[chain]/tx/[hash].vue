@@ -184,3 +184,10 @@ const txLogs = computed(() => {
     </div>
   </div>
 </template>
+
+<style>
+.jv-container .jv-code.boxed {
+  max-height: fit-content;
+  overflow-y: auto;
+}
+</style>
