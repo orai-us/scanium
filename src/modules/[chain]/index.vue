@@ -11,9 +11,8 @@ import {
   useStakingStore,
   useParamStore,
 } from '@/stores';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useIndexModule, colorMap } from './indexStore';
-import { computed } from '@vue/reactivity';
 
 import CardStatisticsVertical from '@/components/CardStatisticsVertical.vue';
 import CopyAddress from '@/layouts/components/CopyAddress.vue';
