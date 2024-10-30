@@ -117,11 +117,11 @@ function myContracts() {
               > -->
             </td>
             <td>
-              <label for="wasm_instantiate_contract" class="btn btn-primary" @click="
+              <label for="wasm_instantiate_contract" class="px-4 py-2 rounded-lg btn-primary hover:cursor-pointer" @click="
                 dialog.open('wasm_instantiate_contract', {
                   codeId: v.codeId,
                 })
-                " v-if="walletStore.currentAddress">{{ $t('cosmwasm.instantiate_contract') }}</label>
+                " v-if="walletStore.currentAddress">Instantiate</label>
 
               <div v-if="!walletStore.currentAddress">
                 <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"

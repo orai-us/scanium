@@ -44,8 +44,7 @@ const unbonding = ref([] as UnbondingDelegation[]);
 const unbondingTotal = ref(0);
 const supportedAssets = ref(true)
 
-
-watch(unbonding, ()=>{
+watch(unbonding, () => {
   console.log({ unbonding: toRaw(unbonding) })
 })
 
@@ -200,6 +199,10 @@ function mapAmount(events: readonly Event[]) {
 function changeStatusSupported(supported: boolean) {
   supportedAssets.value = supported
 }
+
+const isOwnerWallet = computed(() => {
+  return walletStore.currentAddress === props.address
+})
 </script>
 <template>
   <div v-if="account">
@@ -298,10 +301,10 @@ function changeStatusSupported(supported: boolean) {
                 </div>
                 <div class="text-xs">
                   {{
-                  format.calculatePercent(
-                  delegationItem?.balance?.amount,
-                  totalAmount
-                  )
+                    format.calculatePercent(
+                      delegationItem?.balance?.amount,
+                      totalAmount
+                    )
                   }}
                 </div>
               </div>
@@ -328,7 +331,7 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span
                   class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)] text-sm"></span>${{
-                format.tokenValue(rewardItem, 1e18) }}
+                    format.tokenValue(rewardItem, 1e18) }}
               </div>
             </div>
             <!-- mdi-account-arrow-right -->
@@ -340,13 +343,13 @@ function changeStatusSupported(supported: boolean) {
               <div class="flex-1">
                 <div class="text-sm font-semibold">
                   {{
-                  format.formatToken2(
-                  {
-                  amount: String(unbondingTotal),
-                  denom: stakingStore.params.bondDenom,
-                  },
-                  1e18
-                  )
+                    format.formatToken2(
+                      {
+                        amount: String(unbondingTotal),
+                        denom: stakingStore.params.bondDenom,
+                      },
+                      1e18
+                    )
                   }}
                 </div>
                 <div class="text-xs">
@@ -356,20 +359,20 @@ function changeStatusSupported(supported: boolean) {
               <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
                 <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)]"></span>
                 ${{
-                format.tokenValue(
-                {
-                amount: String(unbondingTotal),
-                denom: stakingStore.params.bondDenom,
-                },
-                1e18
-                )
+                  format.tokenValue(
+                    {
+                      amount: String(unbondingTotal),
+                      denom: stakingStore.params.bondDenom,
+                    },
+                    1e18
+                  )
                 }}
               </div>
             </div>
           </div>
           <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
             {{ $t('account.total_value') }}: ${{
-            totalValue ? totalValue : 0
+              totalValue ? totalValue : 0
             }}
           </div>
         </div>
@@ -385,9 +388,12 @@ function changeStatusSupported(supported: boolean) {
         <div>
           <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
             <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
-              @click="dialog.open('delegate', {}, updateEvent)">{{ $t('account.btn_delegate') }}</label>
+              :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
+              @click="() => { if (!isOwnerWallet) return; dialog.open('delegate', {}, updateEvent) }">{{
+                $t('account.btn_delegate') }}</label>
             <label for="withdraw" class="btn btn-third-sm btn-sm"
-              @click="dialog.open('withdraw', {}, updateEvent)">Claim
+              :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
+              @click="() => { if (!isOwnerWallet) return; dialog.open('withdraw', {}, updateEvent) }">Claim
               Reward</label>
           </div>
           <div v-if="!walletStore.currentAddress">
@@ -421,57 +427,64 @@ function changeStatusSupported(supported: boolean) {
                 <RouterLink :to="`/${chain}/staking/${v.delegation.validatorAddress}`">{{
                   format.validatorFromBech32(v.delegation.validatorAddress) ||
                   v.delegation.validatorAddress
-                  }}</RouterLink>
+                }}</RouterLink>
               </td>
               <td class="py-3">
                 {{ format.formatToken(v.balance, true, '0,0.[000000]') }}
               </td>
               <td class="py-3">
                 {{
-                format.formatTokens(
-                rewards?.rewards?.find(
-                (x) =>
-                x.validatorAddress === v.delegation.validatorAddress
-                )?.reward,
-                undefined,
-                undefined,
-                undefined,
-                1e18
-                )
+                  format.formatTokens(
+                    rewards?.rewards?.find(
+                      (x) =>
+                        x.validatorAddress === v.delegation.validatorAddress
+                    )?.reward,
+                    undefined,
+                    undefined,
+                    undefined,
+                    1e18
+                  )
                 }}
               </td>
               <td class="py-3">
-                <div v-if="walletStore.currentAddress === address">
+                <div>
                   <div v-if="v.balance && walletStore.currentAddress" class="flex justify-start">
                     <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
-                      @click="
-                        dialog.open(
-                          'delegate',
-                          {
-                            validator_address: v.delegation.validatorAddress,
-                          },
-                          updateEvent
-                        )
+                      :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'" @click="() => {
+                          if (!isOwnerWallet) return;
+                          dialog.open(
+                            'delegate',
+                            {
+                              validator_address: v.delegation.validatorAddress,
+                            },
+                            updateEvent
+                          )
+                        }
                         ">{{ $t('account.btn_delegate') }}</label>
                     <label for="redelegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
-                      @click="
-                        dialog.open(
-                          'redelegate',
-                          {
-                            validator_address: v.delegation.validatorAddress,
-                          },
-                          updateEvent
-                        )
+                      :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'" @click="() => {
+                          if (!isOwnerWallet) return;
+                          dialog.open(
+                            'redelegate',
+                            {
+                              validator_address: v.delegation.validatorAddress,
+                            },
+                            updateEvent
+                          )
+                        }
                         ">{{ $t('account.btn_redelegate') }}</label>
-                    <label for="unbond" class="text-link cursor-pointer hover:brightness-150 font-semibold" @click="
-                      dialog.open(
-                        'unbond',
-                        {
-                          validator_address: v.delegation.validatorAddress,
-                        },
-                        updateEvent
-                      )
-                      ">{{ $t('account.btn_unbond') }}</label>
+                    <label for="unbond" class="text-link cursor-pointer hover:brightness-150 font-semibold"
+                      :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'" @click="() => {
+                          if (!isOwnerWallet) return;
+                          dialog.open(
+                            'unbond',
+                            {
+                              validator_address: v.delegation.validatorAddress,
+                            },
+                            updateEvent
+                          )
+                        }
+                        ">{{ $t('account.btn_unbond') }}</label>
                   </div>
                   <div v-if="!walletStore.currentAddress">
                     <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
@@ -507,7 +520,7 @@ function changeStatusSupported(supported: boolean) {
               <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
                   v.validatorAddress
-                  }}</RouterLink>
+                }}</RouterLink>
               </td>
               <td class="text-caption py-3">
                 {{
@@ -522,7 +535,7 @@ function changeStatusSupported(supported: boolean) {
                 }}
               </td>
               <td class="text-caption py-3">
-                {{ new Date(Number(v.entries[0]?.completionTime?.seconds)  * 1000).toISOString() }}
+                {{ new Date(Number(v.entries[0]?.completionTime?.seconds) * 1000).toISOString() }}
               </td>
             </tr>
             <!-- <tr v-for="entry in v.entries">
