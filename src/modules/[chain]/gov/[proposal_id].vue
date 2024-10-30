@@ -44,11 +44,13 @@ const store = useGovStore();
 const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const chainStore = useBlockchain();
+const summary = ref()
 
 store.fetchProposal(props.proposal_id).then((res) => {
+  summary.value = res.proposal.summary;
   const proposalDetail = reactive(res.proposal);
   const changeProposal = decodeProto(
-    proposalDetail.content!
+    proposalDetail.content! as any
   ) as ParameterChangeProposal;
   Object.assign(proposalDetail.content!, changeProposal);
   // @ts-ignore
@@ -256,14 +258,24 @@ function metaItem(metadata: string | undefined): {
         </div>
       </h2>
 
-      <div v-if="proposal.content?.description">
+      <!-- <div v-if="proposal.content?.description">
         <MdEditor :model-value="format.multiLine(proposal.content?.description)" previewOnly class="md-editor-recover">
         </MdEditor>
       </div>
       <div v-if="proposalRest">
         <ObjectElement :value="proposalRest" />
+      </div> -->
+
+      <div v-if="proposal.content">
+        <ObjectElement :value="proposal.content" />
+      </div>
+      
+      <div v-if="summary && !proposal.content?.description">
+        <MdEditor :model-value="format.multiLine(summary)" previewOnly class="md-editor-recover">
+        </MdEditor>
       </div>
     </div>
+
     <!-- grid lg:!!grid-cols-3 auto-rows-max-->
     <!-- flex-col lg:!!flex-row flex -->
     <div class="gap-4 mb-4 grid lg:!!grid-cols-3 auto-rows-max">

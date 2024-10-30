@@ -934,6 +934,25 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   async getGovProposal(proposal_id: string) {
     return await this.queryClient.gov.proposal(proposal_id);
   }
+  async getGovProposal1(proposal_id: string) {
+    let data1: any, data2: any;
+    try {
+      data1 = await this.request(this.registry.gov_proposals_proposal_id, {
+        proposal_id,
+      });
+    } catch (error) {}
+
+    try {
+      data2 = await this.queryClient.gov.proposal(proposal_id);
+    } catch (error) {}
+    
+    return {
+      proposal: {
+        ...data1?.proposal,
+        ...data2?.proposal,
+      },
+    };
+  }
   async getGovProposalDeposits(proposal_id: string) {
     return this.queryClient.gov.deposits(proposal_id);
   }
