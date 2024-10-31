@@ -22,6 +22,7 @@ import type { ExtraTxResponse } from '@/libs/client';
 import type { QueryDelegationTotalRewardsResponse } from 'cosmjs-types/cosmos/distribution/v1beta1/query';
 import TransactionsHistory from '@/components/account/TransactionsHistory.vue';
 import Assets from "@/components/account/Assets.vue";
+import TransactionAccountRpc from '@/components/account/TransactionAccountRpc.vue';
 
 const props = defineProps(['address', 'chain']);
 
@@ -349,8 +350,7 @@ const isOwnerWallet = computed(() => {
     </div>
 
     <!-- Transactions -->
-    <TransactionsHistory :address="address" :chain="chain" />
-
+    <TransactionsHistory :address="address" :chain="chain" :txs="txs" />
     <!-- Received -->
     <!-- <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
       <h2 class="card-title mb-4 text-white">{{ $t('account.received') }}</h2>

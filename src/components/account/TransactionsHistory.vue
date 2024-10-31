@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import TransactionsTransfers from "./TransactionsTransfers.vue";
-import TransactionAll from "./TransactionsAll.vue";
+import TransactionAccountIndexs from './TransactionAccountIndexs.vue';
+import TransactionAccountRpc from './TransactionAccountRpc.vue';
+import { CHAIN_INDEXS } from '@/constants';
 
-const props = defineProps(['address', 'chain']);
+const props = defineProps(['address', 'chain', 'txs']);
 
 const TRANSACTION_TYPE = {
   ALL: "tx-all",
@@ -35,7 +37,12 @@ function changeTypeTx(tx: string) {
       </button>
     </div>
     <div v-show="txType === TRANSACTION_TYPE.ALL">
-      <TransactionAll :chain="chain" :address="address" />
+      <div  v-if="CHAIN_INDEXS.includes(chain)">
+        <TransactionAccountIndexs :chain="chain" :address="address" />
+      </div>
+      <div v-else>
+        <TransactionAccountRpc :address="address" :chain="chain" :txs="txs" />
+      </div>
     </div>
     <div v-show="txType === TRANSACTION_TYPE.TRANSFERS">
       <TransactionsTransfers :address="address" :chain="chain" />
