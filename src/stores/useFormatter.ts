@@ -300,6 +300,73 @@ export const useFormatter = defineStore('formatter', {
       }
       return '-';
     },
+    formatToken3(
+      token?: { denom: string; amount: string },
+      withDenom = true,
+      fmt = '0,0.[0]',
+      mode = 'local',
+      decimal?: number
+    ) {
+      if (token && token.amount && token?.denom) {
+        let amount = Number(token.amount);
+
+        if (decimal) {
+          // could be DecCoin
+          amount /= decimal;
+        }
+
+        let denom = token.denom;
+
+        let conf =
+          mode === 'local'
+            ? this.blockchain.current?.assets?.find(
+                // @ts-ignore
+                (x) => x.base === token.denom || x.base.denom === token.denom
+              )
+            : this.findGlobalAssetConfig(token.denom);
+
+        if (denom && denom.startsWith('ibc/')) {
+          conf = this.ibcMetadata[denom.replace('ibc/', '')];
+          if (!conf) {
+            this.fetchDenomMetadata(denom.replace('ibc/', ''));
+          }
+        }
+
+        if (conf) {
+          let unit = { exponent: 0, denom: '' };
+          // find the max exponent for display
+          conf.denom_units.forEach((x) => {
+            if (x.exponent >= unit.exponent) {
+              unit = x;
+            }
+          });
+          if (unit && unit.exponent > 0) {
+            amount = amount / Math.pow(10, unit.exponent || 6);
+            denom = unit.denom.toUpperCase();
+          }
+        }
+        if (amount < 0.000001) {
+          return {
+            amount: 0,
+            denom: `${denom.substring(0, 10).toLowerCase()}`,
+            amountDisplay: "0"
+          }
+        }
+        if (amount < 0.01) {
+          fmt = '0.[000000]';
+        }
+        return {
+          amount: amount,
+          denom: withDenom ? denom.substring(0, 10).toLowerCase() : '',
+          amountDisplay: `${numeral(amount).format(fmt)}`,
+        };
+      }
+      return {
+        amount: 0,
+        denom: `-`,
+        amountDisplay: '0',
+      };
+    },
     formatTokens(
       tokens?: { denom: string; amount: string }[],
       withDenom = true,

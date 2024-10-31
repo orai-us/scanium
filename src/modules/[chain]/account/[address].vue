@@ -6,16 +6,13 @@ import {
   useTxDialog,
   useWalletStore,
 } from '@/stores';
-import DonutChart from '@/components/charts/DonutChart.vue';
-import { computed, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
-import { Icon } from '@iconify/vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
 
 import {
   PageRequest,
 } from '@/types';
 
 import type { Coin } from '@cosmjs/amino';
-import Countdown from '@/components/Countdown.vue';
 import type {
   DelegationResponse,
   UnbondingDelegation,
@@ -23,9 +20,8 @@ import type {
 import { BaseAccount } from 'cosmjs-types/cosmos/auth/v1beta1/auth';
 import type { ExtraTxResponse } from '@/libs/client';
 import type { QueryDelegationTotalRewardsResponse } from 'cosmjs-types/cosmos/distribution/v1beta1/query';
-import { fromTimestamp } from 'cosmjs-types/helpers';
-import type { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionsHistory from '@/components/account/TransactionsHistory.vue';
+import Assets from "@/components/account/Assets.vue";
 
 const props = defineProps(['address', 'chain']);
 
@@ -42,107 +38,13 @@ const balances = ref([] as Coin[]);
 const recentReceived = ref([] as ExtraTxResponse[]);
 const unbonding = ref([] as UnbondingDelegation[]);
 const unbondingTotal = ref(0);
-const supportedAssets = ref(true)
 
-watch(unbonding, () => {
-  console.log({ unbonding: toRaw(unbonding) })
-})
-
-const chart = {};
 onMounted(() => {
   loadAccount(props.address);
 });
 watchEffect(() => {
   loadAccount(props.address);
 })
-const totalAmountByCategory = computed(() => {
-  let sumDel = 0;
-  delegations.value?.forEach((x) => {
-    sumDel += Number(x.balance.amount);
-  });
-  let sumRew = 0;
-  rewards.value?.total?.forEach((x) => {
-    sumRew += Number(x.amount);
-  });
-  let sumBal = 0;
-  balances.value?.forEach((x) => {
-    sumBal += Number(x.amount);
-  });
-  let sumUn = 0;
-  unbonding.value?.forEach((x) => {
-    x.entries?.forEach((y) => {
-      sumUn += Number(y.balance);
-    });
-  });
-  return [sumBal, sumDel, sumRew, sumUn];
-});
-
-const labels = ['Balance', 'Delegation', 'Reward', 'Unbonding'];
-
-const totalAmount = computed(() => {
-  return totalAmountByCategory.value.reduce((p, c) => c + p, 0);
-});
-
-const balanceResult = computed(() => {
-  const balancesNew = balances.value.map((item) => {
-    const denom = format.formatToken(item).split(" ")[1];
-    let amount = (Number(item.amount) / 1e6).toString();
-    if (denom === "ORAI") amount = (Number(item.amount)).toString();
-    return { ...item, denom: denom.toLowerCase(), amount }
-  })
-  if (supportedAssets.value) return balancesNew.filter(item => {
-    return item.denom.length < 8
-  })
-  return balancesNew.filter(item => {
-    return item.denom.length >= 8
-  })
-})
-
-const delegationResult = computed(() => {
-  if (supportedAssets.value) return delegations.value.filter(item => item.balance.denom.length < 10 && item)
-  return delegations.value.filter(item => item.balance.denom.length >= 10 && item)
-})
-
-const rewardTotal = computed(() => {
-  if (supportedAssets.value) return rewards.value.total?.filter(item => item.denom.length < 10 && item)
-  return rewards.value.total?.filter(item => item.denom.length >= 10 && item)
-})
-
-const unbondingTotalDisplay = computed(() => {
-  return (supportedAssets.value && stakingStore.params.bondDenom?.length < 10) || (!supportedAssets.value && stakingStore.params.bondDenom?.length > 10)
-})
-
-
-const totalValue = computed(() => {
-  let value1 = 0;
-  let value2 = 0;
-  let value3 = 0;
-  let value4 = 0;
-  delegationResult.value?.forEach((x) => {
-    value1 += format.tokenValueNumber(x.balance, 1e0);
-  });
-  rewardTotal.value?.forEach((x) => {
-    value2 += format.tokenValueNumber(x, 1e18);
-  });
-  balanceResult.value?.forEach((x) => {
-    value3 += format.tokenValueNumber(x, 1e0);
-  });
-  unbonding.value?.forEach((x) => {
-    x.entries?.forEach((y) => {
-      value4 += format.tokenValueNumber(
-        {
-          amount: y.balance,
-          denom: stakingStore.params.bondDenom,
-        },
-        1e18
-      );
-    });
-  });
-  let value = value1 + value2 + value3 + value4;
-
-  return format.formatNumber(value, '0,0.00')
-    ;
-});
 
 function loadAccount(address: string) {
   blockchain.rpc.getAuthAccount(address).then((x) => {
@@ -188,17 +90,13 @@ function updateEvent() {
   loadAccount(props.address);
 }
 
-function mapAmount(events: readonly Event[]) {
-  if (!events) return [];
-  return events
-    .find((x) => x.type === 'coin_received')
-    ?.attributes.filter((x) => x.key === 'amount')
-    .map((x) => x.value);
-}
-
-function changeStatusSupported(supported: boolean) {
-  supportedAssets.value = supported
-}
+// function mapAmount(events: readonly Event[]) {
+//   if (!events) return [];
+//   return events
+//     .find((x) => x.type === 'coin_received')
+//     ?.attributes.filter((x) => x.key === 'amount')
+//     .map((x) => x.value);
+// }
 
 const isOwnerWallet = computed(() => {
   return walletStore.currentAddress === props.address
@@ -249,136 +147,8 @@ const isOwnerWallet = computed(() => {
     </div>
 
     <!-- Assets -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
-      <div class="flex text-white justify-between">
-        <h2 class="card-title mb-4">{{ $t('account.assets') }}</h2>
-
-        <div class="flex gap-2 mb-4">
-          <button :class="{ 'px-2 py-1 bg-base rounded-md': supportedAssets }" @click="changeStatusSupported(true)">
-            Supported Assets
-          </button>
-          <button :class="{ 'px-2 py-1 bg-base rounded-md': !supportedAssets }" @click="changeStatusSupported(false)">
-            Unsupported Assets
-          </button>
-        </div>
-      </div>
-      <div class="grid md:!grid-cols-3">
-        <div class="md:!col-span-1">
-          <DonutChart :series="totalAmountByCategory" :labels="labels" />
-        </div>
-        <div class="mt-4 md:!col-span-2 md:!mt-0 md:!ml-4">
-          <!-- list-->
-          <div class="">
-            <!--balances  -->
-            <div class="flex items-center px-4 mb-2" v-for="(balanceItem, index) in balanceResult" :key="index">
-              <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
-                <Icon icon="mdi-account-cash" class="text-info" size="20" />
-                <div class="absolute top-0 bottom-0 left-0 right-0 bg-info opacity-20"></div>
-              </div>
-              <div class="flex-1">
-                <div class="text-sm font-semibold">
-                  {{ format.formatToken(balanceItem) }}
-                </div>
-                <div class="text-xs">
-                  {{ format.calculatePercent(balanceItem.amount, totalAmount) }}
-                </div>
-              </div>
-              <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-                <span
-                  class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)] text-sm"></span>
-                ${{ format.tokenValue(balanceItem) }}
-              </div>
-            </div>
-            <!--delegations  -->
-            <div class="flex items-center px-4 mb-2" v-for="(delegationItem, index) in delegationResult" :key="index">
-              <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
-                <Icon icon="mdi-user-clock" class="text-warning" size="20" />
-                <div class="absolute top-0 bottom-0 left-0 right-0 bg-warning opacity-20"></div>
-              </div>
-              <div class="flex-1">
-                <div class="text-sm font-semibold">
-                  {{ format.formatToken2(delegationItem?.balance) }}
-                </div>
-                <div class="text-xs">
-                  {{
-                    format.calculatePercent(
-                      delegationItem?.balance?.amount,
-                      totalAmount
-                    )
-                  }}
-                </div>
-              </div>
-              <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-                <span
-                  class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)] text-sm"></span>
-                ${{ format.tokenValue(delegationItem?.balance) }}
-              </div>
-            </div>
-            <!-- rewards.total -->
-            <div class="flex items-center px-4 mb-2" v-for="(rewardItem, index) in rewardTotal" :key="index">
-              <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
-                <Icon icon="mdi-account-arrow-up" class="text-success" size="20" />
-                <div class="absolute top-0 bottom-0 left-0 right-0 bg-success opacity-20"></div>
-              </div>
-              <div class="flex-1">
-                <div class="text-sm font-semibold">
-                  {{ format.formatToken2(rewardItem, 1e18) }}
-                </div>
-                <div class="text-xs">
-                  {{ format.calculatePercent(rewardItem.amount, totalAmount) }}
-                </div>
-              </div>
-              <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-                <span
-                  class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)] text-sm"></span>${{
-                    format.tokenValue(rewardItem, 1e18) }}
-              </div>
-            </div>
-            <!-- mdi-account-arrow-right -->
-            <div class="flex items-center px-4" v-if="unbondingTotalDisplay">
-              <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
-                <Icon icon="mdi-account-arrow-right" class="text-error" size="20" />
-                <div class="absolute top-0 bottom-0 left-0 right-0 bg-error opacity-20"></div>
-              </div>
-              <div class="flex-1">
-                <div class="text-sm font-semibold">
-                  {{
-                    format.formatToken2(
-                      {
-                        amount: String(unbondingTotal),
-                        denom: stakingStore.params.bondDenom,
-                      },
-                      1e18
-                    )
-                  }}
-                </div>
-                <div class="text-xs">
-                  {{ format.calculatePercent(unbondingTotal, totalAmount) }}
-                </div>
-              </div>
-              <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-                <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-primary dark:bg-[rgba(185,153,243,0.2)]"></span>
-                ${{
-                  format.tokenValue(
-                    {
-                      amount: String(unbondingTotal),
-                      denom: stakingStore.params.bondDenom,
-                    },
-                    1e18
-                  )
-                }}
-              </div>
-            </div>
-          </div>
-          <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
-            {{ $t('account.total_value') }}: ${{
-              totalValue ? totalValue : 0
-            }}
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
+      :unbondingTotal="unbondingTotal" />
     <!-- Delegations -->
     <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
       <div class="flex justify-between">
@@ -390,7 +160,7 @@ const isOwnerWallet = computed(() => {
             <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
               @click="() => { if (!isOwnerWallet) return; dialog.open('delegate', {}, updateEvent) }">{{
-                $t('account.btn_delegate') }}</label>
+              $t('account.btn_delegate') }}</label>
             <label for="withdraw" class="btn btn-third-sm btn-sm"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
               @click="() => { if (!isOwnerWallet) return; dialog.open('withdraw', {}, updateEvent) }">Claim
@@ -427,23 +197,23 @@ const isOwnerWallet = computed(() => {
                 <RouterLink :to="`/${chain}/staking/${v.delegation.validatorAddress}`">{{
                   format.validatorFromBech32(v.delegation.validatorAddress) ||
                   v.delegation.validatorAddress
-                }}</RouterLink>
+                  }}</RouterLink>
               </td>
               <td class="py-3">
                 {{ format.formatToken(v.balance, true, '0,0.[000000]') }}
               </td>
               <td class="py-3">
                 {{
-                  format.formatTokens(
-                    rewards?.rewards?.find(
-                      (x) =>
-                        x.validatorAddress === v.delegation.validatorAddress
-                    )?.reward,
-                    undefined,
-                    undefined,
-                    undefined,
-                    1e18
-                  )
+                format.formatTokens(
+                rewards?.rewards?.find(
+                (x) =>
+                x.validatorAddress === v.delegation.validatorAddress
+                )?.reward,
+                undefined,
+                undefined,
+                undefined,
+                1e18
+                )
                 }}
               </td>
               <td class="py-3">
@@ -520,18 +290,18 @@ const isOwnerWallet = computed(() => {
               <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
                   v.validatorAddress
-                }}</RouterLink>
+                  }}</RouterLink>
               </td>
               <td class="text-caption py-3">
                 {{
-                  format.formatToken(
-                    {
-                      amount: v.entries[0]?.initialBalance,
-                      denom: stakingStore.params.bondDenom,
-                    },
-                    true,
-                    '0,0.[00]'
-                  )
+                format.formatToken(
+                {
+                amount: v.entries[0]?.initialBalance,
+                denom: stakingStore.params.bondDenom,
+                },
+                true,
+                '0,0.[00]'
+                )
                 }}
               </td>
               <td class="text-caption py-3">

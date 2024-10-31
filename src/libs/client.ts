@@ -744,7 +744,6 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   async getBankBalances(address: string) {
     // return this.request(this.registry.bank_balances_address, { address });
     const res = await this.queryClient.bank.allBalances(address);
-    console.log(res);
     return res;
   }
   async getBankDenomsMetadata() {
@@ -790,7 +789,6 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     const res = await this.queryClient.distribution.delegationTotalRewards(
       delegator_addr
     );
-    console.log(res);
     return res;
   }
   async getDistributionValidatorCommission(validator_address: string) {

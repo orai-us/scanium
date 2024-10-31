@@ -12,16 +12,18 @@ const blockSummary = computed(()=>{
   return indexModule.stats
 })
 
-watch(blockSummary, () => {
+watch(blockSummary,async () => {
   const heightNew = blockSummary.value[0]?.stats;
   if (heightNew) {
-    const heightPre = Number(heightNew) - 1
-    store.fetchBlock(heightPre).then((x) => {
-      const block = x?.block;
-      const headerBlock = block?.header;
-      const time = new Date().getTime() - new Date(headerBlock?.time.toString()).getTime()
-      blockTime.value = (time / 1000).toFixed(1) + " s";
-    });
+    const heightOld = Number(heightNew) - 10;
+    const [blockOld, blockNew] = await Promise.all([
+      store.fetchBlock(heightOld),
+      store.fetchBlock(heightNew),
+    ])
+    const blockTimeNew = new Date(blockNew.block?.header?.time?.toString()).getTime();
+    const blockTimeOld = new Date(blockOld.block?.header?.time?.toString()).getTime();
+
+    blockTime.value = (blockTimeNew - blockTimeOld) / 10000 + " s"
   }
 })
 </script>
