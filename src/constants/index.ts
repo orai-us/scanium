@@ -1,5 +1,6 @@
-// id: symbol
+export const CHAIN_INDEXS = ['Oraichain'];
 
+// id: symbol
 export const LIST_COIN = {
   '01coin': 'zoc',
   '0chain': 'zcn',

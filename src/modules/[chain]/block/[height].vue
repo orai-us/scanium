@@ -6,7 +6,9 @@ import { useBaseStore, useFormatter } from '@/stores';
 import Countdown from '@/components/Countdown.vue';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
 import { toBase64 } from '@cosmjs/encoding';
-import TransactionBlock from '@/components/blocks/TransactionBlock.vue';
+import TransactionBlockIndexs from '@/components/blocks/TransactionBlockIndexs.vue';
+import TransactionBlockRpc from '@/components/blocks/TransactionBlockRpc.vue';
+import { CHAIN_INDEXS } from '@/constants';
 
 const props = defineProps(['height', 'chain']);
 
@@ -212,7 +214,12 @@ onBeforeRouteUpdate(async (to, from, next) => {
         </h2>
         <div class="w-full h-[1px] bg-[#242627] my-2"></div>
         <!-- <TxsElement :value="current.block" /> -->
-        <TransactionBlock :height="height"/>
+        <div v-if="CHAIN_INDEXS.includes(chain)">
+          <TransactionBlockIndexs :height="height" :chain="chain" />
+        </div>
+        <div v-else>
+          <TransactionBlockRpc :value="current.block" :chain="chain" :height="height" />
+        </div>
       </div>
 
       <!-- <div class="box-content">

@@ -22,7 +22,9 @@ import type { Coin } from '@cosmjs/stargate';
 import type { QueryAllContractStateResponse } from 'cosmjs-types/cosmwasm/wasm/v1/query';
 import type { ContractInfo } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import 'vue3-json-viewer/dist/index.css';
-import TransactionContract from '@/components/contracts/TransactionContract.vue';
+import TransactionContractIndexs from '@/components/contracts/TransactionContractIndexs.vue';
+import TransactionContractRpc from '@/components/contracts/TransactionContractRpc.vue';
+import { CHAIN_INDEXS } from '@/constants';
 
 const props = defineProps(['chain'])
 const chainStore = useBlockchain();
@@ -42,6 +44,8 @@ const info = ref({} as ContractInfo | undefined);
 const state = ref({} as QueryAllContractStateResponse | undefined);
 const selected = ref('');
 const balances = ref({} as Coin[]);
+const query = ref('');
+const result = ref({});
 
 const contractAddress = String(route.query.contract);
 
@@ -50,38 +54,38 @@ onMounted(() => {
   wasmStore.wasmClient.getWasmContractInfo(address).then((x) => {
     info.value = x;
   });
-  chainStore.rpc
-    .getTxs(
-      [
-        {
-          key: 'wasm._contract_address',
-          value: address,
-        },
-      ],
-      page.value
-    )
-    .then((res) => {
-      txs.value = res;
-    });
+  // chainStore.rpc
+  //   .getTxs(
+  //     [
+  //       {
+  //         key: 'wasm._contract_address',
+  //         value: address,
+  //       },
+  //     ],
+  //     page.value
+  //   )
+  //   .then((res) => {
+  //     txs.value = res;
+  //   });
 });
 
-function pageload(pageNum: number) {
-  page.value.setPage(pageNum);
-  const address = String(route.query.contract);
-  chainStore.rpc
-    .getTxs(
-      [
-        {
-          key: 'wasm._contract_address',
-          value: address,
-        },
-      ],
-      page.value
-    )
-    .then((res) => {
-      txs.value = res;
-    });
-}
+// function pageload(pageNum: number) {
+//   page.value.setPage(pageNum);
+//   const address = String(route.query.contract);
+//   chainStore.rpc
+//     .getTxs(
+//       [
+//         {
+//           key: 'wasm._contract_address',
+//           value: address,
+//         },
+//       ],
+//       page.value
+//     )
+//     .then((res) => {
+//       txs.value = res;
+//     });
+// }
 
 function showFunds() {
   const address = String(route.query.contract);
@@ -109,49 +113,47 @@ function showQuery() {
   result.value = '';
 }
 
-function queryContract() {
-  try {
-    if (selectedRadio.value === 'raw') {
-      wasmStore.wasmClient
-        .getWasmContractRawQuery(contractAddress, query.value)
-        .then((x) => {
-          result.value = x;
-        })
-        .catch((err) => {
-          result.value = err;
-        });
-    } else {
-      wasmStore.wasmClient
-        .getWasmContractSmartQuery(contractAddress, query.value)
-        .then((x) => {
-          result.value = x;
-        })
-        .catch((err) => {
-          result.value = err;
-        });
-    }
-  } catch (err) {
-    result.value = JSON.stringify(err); // not works for now
-  }
-  // TODO, show error in the result.
-}
+// function queryContract() {
+//   try {
+//     if (selectedRadio.value === 'raw') {
+//       wasmStore.wasmClient
+//         .getWasmContractRawQuery(contractAddress, query.value)
+//         .then((x) => {
+//           result.value = x;
+//         })
+//         .catch((err) => {
+//           result.value = err;
+//         });
+//     } else {
+//       wasmStore.wasmClient
+//         .getWasmContractSmartQuery(contractAddress, query.value)
+//         .then((x) => {
+//           result.value = x;
+//         })
+//         .catch((err) => {
+//           result.value = err;
+//         });
+//     }
+//   } catch (err) {
+//     result.value = JSON.stringify(err); // not works for now
+//   }
+//   // TODO, show error in the result.
+// }
 
-const radioContent = [
-  {
-    title: 'Raw Query',
-    desc: 'Return raw result',
-    value: 'raw',
-  },
-  {
-    title: 'Smart Query',
-    desc: 'Return structure result if possible',
-    value: 'smart',
-  },
-];
+// const radioContent = [
+//   {
+//     title: 'Raw Query',
+//     desc: 'Return raw result',
+//     value: 'raw',
+//   },
+//   {
+//     title: 'Smart Query',
+//     desc: 'Return structure result if possible',
+//     value: 'smart',
+//   },
+// ];
 
-const selectedRadio = ref('raw');
-const query = ref('');
-const result = ref({});
+// const selectedRadio = ref('raw');
 </script>
 <template>
   <div class="p-5">
@@ -163,67 +165,52 @@ const result = ref({});
     </div>
 
     <div class="text-center mb-4">
-      <RouterLink to="contracts"
-        ><span class="btn btn-xs text-xs mr-2"> Back </span>
+      <RouterLink to="contracts"><span class="btn btn-xs text-xs mr-2"> Back </span>
       </RouterLink>
-      <label
-        @click="showFunds()"
-        for="modal-contract-funds"
-        class="btn btn-primary btn-xs text-xs mr-2"
-        >{{ $t('cosmwasm.btn_funds') }}</label
-      >
-      <label
-        class="btn btn-primary btn-xs text-xs mr-2"
-        for="modal-contract-states"
-        @click="showState()"
-      >
+      <label @click="showFunds()" for="modal-contract-funds" class="btn btn-primary btn-xs text-xs mr-2">{{
+        $t('cosmwasm.btn_funds') }}</label>
+      <label class="btn btn-primary btn-xs text-xs mr-2" for="modal-contract-states" @click="showState()">
         {{ $t('cosmwasm.btn_states') }}
       </label>
-      <label
-        for="modal-contract-query"
-        class="btn btn-primary btn-xs text-xs mr-2"
-        @click="showQuery()"
-      >
+      <label for="modal-contract-query" class="btn btn-primary btn-xs text-xs mr-2" @click="showQuery()">
         {{ $t('cosmwasm.btn_query') }}
       </label>
-      <label
-        for="wasm_execute_contract"
-        class="btn btn-primary btn-xs text-xs mr-2"
-        @click="
+      <label for="wasm_execute_contract" class="btn btn-primary btn-xs text-xs mr-2" @click="
           dialog.open('wasm_execute_contract', { contract: contractAddress })
-        "
-      >
+        ">
         {{ $t('cosmwasm.btn_execute') }}
       </label>
 
-      <label
-        for="wasm_migrate_contract"
-        class="btn btn-primary btn-xs text-xs mr-2"
-        @click="
+      <label for="wasm_migrate_contract" class="btn btn-primary btn-xs text-xs mr-2" @click="
           dialog.open('wasm_migrate_contract', { contract: contractAddress })
-        "
-      >
+        ">
         {{ $t('cosmwasm.btn_migrate') }}
       </label>
 
-      <label
-        for="wasm_update_admin"
-        class="btn btn-primary btn-xs text-xs mr-2"
-        @click="dialog.open('wasm_update_admin', { contract: contractAddress })"
-      >
+      <label for="wasm_update_admin" class="btn btn-primary btn-xs text-xs mr-2"
+        @click="dialog.open('wasm_update_admin', { contract: contractAddress })">
         {{ $t('cosmwasm.btn_update_admin') }}
       </label>
 
-      <label
-        for="wasm_clear_admin"
-        class="btn btn-primary btn-xs text-xs mr-2"
-        @click="dialog.open('wasm_clear_admin', { contract: contractAddress })"
-      >
+      <label for="wasm_clear_admin" class="btn btn-primary btn-xs text-xs mr-2"
+        @click="dialog.open('wasm_clear_admin', { contract: contractAddress })">
         {{ $t('cosmwasm.btn_clear_admin') }}
       </label>
     </div>
 
-    <TransactionContract :chain="chain" :address="contractAddress"/>
+    <div class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4 shadow flex flex-col gap-4">
+
+      <h2 class="card-title truncate w-full">
+        Transaction
+      </h2>
+      <div class="w-full h-[1px] bg-[#242627] my-2"></div>
+      <div v-if="CHAIN_INDEXS.includes(chain)">
+        <TransactionContractIndexs :chain="chain" :address="contractAddress" />
+      </div>
+      <div v-else>
+        <TransactionContractRpc :chain="chain" :address="contractAddress" />
+      </div>
+    </div>
 
     <!-- <div class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4 shadow">
       <h2 class="card-title truncate w-full mt-4">Transactions</h2>

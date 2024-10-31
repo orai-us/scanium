@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import { useFormatter } from "@/stores";
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
-import Pagination from "../pagination/Pagination.vue";
-import { shortenTxHash } from "@/utils";
 import TransactionTable from "../TransactionTable.vue";
 
-const props = defineProps(['txs', 'chain', 'height'])
-const format = useFormatter();
+const props = defineProps(['chain', 'height'])
 
 // Transaction in contract
 const transactions = ref();
@@ -43,7 +39,7 @@ const query = gql`
 
 const variables = computed(() => {
   return {
-    filter: { blockNumber:{equalTo: props.height} },
+    filter: { blockNumber: { equalTo: props.height } },
     orderBy: "BLOCK_NUMBER_ASC",
     first: pagination.limit,
     offset: pagination.offset
@@ -54,18 +50,7 @@ const { result, refetch } = useQuery(query, variables);
 
 watchEffect(() => {
   if (result.value) {
-    const data = result.value.transactions.results;
-    transactions.value = data.map((item: any) => ({
-      txhash: shortenTxHash(item?.id),
-      result: "Success",
-      message: format.messages(item.messages?.nodes.map((item: any) =>
-        ({ "@type": item.type, typeUrl: item.type })
-      )),
-      height: item.blockNumber,
-      amount: 0,
-      fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
-      timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
-    }));
+    transactions.value  = result.value.transactions.results;
     totalCount.value = result.value.transactions.totalCount;
   }
 })
