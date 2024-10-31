@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import type { Block } from '@cosmjs/tendermint-rpc';
 import { decodeTxRaw } from '@cosmjs/proto-signing';
-import { computed, toRaw, type PropType } from 'vue';
+import { computed, type PropType } from 'vue';
 import { hashTx } from '@/libs';
 import { useFormatter } from '@/stores';
 import type { DecodedTxRaw } from '@cosmjs/proto-signing';
 import TransactionTable from '../TransactionTable.vue';
-import { shortenTxHash } from '@/utils';
 import { toHex } from '@cosmjs/encoding';
 
 const format = useFormatter();
@@ -36,7 +35,7 @@ const txs = computed(() => {
 
 const transactions = computed(() => {
   return txs.value?.map((item: any) => ({
-    txhash: shortenTxHash(toHex(item?.hash)),
+    txhash: item?.hash,
     result: "Success",
     message: item.tx?.body ? format.messages(item.tx?.body.messages.map((x: any) => ({ '@type': x.typeUrl }))) : '',
     height: props.height,

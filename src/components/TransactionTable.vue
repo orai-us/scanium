@@ -12,7 +12,7 @@ const txs = ref([] as Array<any>)
 watch([() => props.transactions], () => {
   if (CHAIN_INDEXS.includes(props.chain)) {
     txs.value = props.transactions?.map((item: any) => ({
-      txhash: shortenTxHash(item?.id),
+      txhash: item?.id,
       result: "Success",
       message: format.messages(item.messages?.nodes.map((item: any) =>
         ({ "@type": item.type, typeUrl: item.type })
@@ -51,7 +51,7 @@ watch([() => props.transactions], () => {
         <tr v-for="(v, index) in txs" :key="index">
           <td class="truncate py-3" style="max-width: 200px">
             <RouterLink :to="`/${chain}/tx/${v.txhash}`" class="text-primary dark:text-link">
-              {{ v.txhash }}
+              {{ shortenTxHash(v.txhash) }}
             </RouterLink>
           </td>
           <td class="text-sm py-3">
