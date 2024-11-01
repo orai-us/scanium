@@ -40,6 +40,11 @@ const recentReceived = ref([] as ExtraTxResponse[]);
 const unbonding = ref([] as UnbondingDelegation[]);
 const unbondingTotal = ref(0);
 
+const isBalancesLoaded = ref(false);
+const isDelegationLoaded = ref(false);
+const isRewardLoaded = ref(false);
+const isUnbodingLoaded = ref(false);
+
 onMounted(() => {
   loadAccount(props.address);
 });
@@ -56,12 +61,15 @@ function loadAccount(address: string) {
   });
   blockchain.rpc.getDistributionDelegatorRewards(address).then((x) => {
     rewards.value = x;
+    isRewardLoaded.value = true;
   });
   blockchain.rpc.getStakingDelegations(address).then((x) => {
     delegations.value = x.delegationResponses;
+    isDelegationLoaded.value = true;
   });
   blockchain.rpc.getBankBalances(address).then((x) => {
     balances.value = x;
+    isBalancesLoaded.value = true;
   });
   blockchain.rpc.getStakingDelegatorUnbonding(address).then((x) => {
     unbonding.value = x.unbondingResponses;
@@ -70,6 +78,7 @@ function loadAccount(address: string) {
         unbondingTotal.value += Number(z.balance);
       });
     });
+    isUnbodingLoaded.value = true;
   });
 
   blockchain.rpc
@@ -148,8 +157,11 @@ const isOwnerWallet = computed(() => {
     </div>
 
     <!-- Assets -->
-    <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
-      :unbondingTotal="unbondingTotal" />
+    <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded">
+      <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
+        :unbondingTotal="unbondingTotal" />
+    </div>
+
     <!-- Delegations -->
     <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
       <div class="flex justify-between">

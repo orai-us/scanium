@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, toRaw, watch, watchEffect } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
 import { LIST_COIN } from '@/constants';
@@ -13,6 +13,7 @@ type Asset = {
   amount: number,
   denom: string,
   amountDisplay: string,
+  id: string
 }
 
 const coingeckoSymbols = Object.values(LIST_COIN);
@@ -22,17 +23,13 @@ const format = useFormatter();
 const supportedAssets = ref(true);
 const stakingStore = useStakingStore();
 
-const balancesSupported = ref([] as Array<Asset>);
-const delegationsSupported = ref([] as Array<Asset>);
-const rewardsTotalSupported = ref([] as Array<Asset>);
-const unbondingSupported = ref([] as Array<Asset>);
+const balancesAssets = ref([] as Array<Asset>);
+const delegatesAssets = ref([] as Array<Asset>);
+const rewardsTotalAssets = ref([] as Array<Asset>);
+const unbondingAssets = ref([] as Array<Asset>);
+const totalValue = ref();
+const totalAmountByCategory = ref();
 
-const balancesUnSupported = ref([] as Array<Asset>);
-const delegationsUnSupported = ref([] as Array<Asset>);
-const rewardsTotalUnSupported = ref([] as Array<Asset>);
-const unbondingUnSupported = ref([] as Array<Asset>);
-  
-const tokenIds = ref([] as Array<string>);
 const priceBySymbol = ref({} as any);
 
 const labels = ['Balance', 'Delegation', 'Reward', 'Unbonding'];
@@ -41,45 +38,45 @@ function changeStatusSupported(supported: boolean) {
   supportedAssets.value = supported
 }
 
-watch([() => props.balances, () => props.delegations, () => props.rewards, () => props.unbondingTotal], () => {
-  let ids: Array<string> = []
-
+watchEffect(() => {
   function getInfoBalancesAssets() {
     const resultSupported: Array<any> = [];
     const resultUnSupported: Array<any> = [];
     for (let balance of props.balances) {
       const formatToken = format.formatToken3(balance);
       const denom = formatToken.denom;
-      const idToken = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-      ids.push(idToken)
+      const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
       if (coingeckoSymbols.includes(denom)) {
-        resultSupported.push(formatToken)
+        resultSupported.push({ ...formatToken, id })
       } else {
-        resultUnSupported.push(formatToken)
+        resultUnSupported.push({ ...formatToken, id })
       }
     }
-    balancesSupported.value = resultSupported;
-    balancesUnSupported.value = resultUnSupported;
+    balancesAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
   }
+  getInfoBalancesAssets()
+})
 
+watchEffect(() => {
   function getDelegationsAssets() {
     const resultSupported: Array<any> = [];
     const resultUnSupported: Array<any> = [];
     for (let delegation of props.delegations) {
       const formatToken = format.formatToken3(delegation.balance);
       const denom = formatToken.denom;
-      const idToken = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-      ids.push(idToken);
+      const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
       if (coingeckoSymbols.includes(denom)) {
-        resultSupported.push(formatToken)
+        resultSupported.push({ ...formatToken, id })
       } else {
-        resultUnSupported.push(formatToken)
+        resultUnSupported.push({ ...formatToken, id })
       }
     }
-    delegationsSupported.value = resultSupported;
-    delegationsUnSupported.value = resultUnSupported;
+    delegatesAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
   }
+  getDelegationsAssets()
+})
 
+watchEffect(() => {
   function getRewardAssets() {
     const resultSupported: Array<any> = [];
     const resultUnSupported: Array<any> = [];
@@ -87,19 +84,20 @@ watch([() => props.balances, () => props.delegations, () => props.rewards, () =>
       for (let reward of props.rewards?.total) {
         const formatToken = format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18);
         const denom = formatToken.denom;
-        const idToken = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-        ids.push(idToken);
+        const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
         if (coingeckoSymbols.includes(denom)) {
-          resultSupported.push(formatToken)
+          resultSupported.push({ ...formatToken, id })
         } else {
-          resultUnSupported.push(formatToken)
+          resultUnSupported.push({ ...formatToken, id })
         }
       }
     }
-    rewardsTotalSupported.value = resultSupported;
-    rewardsTotalUnSupported.value = resultUnSupported;
+    rewardsTotalAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
   }
+  getRewardAssets()
+})
 
+watchEffect(() => {
   function getUnbondingAssets() {
     const resultSupported: Array<any> = [];
     const resultUnSupported: Array<any> = [];
@@ -112,44 +110,21 @@ watch([() => props.balances, () => props.delegations, () => props.rewards, () =>
       1e18
     )
     const denom = formatToken.denom;
-    const idToken = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-    ids.push(idToken)
+    const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
-      resultSupported.push(formatToken)
+      resultSupported.push({ ...formatToken, id })
     } else {
-      resultUnSupported.push(formatToken)
+      resultUnSupported.push({ ...formatToken, id })
     }
-    unbondingSupported.value = resultSupported
-    unbondingUnSupported.value = resultUnSupported
+    unbondingAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
   }
-
-  getInfoBalancesAssets()
-  getDelegationsAssets()
-  getRewardAssets()
   getUnbondingAssets()
-
-  tokenIds.value = Array.from(new Set(ids.filter(item => !!item)));
 })
 
-const balancesAssets = computed(() => {
-  if (supportedAssets.value) return balancesSupported.value;
-  return balancesUnSupported.value;
-});
-const delegatesAssets = computed(() => {
-  if (supportedAssets.value) return delegationsSupported.value;
-  return delegationsUnSupported.value;
-});
-const rewardsTotalAssets = computed(() => {
-  if (supportedAssets.value) return rewardsTotalSupported.value;
-  return rewardsTotalUnSupported.value;
-});
-const unbondingAssets = computed(() => {
-  if (supportedAssets.value) return unbondingSupported.value;
-  return unbondingUnSupported.value
-});
+watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets], async () => {
+  const assets = [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value]
+  const ids = assets.map(item => item?.id)
 
-watch(tokenIds, async () => {
-  const ids = tokenIds.value;
   const result: any = {}
   if (ids.length > 0) {
     const res = await getPriceByIds({ ids: ids.join(",") });
@@ -157,49 +132,46 @@ watch(tokenIds, async () => {
       result[coingeckoSymbols[coingeckoIds.indexOf(item)]] = res[item]?.usd
     }
     priceBySymbol.value = result;
+
+    let total = 0;
+    for (let item of assets) {
+      total += item.amount * result[item.denom];
+    }
+    totalValue.value = total;
   }
-})
 
-function formatValue(amount: number, fmt = '0,0.[0]') {
-  return `${numeral(amount).format(fmt)}`
-}
-
-const totalValue = computed(() => {
-  const assets = [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value]
-  let total = 0;
-  for (let item of assets) {
-    total += item.amount * priceBySymbol.value[item.denom];
-  }
-  return total;
-})
-
-const totalAmountByCategory = computed(() => {
   let sumBalance = 0;
   let sumDelegate = 0;
   let sumReward = 0;
   let sumUnbonding = 0;
 
   for (let item of balancesAssets.value) {
-    const price = priceBySymbol.value[item.denom] ? priceBySymbol.value[item.denom] : 1;
+    const price = result[item.denom] ? result[item.denom] : 1;
     sumBalance += item.amount * price;
   }
 
   for (let item of delegatesAssets.value) {
-    const price = priceBySymbol.value[item.denom] ? priceBySymbol.value[item.denom] : 1;
+    const price = result[item.denom] ? result[item.denom] : 1;
     sumDelegate += item.amount * price;
   }
 
   for (let item of rewardsTotalAssets.value) {
-    const price = priceBySymbol.value[item.denom] ? priceBySymbol.value[item.denom] : 1;
+    const price = result[item.denom] ? result[item.denom] : 1;
     sumReward += item.amount * price;
   }
 
   for (let item of unbondingAssets.value) {
-    const price = priceBySymbol.value[item.denom] ? priceBySymbol.value[item.denom] : 1;
+    const price = result[item.denom] ? result[item.denom] : 1;
     sumUnbonding += item.amount * price;
   }
-  return [sumBalance, sumDelegate, sumReward, sumUnbonding]
+
+  totalAmountByCategory.value = [sumBalance, sumDelegate, sumReward, sumUnbonding]
 })
+
+function formatValue(amount: number, fmt = '0,0.[0]') {
+  const result = `${numeral(amount).format(fmt)}`;
+  return result === "NaN" ? 0 : result
+}
 
 </script>
 
@@ -253,7 +225,7 @@ const totalAmountByCategory = computed(() => {
                 {{ delegationItem?.amountDisplay }} {{ delegationItem?.denom?.toUpperCase() }}
               </div>
               <div class="text-xs">
-                {{ formatValue((priceBySymbol[delegationItem?.denom] * delegationItem?.amount) / totalValue * 100)}}%
+                {{ formatValue((priceBySymbol[delegationItem?.denom] * delegationItem?.amount) / totalValue * 100) }}%
               </div>
             </div>
             <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
@@ -289,17 +261,18 @@ const totalAmountByCategory = computed(() => {
                 {{ unbondingAssets[0]?.amount }} {{ unbondingAssets[0]?.denom?.toUpperCase() }}
               </div>
               <div class="text-xs">
-                {{ formatValue((priceBySymbol[unbondingAssets[0]?.denom] * unbondingAssets[0]?.amount) / totalValue * 100) }}%
+                {{ formatValue((priceBySymbol[unbondingAssets[0]?.denom] * unbondingAssets[0]?.amount) / totalValue *
+                  100) }}%
               </div>
             </div>
             <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-              ${{ formatValue(priceBySymbol[ unbondingAssets[0]?.denom] * unbondingAssets[0]?.amount) }}
+              ${{ formatValue(priceBySymbol[unbondingAssets[0]?.denom] * unbondingAssets[0]?.amount) }}
             </div>
           </div>
         </div>
         <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
           {{ $t('account.total_value') }}: ${{
-          totalValue ? formatValue(totalValue) : 0
+            totalValue ? formatValue(totalValue) : 0
           }}
         </div>
       </div>
