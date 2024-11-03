@@ -15,7 +15,7 @@ const blockSummary = computed(()=>{
 watch(blockSummary,async () => {
   const heightNew = blockSummary.value[0]?.stats;
   if (heightNew) {
-    const heightOld = Number(heightNew) - 10;
+    const heightOld = Number(heightNew) - 5;
     const [blockOld, blockNew] = await Promise.all([
       store.fetchBlock(heightOld),
       store.fetchBlock(heightNew),
@@ -23,7 +23,7 @@ watch(blockSummary,async () => {
     const blockTimeNew = new Date(blockNew.block?.header?.time?.toString()).getTime();
     const blockTimeOld = new Date(blockOld.block?.header?.time?.toString()).getTime();
 
-    blockTime.value = (blockTimeNew - blockTimeOld) / 10000 + " s"
+    blockTime.value = (blockTimeNew - blockTimeOld) / 5000 + " s"
   }
 })
 </script>
