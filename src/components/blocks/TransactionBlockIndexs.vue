@@ -24,6 +24,7 @@ const query = gql`
             gasUsed
             timestamp
             sender
+            code
             fee
             messages {
               nodes {
@@ -63,6 +64,6 @@ function handlePagination(page: number) {
 </script>
 
 <template>
-  <TransactionTable :transaction="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
+  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
     :handlePagination="handlePagination" />
 </template>

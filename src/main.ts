@@ -17,7 +17,7 @@ import { DefaultApolloClient } from '@vue/apollo-composable';
 const cache = new InMemoryCache();
 
 const httpLink = createHttpLink({
-  uri: 'http://192.168.10.150:3000',
+  uri: 'http://192.168.10.221:3000/',
 })
 
 const apolloClient = new ApolloClient({

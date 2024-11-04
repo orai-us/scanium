@@ -25,6 +25,7 @@ const query = gql`
             timestamp
             sender
             fee
+            code
             messages {
               nodes {
                 type
