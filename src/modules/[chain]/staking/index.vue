@@ -9,7 +9,7 @@ import {
 } from '@/stores';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
-import type { Key } from '@/types';
+import type { Key, SigningInfo } from '@/types';
 import { formatSeconds } from '@/libs/utils';
 import type { Validator } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import type { Params, ValidatorSigningInfo } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
@@ -288,7 +288,7 @@ const getUpTimeValidator = (validator: any) => {
   return null
 }
 
-const signingInfo = ref({} as Record<string, ValidatorSigningInfo>);
+const signingInfo = ref({} as Record<string, SigningInfo>);
 
 const listUptime = computed(() => {
   if (chainStore.isConsumerChain) {
@@ -306,7 +306,7 @@ const listUptime = computed(() => {
         hex: hexAddress,
         uptime:
           signing && window > 0
-            ? (window - Number(signing.missedBlocksCounter)) / window
+            ? (window - Number(signing.missed_blocks_counter)) / window
             : undefined,
       };
     });
@@ -322,7 +322,7 @@ const listUptime = computed(() => {
         hex: consensusPubkeyToHexAddress(v.consensusPubkey),
         uptime:
           signing && window > 0
-            ? (window - Number(signing.missedBlocksCounter)) / window
+            ? (window - Number(signing.missed_blocks_counter)) / window
             : undefined,
       };
     });
@@ -723,12 +723,12 @@ function handleSortList(validator: any[], sortDescription: any){
               <label class="truncate text-sm mb-1">
                 <span class="ml-1 text-black dark:text-white">{{ i + 1 }}.{{ v.description.moniker }}</span>
               </label>
-              <div v-if="Number(signing?.missedBlocksCounter || 0) > 10"
+              <div v-if="Number(signing?.missed_blocks_counter || 0) > 10"
                 class="badge badge-sm bg-transparent border-0 text-red-500 font-bold">
-                {{ signing?.missedBlocksCounter }}
+                {{ signing?.missed_blocks_counter }}
               </div>
               <div v-else class="badge badge-sm bg-transparent text-green-600 border-0 font-bold">
-                {{ signing?.missedBlocksCounter }}
+                {{ signing?.missed_blocks_counter }}
               </div>
             </div>
             <UptimeBar :blocks="commits2" :validator="hex" />
