@@ -7,7 +7,7 @@ import { reactive } from "vue";
 
 import TransactionTable from "../TransactionTable.vue";
 
-const props = defineProps(['chain', 'validator'])
+const props = defineProps(['chain', 'account'])
 const format = useFormatter();
 
 const transactions = ref()
@@ -27,6 +27,7 @@ const query = gql`
             timestamp
             sender
             fee
+            code
             messages {
               nodes {
                 type
@@ -44,13 +45,13 @@ const variables = computed(() => {
     filter: {
       messages: {
         some: {
-          validator: {
-            equalTo: props.validator,
+          sender: {
+            equalTo: props.account,
           },
         },
       },
     },
-    orderBy: "BLOCK_NUMBER_ASC",
+    orderBy: "TIMESTAMP_DESC",
     first: pagination.limit,
     offset: pagination.offset
   }
@@ -73,6 +74,6 @@ function handlePagination(page: number) {
 </script>
 
 <template>
-  <TransactionTable :transaction="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
+  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
     :handlePagination="handlePagination" />
 </template>

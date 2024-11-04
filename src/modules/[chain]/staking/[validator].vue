@@ -693,7 +693,7 @@ function mapDelegators(tx: ExtraTxResponse) {
         </table>
       </div> -->
       <div v-if="CHAIN_INDEXS.includes(chain || '')">
-        <TransactionStakingIndexs :chain="chain" :validator="validator" />
+        <TransactionStakingIndexs :chain="chain" :account="addresses.account" />
       </div>
       <div v-else>
         <TransactionStakingRpc :txs="txs" :chain="chain" />
