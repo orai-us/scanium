@@ -23,10 +23,6 @@ const format = useFormatter();
 const supportedAssets = ref(true);
 const stakingStore = useStakingStore();
 
-const balancesAssets = ref([] as Array<Asset>);
-const delegatesAssets = ref([] as Array<Asset>);
-const rewardsTotalAssets = ref([] as Array<Asset>);
-const unbondingAssets = ref([] as Array<Asset>);
 const totalValue = ref();
 const totalAmountByCategory = ref([] as Array<any>);
 
@@ -38,77 +34,11 @@ function changeStatusSupported(supported: boolean) {
   supportedAssets.value = supported
 }
 
-watchEffect(() => {
-  function getInfoBalancesAssets() {
-    const resultSupported: Array<any> = [];
-    const resultUnSupported: Array<any> = [];
-    for (let balance of props.balances) {
-      const formatToken = format.formatToken3(balance);
-      const denom = formatToken.denom;
-      const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-      if (coingeckoSymbols.includes(denom)) {
-        resultSupported.push({ ...formatToken, id })
-      } else {
-        resultUnSupported.push({ ...formatToken, id })
-      }
-    }
-    balancesAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
-  }
-  getInfoBalancesAssets()
-})
-
-watchEffect(() => {
-  function getDelegationsAssets() {
-    const resultSupported: Array<any> = [];
-    const resultUnSupported: Array<any> = [];
-    for (let delegation of props.delegations) {
-      const formatToken = format.formatToken3(delegation.balance);
-      const denom = formatToken.denom;
-      const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-      if (coingeckoSymbols.includes(denom)) {
-        resultSupported.push({ ...formatToken, id })
-      } else {
-        resultUnSupported.push({ ...formatToken, id })
-      }
-    }
-    delegatesAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
-  }
-  getDelegationsAssets()
-})
-
-watchEffect(() => {
-  function getRewardAssets() {
-    const resultSupported: Array<any> = [];
-    const resultUnSupported: Array<any> = [];
-    if (!!props.rewards?.total) {
-      for (let reward of props.rewards?.total) {
-        const formatToken = format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18);
-        const denom = formatToken.denom;
-        const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-        if (coingeckoSymbols.includes(denom)) {
-          resultSupported.push({ ...formatToken, id })
-        } else {
-          resultUnSupported.push({ ...formatToken, id })
-        }
-      }
-    }
-    rewardsTotalAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
-  }
-  getRewardAssets()
-})
-
-watchEffect(() => {
-  function getUnbondingAssets() {
-    const resultSupported: Array<any> = [];
-    const resultUnSupported: Array<any> = [];
-    const formatToken = format.formatToken3(
-      {
-        amount: String(props.unbondingTotal),
-        denom: stakingStore.params.bondDenom,
-      },
-      true, '0,0.[0]', 'local',
-      1e18
-    )
+const balancesAssets = computed(() => {
+  const resultSupported: Array<any> = [];
+  const resultUnSupported: Array<any> = [];
+  for (let balance of props.balances) {
+    const formatToken = format.formatToken3(balance);
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
@@ -116,9 +46,63 @@ watchEffect(() => {
     } else {
       resultUnSupported.push({ ...formatToken, id })
     }
-    unbondingAssets.value = supportedAssets.value ? resultSupported : resultUnSupported;
   }
-  getUnbondingAssets()
+  return supportedAssets.value ? resultSupported : resultUnSupported;
+})
+
+const delegatesAssets = computed(() => {
+  const resultSupported: Array<any> = [];
+  const resultUnSupported: Array<any> = [];
+  for (let delegation of props.delegations) {
+    const formatToken = format.formatToken3(delegation.balance);
+    const denom = formatToken.denom;
+    const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
+    if (coingeckoSymbols.includes(denom)) {
+      resultSupported.push({ ...formatToken, id })
+    } else {
+      resultUnSupported.push({ ...formatToken, id })
+    }
+  }
+  return supportedAssets.value ? resultSupported : resultUnSupported;
+})
+
+const rewardsTotalAssets = computed(() => {
+  const resultSupported: Array<any> = [];
+  const resultUnSupported: Array<any> = [];
+  if (!!props.rewards?.total) {
+    for (let reward of props.rewards?.total) {
+      const formatToken = format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18);
+      const denom = formatToken.denom;
+      const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
+      if (coingeckoSymbols.includes(denom)) {
+        resultSupported.push({ ...formatToken, id })
+      } else {
+        resultUnSupported.push({ ...formatToken, id })
+      }
+    }
+  }
+  return supportedAssets.value ? resultSupported : resultUnSupported;
+})
+
+const unbondingAssets = computed(() => {
+  const resultSupported: Array<any> = [];
+  const resultUnSupported: Array<any> = [];
+  const formatToken = format.formatToken3(
+    {
+      amount: String(props.unbondingTotal),
+      denom: stakingStore.params.bondDenom,
+    },
+    true, '0,0.[0]', 'local',
+    1e18
+  )
+  const denom = formatToken.denom;
+  const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
+  if (coingeckoSymbols.includes(denom)) {
+    resultSupported.push({ ...formatToken, id })
+  } else {
+    resultUnSupported.push({ ...formatToken, id })
+  }
+  return supportedAssets.value ? resultSupported : resultUnSupported;
 })
 
 watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets], async () => {
