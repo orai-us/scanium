@@ -744,7 +744,6 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   async getBankBalances(address: string) {
     // return this.request(this.registry.bank_balances_address, { address });
     const res = await this.queryClient.bank.allBalances(address);
-    console.log(res);
     return res;
   }
   async getBankDenomsMetadata() {
@@ -790,7 +789,6 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     const res = await this.queryClient.distribution.delegationTotalRewards(
       delegator_addr
     );
-    console.log(res);
     return res;
   }
   async getDistributionValidatorCommission(validator_address: string) {
@@ -869,6 +867,11 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     console.log(res);
     return res;
   }
+
+  async getSlashingSigningInfos1() {
+    const query = '?pagination.limit=300';
+    return this.request(this.registry.slashing_signing_info, {}, query);
+  }
   // Gov
   async getParams(subspace: string, key: string) {
     // console.log(this.registry.params, subspace, key);
@@ -933,6 +936,25 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   }
   async getGovProposal(proposal_id: string) {
     return await this.queryClient.gov.proposal(proposal_id);
+  }
+  async getGovProposal1(proposal_id: string) {
+    let data1: any, data2: any;
+    try {
+      data1 = await this.request(this.registry.gov_proposals_proposal_id, {
+        proposal_id,
+      });
+    } catch (error) {}
+
+    try {
+      data2 = await this.queryClient.gov.proposal(proposal_id);
+    } catch (error) {}
+    
+    return {
+      proposal: {
+        ...data1?.proposal,
+        ...data2?.proposal,
+      },
+    };
   }
   async getGovProposalDeposits(proposal_id: string) {
     return this.queryClient.gov.deposits(proposal_id);

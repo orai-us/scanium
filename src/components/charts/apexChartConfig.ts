@@ -263,6 +263,10 @@ export const getMarketPriceChartConfig = (
 
 // const donutColors = Array.from({length: 19}, () => (`#${Math.floor(Math.random()*16777215+100000).toString(16)}`))
 const donutColors = [
+  "#00b2ff",
+  "#fbbd23",
+  "#36d399",
+  "#f87272",
   '#bbe81a',
   '#ff5f0b',
   '#43ebef',
@@ -348,7 +352,9 @@ export const getDonutChartConfig = (theme: string, labels: string[]) => {
             value: {
               fontSize: '1.5rem',
               color: themeSecondaryTextColor,
-              formatter: (val: string) => `${parseInt(val, 10)}`,
+              // formatter: (val: string) => `${parseInt(val, 10)}`,
+              formatter: (val: string) =>
+                `${numeral(parseInt(val, 10)).format('0,0.[0]')}`,
             },
             total: {
               show: false,

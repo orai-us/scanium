@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref } from '@vue/reactivity';
-import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
-import { PageRequest, type AuthAccount, type Pagination } from '@/types';
-import { onMounted } from 'vue';
+import { useBlockchain } from '@/stores';
+import { PageRequest } from '@/types';
+import { onMounted, ref } from 'vue';
 import PaginationBar from '@/components/PaginationBar.vue';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';

@@ -3,8 +3,6 @@ import { TxsHistory } from '@/libs/client';
 import { useFormatter } from '@/stores';
 import { onMounted, reactive, ref, watch } from 'vue';
 import { getHistoryTxs } from '@/service/transactionsService';
-import Pagination from '../pagination/Pagination.vue';
-import { shortenTxHash } from '@/utils';
 import TransactionTable from '../TransactionTable.vue';
 
 const props = defineProps(['address', 'chain']);
@@ -30,7 +28,7 @@ async function fetchTransaction() {
     const response = await getHistoryTxs(params)
     if (!!response) {
       txs.value = response.data.map((item: any) => ({
-        txhash: shortenTxHash(item.txhash),
+        txhash: item.txhash,
         result:  item.status ? "Success" : "Failed",
         message: "",
         height: item.height,

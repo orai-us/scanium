@@ -3,7 +3,7 @@ import PaginationBar from '@/components/PaginationBar.vue';
 import router from '@/router';
 import { useTxDialog, useWalletStore } from '@/stores';
 import { PageRequest } from '@/types';
-import { toBase64, toHex } from '@cosmjs/encoding';
+import { toHex } from '@cosmjs/encoding';
 import type { QueryCodesResponse } from 'cosmjs-types/cosmwasm/wasm/v1/query';
 import { accessTypeToJSON } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import { ref, toRaw, watch, watchEffect } from 'vue';
@@ -30,9 +30,6 @@ function pageload(pageNum: number, nextKey?: Uint8Array) {
     codeIds.value = x?.codeInfos.map(item => item.codeId.toString())
   });
 }
-watchEffect(() => {
-  console.log({ contracts: toRaw(contracts.value) })
-})
 
 watch(codeIds, () => {
   for (let codeId of codeIds.value) {
@@ -90,7 +87,7 @@ function myContracts() {
             <th>{{ $t('cosmwasm.code_id') }}</th>
             <th>{{ $t('cosmwasm.code_hash') }}</th>
             <th>{{ $t('cosmwasm.creator') }}</th>
-            <th>Contract</th>
+            <th>Contracts</th>
             <th class="text-right">{{ $t('cosmwasm.permissions') }}</th>
             <th>Action</th>
           </tr>
@@ -120,11 +117,11 @@ function myContracts() {
               > -->
             </td>
             <td>
-              <label for="wasm_instantiate_contract" class="btn btn-primary" @click="
+              <label for="wasm_instantiate_contract" class="px-4 py-2 rounded-lg btn-primary hover:cursor-pointer" @click="
                 dialog.open('wasm_instantiate_contract', {
                   codeId: v.codeId,
                 })
-                " v-if="walletStore.currentAddress">{{ $t('cosmwasm.instantiate_contract') }}</label>
+                " v-if="walletStore.currentAddress">Instantiate</label>
 
               <div v-if="!walletStore.currentAddress">
                 <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"

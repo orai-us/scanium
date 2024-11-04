@@ -10,11 +10,9 @@ import type {
   PaginabledContractStates,
   WasmParam,
 } from './types';
-import { fromAscii, fromBase64, toAscii, toBase64 } from '@cosmjs/encoding';
+import { toAscii,} from '@cosmjs/encoding';
 import type { PageRequest } from '@/types';
-import { useBlockchain } from '@/stores';
 import type {
-  CodeInfoResponse,
   QueryAllContractStateResponse,
   QueryCodesResponse,
 } from 'cosmjs-types/cosmwasm/wasm/v1/query';

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
-import { computed, ref } from '@vue/reactivity';
 import type { GetTxResponse } from 'cosmjs-types/cosmos/tx/v1beta1/service';
 import { logs } from '@cosmjs/stargate';
 import { JsonViewer } from 'vue3-json-viewer';
@@ -9,6 +8,7 @@ import { JsonViewer } from 'vue3-json-viewer';
 import 'vue3-json-viewer/dist/index.css';
 import { wrapBinary } from '@/libs/utils';
 import { Icon } from '@iconify/vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -32,6 +32,7 @@ const txLogs = computed(() => {
     tx.value?.txResponse?.logs || logs.parseRawLog(tx.value?.txResponse?.rawLog)
   );
 });
+
 </script>
 <template>
   <div class="box-content !p-0">
@@ -183,3 +184,10 @@ const txLogs = computed(() => {
     </div>
   </div>
 </template>
+
+<style>
+.jv-container .jv-code.boxed {
+  max-height: fit-content;
+  overflow-y: auto;
+}
+</style>

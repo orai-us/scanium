@@ -1,6 +1,6 @@
 import { api, METHODS } from './api';
 
-const baseUrlOraidex = import.meta.env.VITE_APP_BASE_URL_ORAIDEX;
+const baseUrlOraidex = 'https://tx-history-backend.oraidex.io';
 
 export interface ParamsGetHistoryTxs {
   addrByNetworks: string;

@@ -9,7 +9,7 @@ import {
 } from '@/stores';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
-import type { Key } from '@/types';
+import type { Key, SigningInfo } from '@/types';
 import { formatSeconds } from '@/libs/utils';
 import type { Validator } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import type { Params, ValidatorSigningInfo } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
@@ -18,7 +18,6 @@ import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { consensusPubkeyToHexAddress, decodeKey, valconsToBase64 } from '@/libs';
 import { Commit } from '@cosmjs/tendermint-rpc';
 import UptimeBar from '@/components/UptimeBar.vue';
-import { toRaw } from 'vue';
 
 enum SORT_TYPE {
   ASC = "asc",
@@ -289,7 +288,7 @@ const getUpTimeValidator = (validator: any) => {
   return null
 }
 
-const signingInfo = ref({} as Record<string, ValidatorSigningInfo>);
+const signingInfo = ref({} as Record<string, SigningInfo>);
 
 const listUptime = computed(() => {
   if (chainStore.isConsumerChain) {
@@ -307,7 +306,7 @@ const listUptime = computed(() => {
         hex: hexAddress,
         uptime:
           signing && window > 0
-            ? (window - Number(signing.missedBlocksCounter)) / window
+            ? (window - Number(signing.missed_blocks_counter)) / window
             : undefined,
       };
     });
@@ -323,7 +322,7 @@ const listUptime = computed(() => {
         hex: consensusPubkeyToHexAddress(v.consensusPubkey),
         uptime:
           signing && window > 0
-            ? (window - Number(signing.missedBlocksCounter)) / window
+            ? (window - Number(signing.missed_blocks_counter)) / window
             : undefined,
       };
     });
@@ -374,7 +373,7 @@ onMounted(() => {
 });
 
 function updateTotalSigningInfo() {
-  chainStore.rpc.getSlashingSigningInfos().then((x) => {
+  chainStore.rpc.getSlashingSigningInfos1().then((x) => {
     x.info?.forEach((i) => {
       signingInfo.value[valconsToBase64(i.address)] = i;
     });
@@ -439,7 +438,7 @@ function handleSortList(validator: any[], sortDescription: any){
           change24hSort
         }
       }).sort((a, b) => {
-        if (a.change24hSort > b.change24hSort) return sortDescription.type === SORT_TYPE.ASC ? -1 : 1
+        if (Number(a.change24hSort) > Number(b.change24hSort)) return sortDescription.type === SORT_TYPE.ASC ? -1 : 1
         return sortDescription.type === SORT_TYPE.ASC ? 1 : -1
       })
       break;
@@ -649,22 +648,22 @@ function handleSortList(validator: any[], sortDescription: any){
                   <div class="flex flex-col">
                     <h6 class="text-sm font-weight-medium whitespace-nowrap">
                       {{
-                        format.formatToken(
-                          {
-                            amount: parseInt(v.tokens).toString(),
-                            denom: staking.params.bondDenom,
-                          },
-                          true,
-                          '0,0'
-                        )
+                      format.formatToken(
+                      {
+                      amount: parseInt(v.tokens).toString(),
+                      denom: staking.params.bondDenom,
+                      },
+                      true,
+                      '0,0'
+                      )
                       }}
                     </h6>
                     <span class="text-xs">{{
                       format.calculatePercent(
-                        v.delegatorShares,
-                        staking.totalPower
+                      v.delegatorShares,
+                      staking.totalPower
                       )
-                    }}</span>
+                      }}</span>
                   </div>
                 </td>
                 <!-- 👉 Uptime  -->
@@ -678,7 +677,7 @@ function handleSortList(validator: any[], sortDescription: any){
                 </td>
                 <!-- 👉 24h Changes -->
                 <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
-                  {{change24h }}-{{ change24Text(v.consensusPubkey) }}
+                  {{ change24h }}
                 </td>
                 <!-- 👉 commission -->
                 <td class="text-right text-xs">
@@ -724,12 +723,12 @@ function handleSortList(validator: any[], sortDescription: any){
               <label class="truncate text-sm mb-1">
                 <span class="ml-1 text-black dark:text-white">{{ i + 1 }}.{{ v.description.moniker }}</span>
               </label>
-              <div v-if="Number(signing?.missedBlocksCounter || 0) > 10"
+              <div v-if="Number(signing?.missed_blocks_counter || 0) > 10"
                 class="badge badge-sm bg-transparent border-0 text-red-500 font-bold">
-                {{ signing?.missedBlocksCounter }}
+                {{ signing?.missed_blocks_counter }}
               </div>
               <div v-else class="badge badge-sm bg-transparent text-green-600 border-0 font-bold">
-                {{ signing?.missedBlocksCounter }}
+                {{ signing?.missed_blocks_counter }}
               </div>
             </div>
             <UptimeBar :blocks="commits2" :validator="hex" />
