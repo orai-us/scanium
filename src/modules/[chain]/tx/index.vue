@@ -50,7 +50,7 @@ watch(transactions, () => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in base.txsInRecents" :index="index" class="hover:bg-base-300">
+          <tr v-for="(item, index) in base.txsInRecents" :index="item.hash" class="hover:bg-base-300">
             <td class="truncate text-link">
               <RouterLink :to="`/${props.chain}/tx/${item.hash}`">{{
                 shortenTxHash(item.hash)
