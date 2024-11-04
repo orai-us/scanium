@@ -143,7 +143,8 @@ function myContracts() {
 <route>
     {
       meta: {
-        i18n: 'cosmwasm'
+        i18n: 'cosmwasm',
+        order: 17
       }
     }
 </route>

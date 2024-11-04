@@ -55,11 +55,11 @@ function pageload(p: number) {
   </div>
 </template>
 
-<route>
+<!-- <route>
     {
       meta: {
         i18n: 'supply',
         order: 17
       }
     }
-  </route>
+  </route> -->
