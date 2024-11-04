@@ -101,15 +101,20 @@ function myContracts() {
                 {{ toHex(v.dataHash) }}
               </RouterLink>
             </td>
-            <td>{{ v.creator }}</td>
+            <td>
+              <RouterLink :to="`/${props.chain}/account/${v.creator}`"
+                class="truncate max-w-[300px] block dark:text-[#B999F3]" :title="toHex(v.dataHash)">
+                {{ v.creator }}
+              </RouterLink>
+            </td>
             <td>{{ contracts[v.codeId.toString()] }}</td>
             <td class="text-right">
               {{
-                accessTypeToJSON(v.instantiatePermission?.permission)
-                  .toLowerCase()
-                  .replace(/^access_type/, '')
-                  .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                  .trim()
+              accessTypeToJSON(v.instantiatePermission?.permission)
+              .toLowerCase()
+              .replace(/^access_type/, '')
+              .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
+              .trim()
               }}
               <!-- <span
                 >{{ v.instantiatePermission?.address }}
@@ -117,7 +122,8 @@ function myContracts() {
               > -->
             </td>
             <td>
-              <label for="wasm_instantiate_contract" class="px-4 py-2 rounded-lg btn-primary hover:cursor-pointer" @click="
+              <label for="wasm_instantiate_contract" class="px-4 py-2 rounded-lg btn-primary hover:cursor-pointer"
+                @click="
                 dialog.open('wasm_instantiate_contract', {
                   codeId: v.codeId,
                 })
@@ -125,8 +131,7 @@ function myContracts() {
 
               <div v-if="!walletStore.currentAddress">
                 <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
-                  class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Connect
-                  wallet</label>
+                  class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Instantiate</label>
               </div>
             </td>
           </tr>
