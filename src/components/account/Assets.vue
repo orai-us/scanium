@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
 import { LIST_COIN } from '@/constants';
@@ -105,7 +105,7 @@ const unbondingAssets = computed(() => {
   return supportedAssets.value ? resultSupported : resultUnSupported;
 })
 
-watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets], async () => {
+watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, supportedAssets], async () => {
   const assets = [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value]
   const ids = assets.map(item => item?.id)
 
