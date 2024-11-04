@@ -28,7 +28,7 @@ const delegatesAssets = ref([] as Array<Asset>);
 const rewardsTotalAssets = ref([] as Array<Asset>);
 const unbondingAssets = ref([] as Array<Asset>);
 const totalValue = ref();
-const totalAmountByCategory = ref();
+const totalAmountByCategory = ref([] as Array<any>);
 
 const priceBySymbol = ref({} as any);
 
@@ -126,7 +126,7 @@ watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets], as
   const ids = assets.map(item => item?.id)
 
   const result: any = {}
-  if (ids.length > 0) {
+  if (ids?.length > 0) {
     const res = await getPriceByIds({ ids: ids.join(",") });
     for (let item in res) {
       result[coingeckoSymbols[coingeckoIds.indexOf(item)]] = res[item]?.usd
@@ -251,7 +251,7 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
             </div>
           </div>
           <!-- mdi-account-arrow-right -->
-          <div class="flex items-center px-4" v-if="unbondingAssets.length > 0">
+          <div class="flex items-center px-4" v-if="unbondingAssets?.length > 0">
             <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
               <Icon icon="mdi-account-arrow-right" class="text-error" size="20" />
               <div class="absolute top-0 bottom-0 left-0 right-0 bg-error opacity-20"></div>
