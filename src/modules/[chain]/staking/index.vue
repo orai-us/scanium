@@ -373,7 +373,7 @@ onMounted(() => {
 });
 
 function updateTotalSigningInfo() {
-  chainStore.rpc.getSlashingSigningInfos().then((x) => {
+  chainStore.rpc.getSlashingSigningInfos1().then((x) => {
     x.info?.forEach((i) => {
       signingInfo.value[valconsToBase64(i.address)] = i;
     });

@@ -861,11 +861,16 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     return res;
   }
   async getSlashingSigningInfos() {
+    // const query = '?pagination.limit=300';
+    // return this.request(this.registry.slashing_signing_info, {}, query);
+    const res = await this.queryClient.slashing.signingInfos();
+    console.log(res);
+    return res;
+  }
+
+  async getSlashingSigningInfos1() {
     const query = '?pagination.limit=300';
     return this.request(this.registry.slashing_signing_info, {}, query);
-    // const res = await this.queryClient.slashing.signingInfos();
-    // console.log(res);
-    // return res;
   }
   // Gov
   async getParams(subspace: string, key: string) {
