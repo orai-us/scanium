@@ -33,7 +33,7 @@ function changeTypeTx(tx: string) {
       </button>
       <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === TRANSACTION_TYPE.TRANSFERS }"
         v-on:click="changeTypeTx(TRANSACTION_TYPE.TRANSFERS)">
-        Token transfers
+        Token Transfers
       </button>
     </div>
     <div v-show="txType === TRANSACTION_TYPE.ALL">
