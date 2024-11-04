@@ -13,7 +13,7 @@ watch([() => props.transactions], () => {
   if (CHAIN_INDEXS.includes(props.chain)) {
     txs.value = props.transactions?.map((item: any) => ({
       txhash: item?.id,
-      result: item.code ? "Success" : "Failed",
+      result: item.code === 0 ? "Success" : "Failed",
       message: format.messages(item.messages?.nodes.map((item: any) =>
         ({ "@type": item.type, typeUrl: item.type })
       )),

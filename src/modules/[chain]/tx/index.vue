@@ -1,7 +1,10 @@
 <script lang="ts" setup>
+import { CHAIN_INDEXS } from '@/constants';
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import { shortenTxHash } from '@/utils';
 import { Icon } from '@iconify/vue';
+import { useQuery } from '@vue/apollo-composable';
+import gql from 'graphql-tag';
 import { computed, ref, toRaw, watch, watchEffect } from 'vue';
 const props = defineProps(['chain']);
 
@@ -10,12 +13,57 @@ const format = useFormatter();
 const blockchain = useBlockchain();
 const detailTxs = ref({} as any);
 
-const transactions = computed(() => {
-  return base.txsInRecents
+const query = gql`
+      query GetTransactions($orderBy: [TransactionsOrderBy!], $first: Int!, $offset: Int!) {
+        transactions(orderBy: $orderBy, first: $first, offset:$offset) {
+          results: nodes {
+            id
+            blockNumber
+            gasUsed
+            timestamp
+            sender
+            fee
+            code
+            messages {
+              nodes {
+                type
+                subType
+              }
+            }
+          }
+          totalCount
+        }
+      }
+`;
+
+const variables = computed(() => {
+  return {
+    orderBy: "BLOCK_NUMBER_DESC",
+    first: 10,
+    offset: 0
+  }
+})
+
+const { result } = useQuery(query, variables);
+
+const transactions: any = computed(() => {
+  console.log({ data: base.txsInRecents })
+  let initTxs: never[] = []
+  if (result.value && CHAIN_INDEXS.includes(props.chain)) {
+    initTxs = result.value?.transactions?.results.map((item: any) => ({
+      hash: item.id,
+      code: item.code,
+      timestamp: item.timestamp,
+      messages: item.messages.nodes[0].type.split(".").slice(-1)[0],
+      height: item.blockNumber,
+      fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom.toUpperCase()}`
+    }))
+    return [...base.txsInRecents, ...initTxs]
+  } else return base.txsInRecents
 })
 
 watch(transactions, () => {
-  for (let tx of transactions.value) {
+  for (let tx of base.txsInRecents) {
     blockchain.rpc.getTx(tx.hash).then((x) => {
       detailTxs.value[tx.hash] = x;
     });
@@ -50,39 +98,48 @@ watch(transactions, () => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in base.txsInRecents" :index="item.hash" class="hover:bg-base-300">
+          <tr v-for="(item, index) in transactions" :index="item.hash" class="hover:bg-base-300">
             <td class="truncate text-link">
               <RouterLink :to="`/${props.chain}/tx/${item.hash}`">{{
                 shortenTxHash(item.hash)
-              }}</RouterLink>
+                }}</RouterLink>
             </td>
             <td>
-              <span class="text-xs truncate relative py-2 w-fit rounded inline-flex items-center" :class="`${detailTxs[item.hash]?.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
+              <span class="text-xs truncate relative py-2 w-fit rounded inline-flex items-center" :class="`${detailTxs[item.hash]?.txResponse.code !== 0 ? 'text-error': 'text-[#39DD47]'
                 }`" v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
                 <!-- <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp; -->
-                {{ detailTxs[item.hash]?.txResponse.code === 0 ? 'Success' : 'Failed' }}
+                {{ detailTxs[item.hash]?.txResponse.code !== 0 ? 'Failed' : 'Success' }}
+              </span>
+              <span v-else-if="item.code !== null && item.code !== undefined" :class="`${item.code !== 0 ? 'text-error' : 'text-[#39DD47]'
+                }`">
+                {{ item.code !== 0 ? "Failed" : "Success" }}
               </span>
               <span v-else>-</span>
             </td>
             <td>
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">
-                {{ format.messages(item.tx.body.messages) }}
+                {{ item.messages || format.messages(item.tx?.body?.messages) }}
               </span>
             </td>
 
-            <td>{{ format.formatTokens(item.tx.authInfo.fee?.amount) }}</td>
+            <td>{{ item.fee || format.formatTokens(item.tx?.authInfo?.fee?.amount) }}</td>
             <td class="text-sm text-link">
               <RouterLink :to="`/${props.chain}/block/${item.height}`">{{
                 item.height
-              }}</RouterLink>
+                }}</RouterLink>
             </td>
             <td>
-             <span v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
-              {{ format.toLocaleDate(detailTxs[item.hash]?.txResponse?.timestamp) }} ({{
+              <span v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
+                {{ format.toLocaleDate(detailTxs[item.hash]?.txResponse?.timestamp) }} ({{
                 format.toDay(detailTxs[item.hash]?.txResponse?.timestamp, 'from')
-              }})
-             </span> 
-             <span v-else>-</span>
+                }})
+              </span>
+              <span v-else-if="!!item.timestamp">
+                {{ format.toLocaleDate(Number(item.timestamp)) }} ({{
+                format.toDay(Number(item.timestamp), 'from')
+                }})
+              </span>
+              <span v-else>-</span>
             </td>
           </tr>
         </tbody>
