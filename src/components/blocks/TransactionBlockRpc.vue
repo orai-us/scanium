@@ -13,7 +13,8 @@ const format = useFormatter();
 const props = defineProps({
   value: { type: Object as PropType<Block> },
   chain: { type: String },
-  height: {type: String}
+  height: {type: String},
+  time: {type: String}
 });
 
 const txs = computed(() => {
@@ -40,7 +41,7 @@ const transactions = computed(() => {
     message: item.tx?.body ? format.messages(item.tx?.body.messages.map((x: any) => ({ '@type': x.typeUrl }))) : '',
     height: props.height,
     fee: `${item?.tx?.authInfo?.fee?.amount[0]?.amount} ${item?.tx?.authInfo?.fee?.amount[0]?.denom?.toUpperCase()}` ,
-    timestamp: format.toLocaleDate(item?.timestamp)
+    timestamp: props.time
   }));
 })
 

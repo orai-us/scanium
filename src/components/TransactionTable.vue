@@ -54,7 +54,8 @@ watch([() => props.transactions], () => {
               {{ shortenTxHash(v.txhash) }}
             </RouterLink>
           </td>
-          <td class="text-sm py-3">
+          <td class="text-sm py-3" :class="`${v.result === 'Success' ? 'text-[#39DD47]' : 'text-error'
+            }`">
             {{ v.result }}
           </td>
           <td class="flex items-center py-3">

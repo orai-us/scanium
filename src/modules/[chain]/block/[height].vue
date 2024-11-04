@@ -218,7 +218,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
           <TransactionBlockIndexs :height="height" :chain="chain" />
         </div>
         <div v-else>
-          <TransactionBlockRpc :value="current.block" :chain="chain" :height="height" />
+          <TransactionBlockRpc :value="current.block" :chain="chain" :height="height" :time="blockInformation?.Time" />
         </div>
       </div>
 
