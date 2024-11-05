@@ -1,0 +1,70 @@
+{
+  "chain_name": "nibiru",
+  "coingecko": "nibiru",
+  "api": [
+    "https://lcd.nibiru.fi",
+    "https://nibiru.api.kjnodes.com",
+    "https://api.nibiru.nodestake.org",
+    "https://api.nibiru.silentvalidator.com",
+    "https://nibiru-api.lavenderfive.com:443",
+    "https://nibiru.api.liveraven.net",
+    "https://nibiru-api.cogwheel.zone",
+    "https://nibiru.api.m.stavr.tech",
+    "https://nibiru.api.nodeshub.online:443",
+    "https://nibiru.api.staking-explorer.com",
+    "https://nibiru-api.noders.services",
+    "https://nibiru-mainnet.api.stakevillage.net",
+    "https://nibiru-rest.publicnode.com"
+  ],
+  "rpc": [
+    "https://rpc.nibiru.fi",
+    "https://nibiru.rpc.kjnodes.com",
+    "https://rpc.nibiru.nodestake.org",
+    "https://nibiru-rpc.lavenderfive.com:443",
+    "https://rpc.nibiru.silentvalidator.com",
+    "https://nibiru.rpc.liveraven.net",
+    "https://nibiru-rpc.cogwheel.zone",
+    "https://nibiru.rpc.nodeshub.online:443",
+    "https://nibiru.rpc.m.stavr.tech:443",
+    "https://nibiru-rpc.noders.services",
+    "https://nibiru-mainnet.rpc.stakevillage.net:443",
+    "https://nibiru-rpc.publicnode.com:443"
+  ],
+  "snapshot_provider": "",
+  "sdk_version": "0.47.10",
+  "coin_type": "118",
+  "min_tx_fee": "250",
+  "addr_prefix": "nibi",
+  "logo": "https://ping.pub/logos/nibiru.svg",
+  "theme_color": "#04d9d9",
+  "assets": [
+    {
+      "base": "unibi",
+      "symbol": "NIBI",
+      "exponent": "6",
+      "coingecko_id": "nibiru",
+      "logo": "https://ping.pub/logos/nibiru.svg"
+    },
+    {
+      "base": "tf/nibi149m52kn7nvsg5nftvv4fh85scsavpdfxp5nr7zasz97dum89dp5qkyhy0t/uoprek",
+      "symbol": "UOPREK",
+      "exponent": "0",
+      "coingecko_id": "",
+      "logo": ""
+    },
+    {
+      "base": "tf/nibi1lp28kx3gz0prsztl024z730ufkg3alahaq3e7a6gae22nk0dqdvsyrrgqw/utestate",
+      "symbol": "UTESTATE",
+      "exponent": "0",
+      "coingecko_id": "",
+      "logo": ""
+    },
+    {
+      "base": "tf/nibi1xpp7yn0tce62ffattws3gpd6v0tah0mlevef3ej3r4pnfvsehcgqk3jvxq/NPP",
+      "symbol": "NPP",
+      "exponent": "0",
+      "coingecko_id": "",
+      "logo": ""
+    }
+  ]
+}
