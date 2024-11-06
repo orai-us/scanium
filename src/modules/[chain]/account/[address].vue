@@ -318,7 +318,7 @@ const isOwnerWallet = computed(() => {
                 }}
               </td>
               <td class="text-caption py-3">
-                {{ new Date(Number(v.entries[0]?.completionTime?.seconds) * 1000).toISOString() }}
+                {{ format.toLocaleDate(new Date(Number(v.entries[0]?.completionTime?.seconds) * 1000)) }}
               </td>
             </tr>
             <!-- <tr v-for="entry in v.entries">
