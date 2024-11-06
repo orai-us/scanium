@@ -35,7 +35,7 @@ async function fetchTransaction() {
         blockNumber: item.height,
         fee: `${Number(item.fee[0]) / 1e6} ORAI`,
         token: item.tokenInfos[0].denom.toUpperCase(),
-        timestamp: item.timestamp * 1000
+        timestamp:  format.toLocaleDate(new Date(Number(item.timestamp * 1000)))
       }));
       txTotal.value = response.totalRecord;
     }
