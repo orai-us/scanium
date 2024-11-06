@@ -13,7 +13,6 @@ import {
 } from '@/stores';
 import { PageRequest } from '@/types';
 import { fromBech32, toHex } from '@cosmjs/encoding';
-import { computed } from '@vue/reactivity';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 import type { Params } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import type { Proposal, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
@@ -29,13 +28,13 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
-    MsgSoftwareUpgrade & {
-      current: Params[];
-    };
+  MsgSoftwareUpgrade & {
+    current: Params[];
+  };
 };
 
 const props = defineProps(['proposal_id', 'chain']);
@@ -45,11 +44,13 @@ const store = useGovStore();
 const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const chainStore = useBlockchain();
+const summary = ref()
 
 store.fetchProposal(props.proposal_id).then((res) => {
+  summary.value = res.proposal.summary;
   const proposalDetail = reactive(res.proposal);
   const changeProposal = decodeProto(
-    proposalDetail.content!
+    proposalDetail.content! as any
   ) as ParameterChangeProposal;
   Object.assign(proposalDetail.content!, changeProposal);
   // @ts-ignore
@@ -118,6 +119,7 @@ const pageResponse = ref({} as PageResponse | undefined);
 store.fetchProposalVotes(props.proposal_id).then((x) => {
   votes.value = x.votes;
   pageResponse.value = x.pagination;
+  console.log({ votes: x.votes })
 });
 
 function shortTime(v: string | Date | Timestamp) {
@@ -207,7 +209,7 @@ const processList = computed(() => {
     { name: 'Turnout', value: turnout.value, class: 'bg-info' },
     { name: 'Yes', value: yes.value, class: 'bg-success' },
     { name: 'No', value: no.value, class: 'bg-error' },
-    { name: 'No With Veto', value: veto.value, class: 'bg-red-800' },
+    { name: 'Veto', value: veto.value, class: 'bg-red-800' },
     { name: 'Abstain', value: abstain.value, class: 'bg-warning' },
   ];
 });
@@ -235,43 +237,45 @@ function metaItem(metadata: string | undefined): {
 } {
   return metadata ? JSON.parse(metadata) : {};
 }
+
 </script>
 
 <template>
   <div class="px-6">
     <div class="px-4 pt-3 pb-4 rounded mb-4 shadow">
-      <h2
-        class="card-title flex flex-col md:!justify-between md:!flex-row mb-2 text-white"
-      >
+      <h2 class="card-title flex flex-col md:!justify-between md:!flex-row mb-2 text-white">
         <p class="truncate w-full">
           #{{ proposal_id }}
           {{ proposal.content?.title }}
         </p>
-        <div
-          class="badge badge-ghost"
-          :class="
-            color === 'success'
-              ? 'text-yes'
-              : color === 'error'
+        <div class="badge badge-ghost" :class="color === 'success'
+            ? 'text-yes'
+            : color === 'error'
               ? 'text-no'
               : 'text-info'
-          "
-        >
+          ">
           {{ proposal.status }}
         </div>
       </h2>
 
-      <div v-if="proposal.content?.description">
-        <MdEditor
-          :model-value="format.multiLine(proposal.content?.description)"
-          previewOnly
-          class="md-editor-recover"
-        ></MdEditor>
+      <!-- <div v-if="proposal.content?.description">
+        <MdEditor :model-value="format.multiLine(proposal.content?.description)" previewOnly class="md-editor-recover">
+        </MdEditor>
       </div>
       <div v-if="proposalRest">
         <ObjectElement :value="proposalRest" />
+      </div> -->
+
+      <div v-if="proposal.content">
+        <ObjectElement :value="proposal.content" />
+      </div>
+      
+      <div v-if="summary && !proposal.content?.description">
+        <MdEditor :model-value="format.multiLine(summary)" previewOnly class="md-editor-recover">
+        </MdEditor>
       </div>
     </div>
+
     <!-- grid lg:!!grid-cols-3 auto-rows-max-->
     <!-- flex-col lg:!!flex-row flex -->
     <div class="gap-4 mb-4 grid lg:!!grid-cols-3 auto-rows-max">
@@ -282,7 +286,7 @@ function metaItem(metadata: string | undefined): {
         </h2>
         <div class="mb-1" v-for="(item, index) of processList" :key="index">
           <label class="block text-sm mb-1">{{ item.name }}</label>
-          <div class="h-5 w-full relative mb-3">
+          <div class="h-5 w-full relative">
             <div
               class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm"
               :class="`${item.class}`"
@@ -292,7 +296,7 @@ function metaItem(metadata: string | undefined): {
               :class="`${item.class}`"
               :style="`width: ${
                 item.value === '-' || item.value === 'NaN%' ? '0%' : item.value
-              }, max-width: 100%`"
+              }`"
             ></div>
             <p
               class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center"
@@ -301,19 +305,13 @@ function metaItem(metadata: string | undefined): {
             </p>
           </div>
         </div>
-        <div class="mt-6 grid grid-cols-2">
-          <label
-            for="vote"
-            class="btn btn-primary float-right btn-sm mx-1"
-            @click="dialog.open('vote', { proposal_id })"
-            >{{ $t('gov.btn_vote') }}</label
-          >
-          <label
-            for="deposit"
+        <div class="mt-6 grid grid-cols-2"
+          v-if="proposal.status !== ProposalStatus.PROPOSAL_STATUS_PASSED && proposal.status !== ProposalStatus.PROPOSAL_STATUS_REJECTED">
+          <label for="vote" class="btn btn-primary float-right btn-sm mx-1"
+            @click="dialog.open('vote', { proposal_id })">{{ $t('gov.btn_vote') }}</label>
+          <label for="deposit"
             class="btn btn-primary rounded-lg float-right btn-sm mx-1 bg-[#2E2E33] border border-[#383B40]"
-            @click="dialog.open('deposit', { proposal_id })"
-            >{{ $t('gov.btn_deposit') }}</label
-          >
+            @click="dialog.open('deposit', { proposal_id })">{{ $t('gov.btn_deposit') }}</label>
         </div>
       </div>
 
@@ -336,22 +334,22 @@ function metaItem(metadata: string | undefined): {
             <div class="text-base flex-1 text-main">
               {{ $t('gov.deposited_at') }}:
               {{
-                format.toDay(
-                  proposal.status ===
-                    ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD
-                    ? proposal.depositEndTime
-                    : proposal.votingStartTime
-                )
+              format.toDay(
+              proposal.status ===
+              ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD
+              ? proposal.depositEndTime
+              : proposal.votingStartTime
+              )
               }}
             </div>
             <div class="text-sm">
               {{
-                shortTime(
-                  proposal.status ===
-                    ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD
-                    ? proposal.depositEndTime
-                    : proposal.votingStartTime
-                )
+              shortTime(
+              proposal.status ===
+              ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD
+              ? proposal.depositEndTime
+              : proposal.votingStartTime
+              )
               }}
             </div>
           </div>
@@ -366,7 +364,8 @@ function metaItem(metadata: string | undefined): {
                 {{ shortTime(proposal.votingStartTime) }}
               </div>
             </div>
-            <div class="pl-5 text-sm mt-2">
+            <div class="pl-5 text-sm mt-2"
+              v-if="proposal.status !== ProposalStatus.PROPOSAL_STATUS_PASSED && proposal.status !== ProposalStatus.PROPOSAL_STATUS_REJECTED">
               <Countdown :time="votingCountdown" />
             </div>
           </div>
@@ -384,37 +383,34 @@ function metaItem(metadata: string | undefined): {
             <div class="pl-5 text-sm">
               {{ $t('gov.current_status') }}:
               {{
-                $t(
-                  `gov.proposal_statuses.${proposalStatusToJSON(
-                    proposal.status
-                  )}`
-                )
+              $t(
+              `gov.proposal_statuses.${proposalStatusToJSON(
+              proposal.status
+              )}`
+              )
               }}
             </div>
           </div>
 
-          <div
-            class="mt-4"
-            v-if="
-              proposal?.content?.typeUrl.endsWith('SoftwareUpgradeProposal')
-            "
-          >
+          <div class="mt-4" v-if="
+            proposal?.content?.typeUrl.endsWith('SoftwareUpgradeProposal')
+          ">
             <div class="flex items-center">
               <div class="w-2 h-2 rounded-full bg-warning mr-3"></div>
               <div class="text-base flex-1 text-main">
                 {{ $t('gov.upgrade_plan') }}:
                 <span v-if="Number(proposal.content.plan?.height || '0') > 0">
-                  (EST)</span
-                >
+                  (EST)</span>
                 <span v-else>{{
                   format.toDay(proposal.content?.plan?.time)
-                }}</span>
+                  }}</span>
               </div>
               <div class="text-sm">
                 {{ shortTime(proposal.votingEndTime) }}
               </div>
             </div>
-            <div class="pl-5 text-sm mt-2">
+            <div class="pl-5 text-sm mt-2"
+              v-if="proposal.status !== ProposalStatus.PROPOSAL_STATUS_PASSED && proposal.status !== ProposalStatus.PROPOSAL_STATUS_REJECTED">
               <Countdown :time="upgradeCountdown" />
             </div>
           </div>
@@ -429,45 +425,36 @@ function metaItem(metadata: string | undefined): {
           <tbody>
             <tr v-for="(item, index) of votes" :key="index">
               <td class="py-2 text-sm">{{ showValidatorName(item.voter) }}</td>
-              <td
-                v-if="item.option"
-                class="py-2 text-sm"
-                :class="{
-                  'text-yes': item.option === VoteOption.VOTE_OPTION_YES,
-                  'text-gray-400':
-                    item.option === VoteOption.VOTE_OPTION_ABSTAIN,
-                }"
-              >
+              <td v-if="item.option" class="py-2 text-sm" :class="{
+                'text-yes': item.option === VoteOption.VOTE_OPTION_YES,
+                'text-gray-400':
+                  item.option === VoteOption.VOTE_OPTION_ABSTAIN,
+              }">
                 {{
-                  voteOptionToJSON(item.option)
-                    .toLowerCase()
-                    .replace(/^vote_option/, '')
-                    .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                    .trim()
+                voteOptionToJSON(item.option)
+                .toLowerCase()
+                .replace(/^vote_option/, '')
+                .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
+                .trim()
                 }}
               </td>
               <td v-if="item.options" class="py-2 text-sm">
                 {{
                   item.options
-                    .map(
-                      (x) =>
-                        `${voteOptionToJSON(x.option)
-                          .toLowerCase()
-                          .replace(/^vote_option/, '')
-                          .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                          .trim()}:${format.percent(x.weight, 1e18)}`
-                    )
-                    .join(', ')
+                    .map((x:any) => {
+                      const result = `${voteOptionToJSON(x.option)
+                        .toLowerCase()
+                        .replace(/^vote_option/, '')
+                        .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
+                        .trim()}`
+                      if (result === "No With Vote") return "Vote"
+                    return result}).join(', ')
                 }}
               </td>
             </tr>
           </tbody>
         </table>
-        <PaginationBar
-          :limit="pageRequest.limit"
-          :total="pageResponse?.total?.toString()"
-          :callback="pageload"
-        />
+        <PaginationBar :limit="pageRequest.limit" :total="pageResponse?.total?.toString()" :callback="pageload" />
       </div>
     </div>
   </div>

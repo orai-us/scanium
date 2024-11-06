@@ -74,7 +74,7 @@ export function consensusPubkeyToKey(consensusPubkey?: Any) {
 }
 
 export function consensusPubkeyToHexAddress(consensusPubkey?: Any) {
-  console.log('consensusPubkey', consensusPubkey);
+  // console.log('consensusPubkey', consensusPubkey);
   const pubkey = consensusPubkeyToKey(consensusPubkey);
   if (!pubkey) return '';
   if (consensusPubkey?.typeUrl === '/cosmos.crypto.ed25519.PubKey') {

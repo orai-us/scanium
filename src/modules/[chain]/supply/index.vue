@@ -1,13 +1,10 @@
 <script lang="ts" setup>
-import { computed, ref } from '@vue/reactivity';
-import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
+import { useBlockchain, useFormatter } from '@/stores';
 import {
   PageRequest,
-  type AuthAccount,
-  type Pagination,
   type Coin,
 } from '@/types';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import PaginationBar from '@/components/PaginationBar.vue';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 const props = defineProps(['chain']);
@@ -58,11 +55,11 @@ function pageload(p: number) {
   </div>
 </template>
 
-<route>
+<!-- <route>
     {
       meta: {
         i18n: 'supply',
         order: 17
       }
     }
-  </route>
+  </route> -->

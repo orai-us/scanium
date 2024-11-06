@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
-import TxsElement from '@/components/dynamic/TxsElement.vue';
-import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
-import { computed } from '@vue/reactivity';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useBaseStore, useFormatter } from '@/stores';
 import Countdown from '@/components/Countdown.vue';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
+import { toBase64 } from '@cosmjs/encoding';
+import TransactionBlockIndexs from '@/components/blocks/TransactionBlockIndexs.vue';
+import TransactionBlockRpc from '@/components/blocks/TransactionBlockRpc.vue';
+import { CHAIN_INDEXS } from '@/constants';
 
 const props = defineProps(['height', 'chain']);
 
@@ -15,7 +16,7 @@ const store = useBaseStore();
 const format = useFormatter();
 const current = ref({} as BlockResponse);
 const target = ref(Number(props.height || 0));
-
+const blockInformation = ref();
 const height = computed(() => {
   return Number(current.value.block?.header?.height || props.height || 0);
 });
@@ -60,6 +61,28 @@ const estimateDate = computed(() => {
   return new Date(new Date().getTime() + estimateTime.value);
 });
 
+watch((current), () => {
+  const block = current.value?.block;
+  const blockId = current.value?.blockId;
+  const headerBlock = block?.header;
+  const lastCommit = block?.lastCommit;
+  const time = headerBlock?.time;
+  const chainId = headerBlock?.chainId;
+  const blockHash = toBase64(blockId?.hash);
+  const round = lastCommit?.round;
+  const txCount = block?.txs?.length;
+  const proposerAddress = headerBlock?.proposerAddress;
+  const proposer = format.validator(proposerAddress && toBase64(proposerAddress))
+  blockInformation.value = {
+    'Time': format.toLocaleDate(time.toString()),
+    'Chain': chainId,
+    'Block Hash': blockHash,
+    'Round': round,
+    'TX Counts': txCount,
+    'Proposer': proposer
+  }
+})
+
 const edit = ref(false);
 const newHeight = ref(props.height);
 function updateTarget() {
@@ -86,16 +109,13 @@ onBeforeRouteUpdate(async (to, from, next) => {
           {{ $t('block.estimated_time') }}:
           <span class="text-xl font-normal">{{
             format.toLocaleDate(estimateDate)
-          }}</span>
+            }}</span>
         </div>
         <div class="pt-10 flex justify-center">
           <div class="box-content !p-6 rounded-2xl !bg-base">
             <table class="table w-max rounded-2xl">
               <tbody>
-                <tr
-                  class="hover hover:brightness-150 rounded cursor-pointer !border-base-300"
-                  @click="edit = !edit"
-                >
+                <tr class="hover hover:brightness-150 rounded cursor-pointer !border-base-300" @click="edit = !edit">
                   <td>{{ $t('block.countdown_for_block') }}:</td>
                   <td class="text-right">
                     <span class="md:!ml-40">{{ target }}</span>
@@ -108,15 +128,8 @@ onBeforeRouteUpdate(async (to, from, next) => {
                     </h3>
                     <div class="py-4">
                       <div class="join">
-                        <input
-                          class="input input-bordered join-item !bg-base-300"
-                          v-model="newHeight"
-                          type="number"
-                        />
-                        <button
-                          class="btn btn-primary join-item"
-                          @click="updateTarget()"
-                        >
+                        <input class="input input-bordered join-item !bg-base-300" v-model="newHeight" type="number" />
+                        <button class="btn btn-primary join-item" @click="updateTarget()">
                           {{ $t('block.btn_update') }}
                         </button>
                       </div>
@@ -148,47 +161,73 @@ onBeforeRouteUpdate(async (to, from, next) => {
     <div v-else>
       <div class="box-content">
         <h2 class="card-title flex flex-row justify-between text-white">
-          <p class="">#{{ current.block?.header?.height }}</p>
+          <p class="">Block #{{ current.block?.header?.height }}</p>
           <div class="flex" v-if="props.height">
-            <RouterLink
-              :to="`/${store.blockchain.chainName}/block/${height - 1}`"
-              class="btn btn-primary btn-sm p-1 text-2xl mr-2"
-            >
+            <RouterLink :to="`/${store.blockchain.chainName}/block/${height - 1}`"
+              class="btn btn-primary btn-sm p-1 text-2xl mr-2">
               <Icon icon="mdi-arrow-left" class="w-full h-full" />
             </RouterLink>
-            <RouterLink
-              :to="`/${store.blockchain.chainName}/block/${height + 1}`"
-              class="btn btn-primary btn-sm p-1 text-2xl"
-            >
+            <RouterLink :to="`/${store.blockchain.chainName}/block/${height + 1}`"
+              class="btn btn-primary btn-sm p-1 text-2xl">
               <Icon icon="mdi-arrow-right" class="w-full h-full" />
             </RouterLink>
           </div>
         </h2>
-        <div>
+        <!-- <div>
           <DynamicComponent :value="current.blockId" />
-        </div>
+        </div> -->
       </div>
 
-      <div class="box-content">
+      <!-- <div class="box-content">
         <h2 class="card-title flex flex-row justify-between text-white">
           {{ $t('block.block_header') }}
         </h2>
         <DynamicComponent :value="current.block?.header" />
+      </div> -->
+
+      <div class="box-content">
+        <h2 class="card-title flex flex-row justify-between text-white">
+          <p class="">Block Information</p>
+        </h2>
+        <div class="w-full h-[1px] bg-[#242627] my-2"></div>
+        <div class="overflow-auto">
+          <table class="table table-compact w-full text-sm">
+            <tbody>
+              <tr v-for="(v, k) of blockInformation">
+                <td class="capitalize whitespace-break-spaces min-w-max">
+                  {{ k }}
+                </td>
+                <td class="w-4/5">
+                  <div class="overflow-hidden w-auto whitespace-normal">
+                    <p>{{ v }}</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="box-content">
         <h2 class="card-title flex flex-row justify-between text-white">
           {{ $t('account.transactions') }}
         </h2>
-        <TxsElement :value="current.block" />
+        <div class="w-full h-[1px] bg-[#242627] my-2"></div>
+        <!-- <TxsElement :value="current.block" /> -->
+        <div v-if="CHAIN_INDEXS.includes(chain)">
+          <TransactionBlockIndexs :height="height" :chain="chain" />
+        </div>
+        <div v-else>
+          <TransactionBlockRpc :value="current.block" :chain="chain" :height="height" :time="blockInformation?.Time" />
+        </div>
       </div>
 
-      <div class="box-content">
+      <!-- <div class="box-content">
         <h2 class="card-title flex flex-row justify-between text-white">
           {{ $t('block.last_commit') }}
         </h2>
         <DynamicComponent :value="commit" />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

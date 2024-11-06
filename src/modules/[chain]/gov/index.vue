@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useGovStore } from '@/stores';
 import ProposalListItem from '@/components/ProposalListItem.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, toRaw } from 'vue';
 import PaginationBar from '@/components/PaginationBar.vue';
 import { PageRequest } from '@/types';
 import { ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
@@ -12,14 +12,14 @@ const pageRequest = ref(new PageRequest());
 
 onMounted(() => {
   store
-    .fetchProposals(ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD)
+    .fetchProposals(ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD, pageRequest.value)
     .then((x) => {
       if (x?.proposals.length === 0) {
         tab.value = ProposalStatus.PROPOSAL_STATUS_PASSED;
-        store.fetchProposals(ProposalStatus.PROPOSAL_STATUS_PASSED);
+        store.fetchProposals(ProposalStatus.PROPOSAL_STATUS_PASSED, pageRequest.value);
       }
-      store.fetchProposals(ProposalStatus.PROPOSAL_STATUS_PASSED);
-      store.fetchProposals(ProposalStatus.PROPOSAL_STATUS_REJECTED);
+      store.fetchProposals(ProposalStatus.PROPOSAL_STATUS_PASSED, pageRequest.value);
+      store.fetchProposals(ProposalStatus.PROPOSAL_STATUS_REJECTED, pageRequest.value);
     });
 });
 
@@ -40,35 +40,18 @@ function page(p: number) {
 <template>
   <div class="mx-6 section">
     <div class="tabs tabs-boxed bg-transparent mb-4 text-center customTab">
-      <a
-        class="tab text-gray-400 uppercase"
-        :class="{
-          'tab-active': tab === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
-        }"
-        @click="changeTab(ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD)"
-        >{{ $t('gov.voting') }}</a
-      >
-      <a
-        class="tab text-gray-400 uppercase"
-        :class="{ 'tab-active': tab === ProposalStatus.PROPOSAL_STATUS_PASSED }"
-        @click="changeTab(ProposalStatus.PROPOSAL_STATUS_PASSED)"
-        >{{ $t('gov.passed') }}</a
-      >
-      <a
-        class="tab text-gray-400 uppercase"
-        :class="{
-          'tab-active': tab === ProposalStatus.PROPOSAL_STATUS_REJECTED,
-        }"
-        @click="changeTab(ProposalStatus.PROPOSAL_STATUS_REJECTED)"
-        >{{ $t('gov.rejected') }}</a
-      >
+      <a class="tab text-gray-400 uppercase" :class="{
+        'tab-active': tab === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
+      }" @click="changeTab(ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD)">{{ $t('gov.voting') }}</a>
+      <a class="tab text-gray-400 uppercase" :class="{ 'tab-active': tab === ProposalStatus.PROPOSAL_STATUS_PASSED }"
+        @click="changeTab(ProposalStatus.PROPOSAL_STATUS_PASSED)">{{ $t('gov.passed') }}</a>
+      <a class="tab text-gray-400 uppercase" :class="{
+        'tab-active': tab === ProposalStatus.PROPOSAL_STATUS_REJECTED,
+      }" @click="changeTab(ProposalStatus.PROPOSAL_STATUS_REJECTED)">{{ $t('gov.rejected') }}</a>
     </div>
     <ProposalListItem :proposals="store?.proposals[tab]" />
-    <PaginationBar
-      :total="store?.proposals[tab]?.pagination?.total.toString()"
-      :limit="pageRequest.limit"
-      :callback="page"
-    />
+    <PaginationBar :total="store?.proposals[tab]?.pagination?.total.toString()" :limit="pageRequest.limit"
+      :callback="page" />
   </div>
 </template>
 <route>

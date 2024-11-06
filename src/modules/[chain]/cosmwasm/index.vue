@@ -1,22 +1,25 @@
 <script lang="ts" setup>
 import PaginationBar from '@/components/PaginationBar.vue';
 import router from '@/router';
-import { useTxDialog } from '@/stores';
+import { useTxDialog, useWalletStore } from '@/stores';
 import { PageRequest } from '@/types';
-import { toBase64, toHex } from '@cosmjs/encoding';
+import { toHex } from '@cosmjs/encoding';
 import type { QueryCodesResponse } from 'cosmjs-types/cosmwasm/wasm/v1/query';
 import { accessTypeToJSON } from 'cosmjs-types/cosmwasm/wasm/v1/types';
-import { ref } from 'vue';
+import { ref, toRaw, watch, watchEffect } from 'vue';
 import { useWasmStore } from './WasmStore';
 
 const props = defineProps(['chain']);
 
 const codes = ref({} as QueryCodesResponse | undefined);
+const walletStore = useWalletStore();
 
 const pageRequest = ref(new PageRequest());
 const wasmStore = useWasmStore();
 const dialog = useTxDialog();
 const creator = ref('');
+const codeIds = ref([] as any);
+const contracts = ref({} as any);
 
 function pageload(pageNum: number, nextKey?: Uint8Array) {
   pageRequest.value.setNextKey(nextKey);
@@ -24,8 +27,31 @@ function pageload(pageNum: number, nextKey?: Uint8Array) {
 
   wasmStore.wasmClient.getWasmCodeList(pageRequest.value).then((x) => {
     codes.value = x;
+    codeIds.value = x?.codeInfos.map(item => item.codeId.toString())
   });
 }
+
+watch(codeIds, () => {
+  for (let codeId of codeIds.value) {
+    if (String(codeId).search(/^[\d]+$/) > -1) {
+      // query with code id
+      wasmStore.wasmClient.getWasmCodeContracts(codeId).then((x) => {
+        contracts.value[codeId] = x.contracts.length;
+        // contracts.value?.push({ [codeId]: x.contracts.length });
+      });
+    } else {
+      // query by creator
+      wasmStore.wasmClient
+        .getWasmContractsByCreator(codeId)
+        .then((x) => {
+          contracts.value?.push({
+            [codeId]: x.contractAddresses.length
+          })
+        });
+    }
+  }
+})
+
 pageload(1);
 
 function myContracts() {
@@ -41,29 +67,17 @@ function myContracts() {
 
       <div class="flex items-center gap-3 flex-wrap">
         <div class="join flex items-center gap-3 mt-4 md:mt-0">
-          <input
-            v-model="creator"
-            type="text"
+          <input v-model="creator" type="text"
             class="input input-bordered w-[50vw] md:w-[27vw] bg-[#2E2E33] border border-[#383B40]"
-            placeholder="Creator address"
-          />
-          <button
-            class="btn btn-primary bg-[#2E2E33] border border-[#383B40]"
-            :class="
-              !creator.length ? 'cursor-not-allowed pointer-events-none' : ''
-            "
-            @click="myContracts()"
-          >
+            placeholder="Creator address" />
+          <button class="btn btn-primary bg-[#2E2E33] border border-[#383B40]" :class="!creator.length ? 'cursor-not-allowed pointer-events-none' : ''
+            " @click="myContracts()">
             {{ $t('cosmwasm.btn_query') }}
           </button>
         </div>
         <div class="w-[1px] h-[35px] bg-[#383B40] mx-2 hidden md:block"></div>
-        <label
-          for="wasm_store_code"
-          class="btn btn-primary my-5 capitalize rounded-lg"
-          @click="dialog.open('wasm_store_code', {})"
-          >{{ $t('cosmwasm.btn_up_sc') }}</label
-        >
+        <label for="wasm_store_code" class="btn btn-primary my-5 capitalize rounded-lg"
+          @click="dialog.open('wasm_store_code', {})">{{ $t('cosmwasm.btn_up_sc') }}</label>
       </div>
     </div>
     <div class="overflow-x-auto">
@@ -73,51 +87,59 @@ function myContracts() {
             <th>{{ $t('cosmwasm.code_id') }}</th>
             <th>{{ $t('cosmwasm.code_hash') }}</th>
             <th>{{ $t('cosmwasm.creator') }}</th>
+            <th>Contracts</th>
             <th class="text-right">{{ $t('cosmwasm.permissions') }}</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(v, index) in codes?.codeInfos"
-            :key="index"
-            class="border-b border-b-[#242627] px-4"
-          >
+          <tr v-for="(v, index) in codes?.codeInfos" :key="index" class="border-b border-b-[#242627] px-4">
             <td>{{ v.codeId }}</td>
             <td>
-              <RouterLink
-                :to="`/${props.chain}/cosmwasm/${v.codeId}/contracts`"
-                class="truncate max-w-[200px] block dark:text-[#B999F3]"
-                :title="toHex(v.dataHash)"
-              >
+              <RouterLink :to="`/${props.chain}/cosmwasm/${v.codeId}/contracts`"
+                class="truncate max-w-[200px] block dark:text-[#B999F3]" :title="toHex(v.dataHash)">
                 {{ toHex(v.dataHash) }}
               </RouterLink>
             </td>
-            <td>{{ v.creator }}</td>
+            <td>
+              <RouterLink :to="`/${props.chain}/account/${v.creator}`"
+                class="truncate max-w-[300px] block dark:text-[#B999F3]" :title="toHex(v.dataHash)">
+                {{ v.creator }}
+              </RouterLink>
+            </td>
+            <td>{{ contracts[v.codeId.toString()] }}</td>
             <td class="text-right">
               {{
-                accessTypeToJSON(v.instantiatePermission?.permission)
-                  .toLowerCase()
-                  .replace(/^access_type/, '')
-                  .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                  .trim()
+              accessTypeToJSON(v.instantiatePermission?.permission)
+              .toLowerCase()
+              .replace(/^access_type/, '')
+              .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
+              .trim()
               }}
-              <span
+              <!-- <span
                 >{{ v.instantiatePermission?.address }}
                 {{ v.instantiatePermission?.addresses.join(', ') }}</span
-              >
+              > -->
+            </td>
+            <td>
+              <label for="wasm_instantiate_contract" class="px-4 py-2 rounded-lg btn-primary hover:cursor-pointer"
+                @click="
+                dialog.open('wasm_instantiate_contract', {
+                  codeId: v.codeId,
+                })
+                " v-if="walletStore.currentAddress">Instantiate</label>
+
+              <div v-if="!walletStore.currentAddress">
+                <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
+                  class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Instantiate</label>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
       <div class="flex justify-end">
-        <PaginationBar
-          :limit="pageRequest.limit"
-          :total="
-            codes?.pagination?.total ? codes.pagination.total.toString() : '0'
-          "
-          :nextKey="codes?.pagination?.nextKey"
-          :callback="pageload"
-        />
+        <PaginationBar :limit="pageRequest.limit" :total="codes?.pagination?.total ? codes.pagination.total.toString() : '0'
+          " :nextKey="codes?.pagination?.nextKey" :callback="pageload" />
       </div>
     </div>
   </div>
@@ -126,7 +148,8 @@ function myContracts() {
 <route>
     {
       meta: {
-        i18n: 'cosmwasm'
+        i18n: 'cosmwasm',
+        order: 17
       }
     }
 </route>
