@@ -82,7 +82,8 @@ function confirm() {
   }
   const height = /^\d+$/;
   const txhash = /^[A-Z\d]{64}$/;
-  const addr = /^[a-z\d]+1[a-z\d]{38,69}$/;
+  const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
+  const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
 
   const current = blockchain?.current?.chainName || '';
   const routeParams = vueRouters?.currentRoute?.value;
@@ -96,6 +97,10 @@ function confirm() {
       //     this.$router.push({ name: 'transaction', params: { chain: c.chain_name, hash: key } })
     } else if (addr.test(key)) {
       vueRouters.push({ path: `/${current}/account/${key}` });
+    } else if (contract.test(key)) {
+      wasmStore.wasmClient.getWasmContractInfo(key).then((x) => {
+        vueRouters.push({ path: `/${current}/cosmwasm/${Number(x?.codeId)}/transactions`, query: { contract: key } });
+      });
     } else {
       errorMessage.value = 'The input not recognized';
     }
@@ -308,7 +313,7 @@ onClickOutside(refSearchInput, event => clickOutsideSearch.value=false);
             v-model="searchQuery" placeholder="Search by Height, Address, Contracts, and TxHash"
             v-on:keyup.enter="confirm" />
           <div class="absolute mt-2 text-sm bg-base flex flex-col w-full rounded-md shadow-sm shadow-gray-500"
-            v-show="searchQuery.length > 30 && clickOutsideSearch">
+            v-show="searchQuery.length < 49 && searchQuery.length > 37 && clickOutsideSearch">
             <div class="hover:cursor-pointer hover:bg-[#47474B] w-full px-4 py-2 rounded-t-md"
               @click="handleSearchAccountContract('ACCOUNT', searchQuery)"><span class="flex gap-2">Search
                 For <p class="text-white font-bold">Account</p></span></div>
