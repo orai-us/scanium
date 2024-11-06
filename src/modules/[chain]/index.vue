@@ -467,7 +467,7 @@ const amount = computed({
                         updateState
                       )
                     ">
-                    {{ $t('index.btn_withdraw_reward') }}
+                    {{ $t('index.btn_claim') }}
                   </label>
                 </div>
               </td>

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { TxsHistory } from '@/libs/client';
 import { useFormatter } from '@/stores';
-import { onMounted, reactive, ref, toRaw, watch, watchEffect } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { getHistoryTxs } from '@/service/transactionsService';
-import TransactionTable from '../TransactionTable.vue';
 import { shortenTxHash } from '@/utils';
+import Pagination from '../pagination/Pagination.vue';
 
 const props = defineProps(['address', 'chain']);
 const txs = ref([] as Array<any>);
@@ -27,14 +27,13 @@ async function fetchTransaction() {
       offset: pagination.offset
     }
     const response = await getHistoryTxs(params)
-    console.log({ response })
     if (!!response) {
       txs.value = response.data.map((item: any) => ({
         ...item,
         result: item.status === 0 ? "Success" : "Failed",
         blockNumber: item.height,
         fee: `${Number(item.fee[0]) / 1e6} ORAI`,
-        token: item.tokenInfos[0].denom.toUpperCase(),
+        token: item.tokenInfos[0].abbr.toUpperCase(),
         timestamp:  format.toLocaleDate(new Date(Number(item.timestamp * 1000)))
       }));
       txTotal.value = response.totalRecord;
@@ -44,11 +43,8 @@ async function fetchTransaction() {
   }
 }
 
-watch(pagination, () => {
+watch([() => props.address, pagination], () => {
   fetchTransaction()
-})
-watchEffect(()=>{
-  console.log({ data: toRaw(txs.value) })
 })
 
 function handlePagination(page: number) {
