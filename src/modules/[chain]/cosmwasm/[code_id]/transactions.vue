@@ -1,23 +1,15 @@
 <script lang="ts" setup>
-import PaginationBar from '@/components/PaginationBar.vue';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import {
-  useBaseStore,
   useBlockchain,
-  useFormatter,
   useTxDialog,
 } from '@/stores';
 import { PageRequest } from '@/types';
-import { toHex } from '@cosmjs/encoding';
-import { Icon } from '@iconify/vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-import { JsonViewer } from 'vue3-json-viewer';
 import { useWasmStore } from '../WasmStore';
 // if you used v1.0.5 or latster ,you should add import "vue3-json-viewer/dist/index.css"
-import WasmVerification from '@/components/WasmVerification.vue';
 import type { ExtraTxSearchResponse } from '@/libs/client';
-import { decodeBuffer } from '@/libs/utils';
 import type { Coin } from '@cosmjs/stargate';
 import type { QueryAllContractStateResponse } from 'cosmjs-types/cosmwasm/wasm/v1/query';
 import type { ContractInfo } from 'cosmjs-types/cosmwasm/wasm/v1/types';
@@ -28,18 +20,14 @@ import { CHAIN_INDEXS } from '@/constants';
 
 const props = defineProps(['chain'])
 const chainStore = useBlockchain();
-const baseStore = useBaseStore();
-const format = useFormatter();
 const wasmStore = useWasmStore();
 
 const route = useRoute();
-const page = ref(new PageRequest());
 const pageRequest = ref(new PageRequest());
 
 const txs = ref<ExtraTxSearchResponse>({ txs: [], totalCount: 0 });
 
 const dialog = useTxDialog();
-const infoDialog = ref(false);
 const info = ref({} as ContractInfo | undefined);
 const state = ref({} as QueryAllContractStateResponse | undefined);
 const selected = ref('');
@@ -47,10 +35,18 @@ const balances = ref({} as Coin[]);
 const query = ref('');
 const result = ref({});
 
-const contractAddress = String(route.query.contract);
+const contractAddress = ref(String(route.query.contract));
+
+watchEffect(() => {
+  contractAddress.value = String(route.query.contract)
+  const address = String(route.query.contract)
+  wasmStore.wasmClient.getWasmContractInfo(address).then((x) => {
+    info.value = x;
+  });
+})
 
 onMounted(() => {
-  const address = contractAddress;
+  const address = contractAddress.value;
   wasmStore.wasmClient.getWasmContractInfo(address).then((x) => {
     info.value = x;
   });

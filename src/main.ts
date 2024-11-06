@@ -17,7 +17,7 @@ import { DefaultApolloClient } from '@vue/apollo-composable';
 const cache = new InMemoryCache();
 
 const httpLink = createHttpLink({
-  uri: 'http://192.168.10.221:3000/',
+  uri: 'https://indexer.scanium.io/',
 })
 
 const apolloClient = new ApolloClient({

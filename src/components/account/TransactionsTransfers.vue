@@ -26,15 +26,15 @@ async function fetchTransaction() {
       offset: pagination.offset
     }
     const response = await getHistoryTxs(params)
+    console.log({ response })
     if (!!response) {
       txs.value = response.data.map((item: any) => ({
-        txhash: item.txhash,
-        result:  item.status ? "Success" : "Failed",
+        id: item.txhash,
+        code: item.status,
         message: "",
-        height: item.height,
-        amount:  `${Number(item.amount[0]) / 1e6} ${item?.tokenInfos[0].denom?.toUpperCase()}`,
-        fee: `${Number(item.fee[0]) / 1e6} ${item?.tokenInfos[0].denom?.toUpperCase()}`,
-        timestamp: format.toLocaleDate(new Date(Number(item.timestamp * 1000)))
+        blockNumber: item.height,
+        fee: [{amount: Number(item.fee[0]), denom: item.tokenInfos[0].abbr}],
+        timestamp: item.timestamp * 1000
       }));
       txTotal.value = response.totalRecord;
     }
@@ -54,7 +54,7 @@ function handlePagination(page: number) {
 
 <template>
   <div>
-    <TransactionTable :transaction="txs" :chain="chain" :txTotal="txTotal" :pagination="pagination" :handlePagination="handlePagination" />
+    <TransactionTable :transactions="txs" :chain="chain" :txTotal="txTotal" :pagination="pagination" :handlePagination="handlePagination" />
   </div>
 </template>
 

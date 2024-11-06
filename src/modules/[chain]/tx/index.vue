@@ -39,7 +39,7 @@ const query = gql`
 const variables = computed(() => {
   return {
     orderBy: "BLOCK_NUMBER_DESC",
-    first: 10,
+    first: 5,
     offset: 0
   }
 })
@@ -47,7 +47,6 @@ const variables = computed(() => {
 const { result } = useQuery(query, variables);
 
 const transactions: any = computed(() => {
-  console.log({ data: base.txsInRecents })
   let initTxs: never[] = []
   if (result.value && CHAIN_INDEXS.includes(props.chain)) {
     initTxs = result.value?.transactions?.results.map((item: any) => ({

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, toRaw, watch, watchEffect } from 'vue';
 import Pagination from './pagination/Pagination.vue';
 import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
@@ -9,20 +9,22 @@ const props = defineProps(['transactions', 'chain', 'txTotal', 'limit', 'handleP
 const format = useFormatter();
 const txs = ref([] as Array<any>)
 
-watch([() => props.transactions], () => {
-  if (CHAIN_INDEXS.includes(props.chain)) {
-    txs.value = props.transactions?.map((item: any) => ({
-      txhash: item?.id,
-      result: item.code === 0 ? "Success" : "Failed",
-      message: format.messages(item.messages?.nodes.map((item: any) =>
-        ({ "@type": item.type, typeUrl: item.type })
-      )),
-      height: item.blockNumber,
-      fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
-      timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
-    }));
-  }else{
-    txs.value = props.transactions
+watchEffect(() => {
+  if (!!props?.transactions?.length) {
+    if (CHAIN_INDEXS.includes(props.chain)) {
+      txs.value = props?.transactions?.map((item: any) => ({
+        txhash: item?.id,
+        result: item.code === 0 ? "Success" : "Failed",
+        message: format.messages(item.messages?.nodes.map((item: any) =>
+          ({ "@type": item.type, typeUrl: item.type })
+        )),
+        height: item.blockNumber,
+        fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
+        timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
+      }));
+    } else {
+      txs.value = props.transactions
+    }
   }
 })
 </script>
@@ -67,9 +69,9 @@ watch([() => props.transactions], () => {
             </RouterLink>
           </td>
           <td class="py-3">
-            <span class="text-xs">{{ v.fee }}</span>
+            <span class="text-xs">{{ v.fee || "-" }}</span>
           </td>
-          <td>{{ v.timestamp }}</td>
+          <td>{{ v.timestamp || "-" }}</td>
         </tr>
       </tbody>
     </table>
