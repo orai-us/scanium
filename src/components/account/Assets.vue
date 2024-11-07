@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
-import { LIST_COIN } from '@/constants';
-import { getPriceByIds } from '@/service/assetsService';
+import { CHAIN_INDEXS, LIST_COIN } from '@/constants';
+import { getPriceByIds, getSmartQueryByContract } from '@/service/assetsService';
 import numeral from 'numeral';
+import ChainRegistryClient from '@ping-pub/chain-registry-client';
+import axios from 'axios';
 
-const props = defineProps(['balances', 'delegations', 'rewards', 'unbonding', 'unbondingTotal'])
+const props = defineProps(['balances', 'delegations', 'rewards', 'unbonding', 'unbondingTotal', 'address', 'chain']);
 
+const client = new ChainRegistryClient()
 type Asset = {
   amount: number,
   denom: string,
@@ -25,6 +28,7 @@ const stakingStore = useStakingStore();
 
 const totalValue = ref();
 const totalAmountByCategory = ref([] as Array<any>);
+const balancesChain = ref([] as Array<any>)
 
 const priceBySymbol = ref({} as any);
 
@@ -34,10 +38,43 @@ function changeStatusSupported(supported: boolean) {
   supportedAssets.value = supported
 }
 
+async function getBalancesCw20() {
+  const obj = {
+    "balance": {
+      "address": props.address
+    }
+  }
+  const msg = JSON.stringify(obj);
+  const query = Buffer.from(msg).toString("base64");
+
+  const balances = [];
+  const responseRegistry = await axios(`https://registry.ping.pub/${props.chain.toLowerCase()}/assetlist.json`);
+  if (!!responseRegistry?.data) {
+    const assetCw20s = responseRegistry.data.assets?.filter((item: any) => item.type_asset === "cw20");
+    for (let asset of assetCw20s) {
+      const contractAddress = asset.address;
+      const smartQueryContract = await getSmartQueryByContract(contractAddress, query);
+      const balance = smartQueryContract.data?.balance;
+      if (balance !== '0') {
+        balances.push({
+          denom: asset.denom_units[1].denom,
+          amount: balance
+        })
+      }
+    }
+    balancesChain.value = balances;
+  }
+}
+
+onMounted(async () => {
+  getBalancesCw20()
+})
+
 const balancesAssets = computed(() => {
+  const balances = [...props.balances, ...balancesChain.value];
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
-  for (let balance of props.balances) {
+  for (let balance of balances) {
     const formatToken = format.formatToken3(balance);
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
