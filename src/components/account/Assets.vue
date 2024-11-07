@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, toRaw, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
 import { CHAIN_INDEXS, LIST_COIN } from '@/constants';
-import { getPriceByIds, getSmartQueryByContract } from '@/service/assetsService';
+import { getMulticalContractAddress, getPriceByIds, getSmartQueryByContract } from '@/service/assetsService';
 import numeral from 'numeral';
 import ChainRegistryClient from '@ping-pub/chain-registry-client';
 import axios from 'axios';
@@ -39,30 +39,29 @@ function changeStatusSupported(supported: boolean) {
 }
 
 async function getBalancesCw20() {
-  const obj = {
-    "balance": {
-      "address": props.address
-    }
-  }
-  const msg = JSON.stringify(obj);
-  const query = Buffer.from(msg).toString("base64");
-
-  const balances = [];
   const responseRegistry = await axios(`https://registry.ping.pub/${props.chain.toLowerCase()}/assetlist.json`);
+
   if (!!responseRegistry?.data) {
     const assetCw20s = responseRegistry.data.assets?.filter((item: any) => item.type_asset === "cw20");
-    for (let asset of assetCw20s) {
-      const contractAddress = asset.address;
-      const smartQueryContract = await getSmartQueryByContract(contractAddress, query);
-      const balance = smartQueryContract.data?.balance;
-      if (balance !== '0') {
-        balances.push({
-          denom: asset.denom_units[1].denom,
-          amount: balance
-        })
-      }
+    const denoms = [];
+    for (const asset of assetCw20s) {
+      if (!!asset) denoms.push(asset?.address);
     }
-    balancesChain.value = balances;
+
+    const multiplyContract = await getMulticalContractAddress(props.address, denoms);
+    if (!!multiplyContract && multiplyContract?.data) {
+      const returnData = multiplyContract.data.return_data
+      if (!!returnData) {
+        const returnDataBalance = multiplyContract.data.return_data?.map((rs: any) => JSON.parse(atob(rs.data)).balance);
+        const balances = returnDataBalance.map((item: string, index: number) => ({
+          denom: assetCw20s[index].denom_units[1].denom,
+          amount: (Number(item) / 1e6).toString()
+        })).filter((balance: any) => balance?.amount != '0')
+
+        balancesChain.value = balances
+      }
+
+    }
   }
 }
 
@@ -74,7 +73,7 @@ const balancesAssets = computed(() => {
   const balances = [...props.balances, ...balancesChain.value];
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
-  for (let balance of balances) {
+  for (const balance of balances) {
     const formatToken = format.formatToken3(balance);
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
@@ -143,6 +142,7 @@ const unbondingAssets = computed(() => {
 })
 
 watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, supportedAssets], async () => {
+  console.log({ balancesAssets: toRaw(balancesAssets.value) })
   const assets = [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value]
   const ids = assets.map(item => item?.id)
 
