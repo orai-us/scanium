@@ -48,8 +48,8 @@ export const getSmartQueryByContract = async (
   return res?.data;
 };
 
-export const getMulticalContractAddress= async(address: string, denoms: Array<string>)=>{
-  const multicallUrl = `${urlSmartContract}/${multiCallContractAddress}/smart/`;
+export const getCw20Balances= async(address: string, denoms: Array<string>)=>{
+  const multiCallUrl = `${urlSmartContract}/${multiCallContractAddress}/smart/`;
   const msgJson = {
     aggregate: {
       queries: denoms.map((denom) => ({
@@ -58,7 +58,7 @@ export const getMulticalContractAddress= async(address: string, denoms: Array<st
       })),
     },
   };
-  const url = multicallUrl + btoa(JSON.stringify(msgJson));
+  const url = multiCallUrl + btoa(JSON.stringify(msgJson));
   const config = {
     baseURL: baseCosmwasm,
     url,
@@ -68,3 +68,4 @@ export const getMulticalContractAddress= async(address: string, denoms: Array<st
   const res = await api.request(config);
   return res?.data;
 }
+
