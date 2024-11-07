@@ -159,7 +159,7 @@ const isOwnerWallet = computed(() => {
     <!-- Assets -->
     <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded">
       <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
-        :unbondingTotal="unbondingTotal" />
+        :unbondingTotal="unbondingTotal" :address="address" :chain="chain"/>
     </div>
 
     <!-- Delegations -->

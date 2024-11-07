@@ -355,6 +355,9 @@ export const useFormatter = defineStore('formatter', {
         if (amount < 0.01) {
           fmt = '0.[000000]';
         }
+        if (amount < 1) {
+          fmt = '0.[000]';
+        }
         return {
           amount: amount,
           denom: withDenom ? denom.substring(0, 10).toLowerCase() : '',
