@@ -43,6 +43,7 @@ async function getBalancesCw20() {
 
   if (!!responseRegistry?.data) {
     const assetCw20s = responseRegistry.data.assets?.filter((item: any) => item?.type_asset === "cw20");
+    if (!assetCw20s) return;
     const denoms = [];
     for (const asset of assetCw20s) {
       if (!!asset) denoms.push(asset.address);
@@ -57,10 +58,9 @@ async function getBalancesCw20() {
           denom: assetCw20s[index].denom_units[1].denom,
           amount: (Number(item) / 1e6).toString()
         })).filter((balance: any) => balance?.amount != '0');
-
+        if (!balances) return;
         balancesChain.value = balances;
       }
-
     }
   }
 }
@@ -149,7 +149,7 @@ watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, sup
   if (ids?.length > 0) {
     const res = await getPriceByIds({ ids: ids.join(",") });
     for (let item in res) {
-      result[coingeckoSymbols[coingeckoIds.indexOf(item)]] = res[item]?.usd;
+      if (coingeckoIds.indexOf(item) > -1) result[coingeckoSymbols[coingeckoIds.indexOf(item)]] = res[item]?.usd;
     }
     priceBySymbol.value = result;
 
