@@ -132,18 +132,22 @@ const unbondingAssets = computed(() => {
   // console.log({ formatToken })
   // console.log({ unbondingTotal: props.unbondingTotal })
   // console.log({ denom: stakingStore.params.bondDenom })
-  const formatToken = {
-    amount: Number(props.unbondingTotal) / 1e6,
-    denom: stakingStore.params.bondDenom,
-    amountDisplay: String(Number(props.unbondingTotal) / 1e6,)
+  const totalUnbonding = Number(props.unbondingTotal);
+  if (!!totalUnbonding && typeof totalUnbonding === "number") {
+    const formatToken = {
+      amount: totalUnbonding / 1e6,
+      denom: stakingStore.params.bondDenom,
+      amountDisplay: String(totalUnbonding / 1e6,)
+    }
+    const denom = formatToken.denom;
+    const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
+    if (coingeckoSymbols.includes(denom)) {
+      resultSupported.push({ ...formatToken, id })
+    } else {
+      resultUnSupported.push({ ...formatToken, id })
+    }
   }
-  const denom = formatToken.denom;
-  const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
-  if (coingeckoSymbols.includes(denom)) {
-    resultSupported.push({ ...formatToken, id })
-  } else {
-    resultUnSupported.push({ ...formatToken, id })
-  }
+  
   return supportedAssets.value ? resultSupported : resultUnSupported;
 })
 
