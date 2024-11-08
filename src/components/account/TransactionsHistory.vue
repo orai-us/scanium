@@ -27,11 +27,11 @@ function changeTypeTx(tx: string) {
       {{ $t('account.transactions') }}
     </h2> -->
     <div class="flex gap-2 mb-4">
-      <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === TRANSACTION_TYPE.ALL }"
+      <button :class="{ 'px-2 py-1 bg-base rounded-md text-white': txType === TRANSACTION_TYPE.ALL }"
         v-on:click="changeTypeTx(TRANSACTION_TYPE.ALL)">
         {{ $t('account.transactions') }}
       </button>
-      <button :class="{ 'px-2 py-1 bg-base rounded-md': txType === TRANSACTION_TYPE.TRANSFERS }"
+      <button :class="{ 'px-2 py-1 bg-base rounded-md text-white': txType === TRANSACTION_TYPE.TRANSFERS }"
         v-on:click="changeTypeTx(TRANSACTION_TYPE.TRANSFERS)">
         Token Transfers
       </button>

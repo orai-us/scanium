@@ -170,11 +170,11 @@ const isOwnerWallet = computed(() => {
         </h2>
         <div>
           <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
-            <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
+            <label for="delegate" class="bg-base rounded-md text-white p-2 mr-2 xl:text-sm text-xs hover:cursor-pointer"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
               @click="() => { if (!isOwnerWallet) return; dialog.open('delegate', {}, updateEvent) }">{{
               $t('account.btn_delegate') }}</label>
-            <label for="withdraw" class="btn btn-third-sm btn-sm"
+            <label for="withdraw" class="bg-base rounded-md text-white p-2 xl:text-sm text-xs hover:cursor-pointer"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
               @click="() => { if (!isOwnerWallet) return; dialog.open('withdraw', {}, updateEvent) }">Claim
               Reward</label>
@@ -206,16 +206,16 @@ const isOwnerWallet = computed(() => {
               </td>
             </tr>
             <tr v-for="(v, index) in delegations" :key="index">
-              <td class="text-caption text-link py-3">
+              <td class="text-caption text-link py-3 !break-normal">
                 <RouterLink :to="`/${chain}/staking/${v.delegation.validatorAddress}`">{{
                   format.validatorFromBech32(v.delegation.validatorAddress) ||
                   v.delegation.validatorAddress
                   }}</RouterLink>
               </td>
-              <td class="py-3">
+              <td class="py-3 !break-normal">
                 {{ format.formatToken(v.balance, true, '0,0.[000000]') }}
               </td>
-              <td class="py-3">
+              <td class="py-3 !break-normal">
                 {{
                 format.formatTokens(
                 rewards?.rewards?.find(
@@ -229,7 +229,7 @@ const isOwnerWallet = computed(() => {
                 )
                 }}
               </td>
-              <td class="py-3">
+              <td class="py-3 !break-normal">
                 <div>
                   <div v-if="v.balance && walletStore.currentAddress" class="flex justify-start">
                     <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"

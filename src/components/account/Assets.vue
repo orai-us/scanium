@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, onMounted, ref, toRaw, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
 import { LIST_COIN } from '@/constants';
@@ -12,12 +12,6 @@ import axios from 'axios';
 const props = defineProps(['balances', 'delegations', 'rewards', 'unbonding', 'unbondingTotal', 'address', 'chain']);
 
 const client = new ChainRegistryClient();
-type Asset = {
-  amount: number,
-  denom: string,
-  amountDisplay: string,
-  id: string
-};
 
 const coingeckoSymbols = Object.values(LIST_COIN);
 const coingeckoIds = Object.keys(LIST_COIN);
@@ -197,13 +191,13 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
 
 <template>
   <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
-    <div class="flex text-white justify-between">
-      <h2 class="card-title mb-4">{{ $t('account.assets') }}</h2>
-      <div class="flex gap-2 mb-4">
-        <button :class="{ 'px-2 py-1 bg-base rounded-md': supportedAssets }" @click="changeStatusSupported(true)">
+    <div class="flex xl:flex-row flex-col justify-between">
+      <h2 class="card-title mb-4 text-white">{{ $t('account.assets') }}</h2>
+      <div class="flex gap-2 mb-4 w-full xl:w-[300px]">
+        <button class="w-1/2 xl:text-sm text-xs py-2" :class="{ 'bg-base rounded-md text-white': supportedAssets }" @click="changeStatusSupported(true)">
           Supported Assets
         </button>
-        <button :class="{ 'px-2 py-1 bg-base rounded-md': !supportedAssets }" @click="changeStatusSupported(false)">
+        <button class="w-1/2 xl:text-sm text-xs py-2" :class="{ 'bg-base rounded-md text-white': !supportedAssets }" @click="changeStatusSupported(false)">
           Unsupported Assets
         </button>
       </div>
@@ -282,7 +276,7 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
               </div>
               <div class="text-xs">
                 {{ formatValue((priceBySymbol[unbondingAssets[0]?.denom] * unbondingAssets[0]?.amount) / totalValue *
-                  100) }}%
+                100) }}%
               </div>
             </div>
             <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
@@ -292,7 +286,7 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
         </div>
         <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
           {{ $t('account.total_value') }}: ${{
-            totalValue ? formatValue(totalValue) : 0
+          totalValue ? formatValue(totalValue) : 0
           }}
         </div>
       </div>
