@@ -9,7 +9,7 @@ import numeral from 'numeral';
 import ChainRegistryClient from '@ping-pub/chain-registry-client';
 import axios from 'axios';
 
-const props = defineProps(['balances', 'delegations', 'rewards', 'unbonding', 'unbondingTotal', 'address', 'chain']);
+const props = defineProps(['balances', 'delegations', 'rewards', 'unbondingTotal', 'address', 'chain']);
 
 const client = new ChainRegistryClient();
 
@@ -60,6 +60,10 @@ async function getBalancesCw20() {
 }
 
 onMounted(async () => {
+  getBalancesCw20()
+})
+
+watch([() => props.address], () => {
   getBalancesCw20()
 })
 
@@ -117,14 +121,22 @@ const rewardsTotalAssets = computed(() => {
 const unbondingAssets = computed(() => {
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
-  const formatToken = format.formatToken3(
-    {
-      amount: String(props.unbondingTotal),
-      denom: stakingStore.params.bondDenom,
-    },
-    true, '0,0.[0]', 'local',
-    1e18
-  );
+  // const formatToken = format.formatToken3(
+  //   {
+  //     amount: String(props.unbondingTotal),
+  //     denom: stakingStore.params.bondDenom,
+  //   },
+  //   true, '0,0.[0]', 'local',
+  //   1e18
+  // );
+  // console.log({ formatToken })
+  // console.log({ unbondingTotal: props.unbondingTotal })
+  // console.log({ denom: stakingStore.params.bondDenom })
+  const formatToken = {
+    amount: Number(props.unbondingTotal) / 1e6,
+    denom: stakingStore.params.bondDenom,
+    amountDisplay: String(Number(props.unbondingTotal) / 1e6,)
+  }
   const denom = formatToken.denom;
   const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
   if (coingeckoSymbols.includes(denom)) {

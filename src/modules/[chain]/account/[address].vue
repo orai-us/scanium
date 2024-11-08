@@ -38,6 +38,7 @@ const rewards = ref({} as QueryDelegationTotalRewardsResponse);
 const balances = ref([] as Coin[]);
 const recentReceived = ref([] as ExtraTxResponse[]);
 const unbonding = ref([] as UnbondingDelegation[]);
+const unbondingList = ref([] as any);
 const unbondingTotal = ref(0);
 
 const isBalancesLoaded = ref(false);
@@ -71,13 +72,30 @@ function loadAccount(address: string) {
     balances.value = x;
     isBalancesLoaded.value = true;
   });
+  const resultUnbondingList: any = [];
+  let totalUnbond = 0;
   blockchain.rpc.getStakingDelegatorUnbonding(address).then((x) => {
-    unbonding.value = x.unbondingResponses;
-    x.unbondingResponses?.forEach((y) => {
-      y.entries.forEach((z) => {
-        unbondingTotal.value += Number(z.balance);
+    if (!!x.unbondingResponses) {
+      unbonding.value = x.unbondingResponses;
+      x.unbondingResponses?.forEach((y) => {
+        y.entries.forEach((z) => {
+          totalUnbond += Number(z.balance);
+        });
       });
-    });
+      unbondingTotal.value = totalUnbond;
+
+      for (const unbond of x.unbondingResponses) {
+        if (!!unbond) {
+          for (const entries of unbond.entries) {
+            resultUnbondingList.push({
+              ...entries,
+              validatorAddress: unbond.validatorAddress
+            })
+          }
+        }
+      }
+      unbondingList.value = resultUnbondingList
+    }
     isUnbodingLoaded.value = true;
   });
 
@@ -298,7 +316,7 @@ const isOwnerWallet = computed(() => {
               <th class="py-3">Unbond Completed By</th>
             </tr>
           </thead>
-          <tbody class="text-sm" v-for="(v, index) in unbonding" :key="index">
+          <tbody class="text-sm" v-for="(v, index) in unbondingList" :key="index">
             <tr>
               <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
@@ -309,7 +327,7 @@ const isOwnerWallet = computed(() => {
                 {{
                 format.formatToken(
                 {
-                amount: v.entries[0]?.initialBalance,
+                amount: v.initialBalance,
                 denom: stakingStore.params.bondDenom,
                 },
                 true,
@@ -318,7 +336,7 @@ const isOwnerWallet = computed(() => {
                 }}
               </td>
               <td class="text-caption py-3">
-                {{ format.toLocaleDate(new Date(Number(v.entries[0]?.completionTime?.seconds) * 1000)) }}
+                {{ format.toLocaleDate(new Date(Number(v.completionTime?.seconds) * 1000)) }}
               </td>
             </tr>
             <!-- <tr v-for="entry in v.entries">
