@@ -6,7 +6,7 @@ import {
   useTxDialog,
   useWalletStore,
 } from '@/stores';
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 
 import {
   PageRequest,
@@ -31,6 +31,7 @@ const blockchain = useBlockchain();
 const stakingStore = useStakingStore();
 const dialog = useTxDialog();
 const format = useFormatter();
+const staking = useStakingStore();
 const account = ref({} as BaseAccount | undefined);
 const txs = ref({} as ExtraTxResponse[]);
 const delegations = ref([] as DelegationResponse[]);
@@ -111,6 +112,17 @@ function updateEvent() {
 const isOwnerWallet = computed(() => {
   return walletStore.currentAddress === props.address
 })
+
+function getNameValidator(validatorAddress: string) {
+  let name = ""
+  const validators = staking?.validators;
+  if (Array.isArray(validators)) {
+    const validator = validators.filter((item: any) => item?.operatorAddress === validatorAddress)[0];
+    if (!!validator) name = validator.description?.moniker
+  }
+  return name;
+}
+
 </script>
 <template>
   <div v-if="account">
@@ -159,7 +171,7 @@ const isOwnerWallet = computed(() => {
     <!-- Assets -->
     <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded">
       <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
-        :unbondingTotal="unbondingTotal" :address="address" :chain="chain"/>
+        :unbondingTotal="unbondingTotal" :address="address" :chain="chain" />
     </div>
 
     <!-- Delegations -->
@@ -302,8 +314,8 @@ const isOwnerWallet = computed(() => {
             <tr>
               <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
-                  v.validatorAddress
-                  }}</RouterLink>
+                  getNameValidator(v.validatorAddress)
+                }}</RouterLink>
               </td>
               <td class="text-caption py-3">
                 {{
