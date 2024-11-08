@@ -115,7 +115,7 @@ watch(transactions, () => {
               </span>
               <span v-else>-</span>
             </td>
-            <td>
+            <td class="!break-normal">
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">
                 {{ format.messages(item.tx?.body?.messages || item?.messages) }}
               </span>
@@ -127,7 +127,7 @@ watch(transactions, () => {
                 item.height
                 }}</RouterLink>
             </td>
-            <td>
+            <td class="!break-normal">
               <span v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
                 {{ format.toLocaleDate(detailTxs[item.hash]?.txResponse?.timestamp) }} ({{
                 format.toDay(detailTxs[item.hash]?.txResponse?.timestamp, 'from')

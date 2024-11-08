@@ -121,7 +121,7 @@ function myContracts() {
                 {{ v.instantiatePermission?.addresses.join(', ') }}</span
               > -->
             </td>
-            <td>
+            <td class="!break-normal">
               <label for="wasm_instantiate_contract" class="px-4 py-2 rounded-lg btn-primary hover:cursor-pointer"
                 @click="
                 dialog.open('wasm_instantiate_contract', {
