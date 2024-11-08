@@ -89,7 +89,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
             <thead class="border border-base-200">
               <tr>
                 <th class="text-white text-xs font-bold">#ID</th>
-                <th class="text-white text-xs font-bold" style="position: relative; z-index: 2">
+                <th class="text-white text-xs font-bold">
                   Block Proposer
                 </th>
                 <th class="text-white text-xs font-bold">TXS Count</th>
@@ -113,7 +113,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
                     )}`"
                     class="text-link cursor-pointer hover:text-primary"
                   > -->
-                  <div class="mt-2 hidden text-sm sm:!block truncate text-white font-semibold">
+                  <div class="mt-2 text-sm text-white font-semibold">
                     <span>{{
                       format.validator(
                         item.block?.header?.proposerAddress &&
