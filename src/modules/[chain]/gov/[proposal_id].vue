@@ -425,7 +425,7 @@ function metaItem(metadata: string | undefined): {
           <tbody>
             <tr v-for="(item, index) of votes" :key="index">
               <td class="py-2 text-sm">{{ showValidatorName(item.voter) }}</td>
-              <td v-if="item.option" class="py-2 text-sm" :class="{
+              <!-- <td v-if="item.option" class="py-2 text-sm" :class="{
                 'text-yes': item.option === VoteOption.VOTE_OPTION_YES,
                 'text-gray-400':
                   item.option === VoteOption.VOTE_OPTION_ABSTAIN,
@@ -437,7 +437,7 @@ function metaItem(metadata: string | undefined): {
                 .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
                 .trim()
                 }}
-              </td>
+              </td> -->
               <td v-if="item.options" class="py-2 text-sm">
                 {{
                   item.options
@@ -447,7 +447,7 @@ function metaItem(metadata: string | undefined): {
                         .replace(/^vote_option/, '')
                         .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
                         .trim()}`
-                      if (result === "No With Vote") return "Vote"
+                      if (result === "No With Veto") return "Veto"
                     return result}).join(', ')
                 }}
               </td>
