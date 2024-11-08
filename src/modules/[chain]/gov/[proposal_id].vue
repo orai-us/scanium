@@ -28,7 +28,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, toRaw, watchEffect } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
@@ -63,7 +63,13 @@ store.fetchProposal(props.proposal_id).then((res) => {
     });
   }
   // @ts-ignore
-  proposal.value = proposalDetail;
+  // proposal.value = proposalDetail;
+  proposal.value = { ...proposalDetail, 
+    submitTime: proposalDetail.submitTime || proposalDetail.submit_time, 
+    depositEndTime: proposalDetail.depositEndTime || proposalDetail.deposit_end_time, 
+    votingStartTime: proposalDetail.votingStartTime || proposalDetail.voting_start_time,
+    votingEndTime: proposalDetail.votingEndTime || proposalDetail.voting_end_time,
+  }
 
   // load origin params if the proposal is param change
   if (changeProposal?.changes) {
@@ -119,7 +125,6 @@ const pageResponse = ref({} as PageResponse | undefined);
 store.fetchProposalVotes(props.proposal_id).then((x) => {
   votes.value = x.votes;
   pageResponse.value = x.pagination;
-  console.log({ votes: x.votes })
 });
 
 function shortTime(v: string | Date | Timestamp) {
@@ -237,6 +242,10 @@ function metaItem(metadata: string | undefined): {
 } {
   return metadata ? JSON.parse(metadata) : {};
 }
+
+watchEffect(()=>{
+  console.log({ proposal: toRaw(proposal.value) })
+})
 
 </script>
 
@@ -380,7 +389,7 @@ function metaItem(metadata: string | undefined): {
                 {{ shortTime(proposal.votingEndTime) }}
               </div>
             </div>
-            <div class="pl-5 text-sm">
+            <div class="pl-5 text-sm" v-if="typeof proposal.status === 'number'">
               {{ $t('gov.current_status') }}:
               {{
               $t(
@@ -390,10 +399,14 @@ function metaItem(metadata: string | undefined): {
               )
               }}
             </div>
+            <div class="pl-5 text-sm" v-else>
+              {{ $t('gov.current_status') }}:
+              {{ $t(`gov.proposal_statuses.${proposal.status}`) }}
+            </div>
           </div>
 
           <div class="mt-4" v-if="
-            proposal?.content?.typeUrl.endsWith('SoftwareUpgradeProposal')
+            proposal?.content?.typeUrl?.endsWith('SoftwareUpgradeProposal')
           ">
             <div class="flex items-center">
               <div class="w-2 h-2 rounded-full bg-warning mr-3"></div>
