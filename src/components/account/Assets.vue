@@ -129,15 +129,12 @@ const unbondingAssets = computed(() => {
   //   true, '0,0.[0]', 'local',
   //   1e18
   // );
-  // console.log({ formatToken })
-  // console.log({ unbondingTotal: props.unbondingTotal })
-  // console.log({ denom: stakingStore.params.bondDenom })
   const totalUnbonding = Number(props.unbondingTotal);
-  if (!!totalUnbonding && typeof totalUnbonding === "number") {
+  if (!!totalUnbonding) {
     const formatToken = {
       amount: totalUnbonding / 1e6,
       denom: stakingStore.params.bondDenom,
-      amountDisplay: String(totalUnbonding / 1e6,)
+      amountDisplay: String(totalUnbonding / 1e6)
     }
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];

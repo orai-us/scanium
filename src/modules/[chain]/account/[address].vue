@@ -77,7 +77,7 @@ function loadAccount(address: string) {
   blockchain.rpc.getStakingDelegatorUnbonding(address).then((x) => {
     if (!!x.unbondingResponses) {
       unbonding.value = x.unbondingResponses;
-      x.unbondingResponses?.forEach((y) => {
+      x.unbondingResponses.forEach((y) => {
         y.entries.forEach((z) => {
           totalUnbond += Number(z.balance);
         });
@@ -336,7 +336,8 @@ const isOwnerWallet = computed(() => {
                 }}
               </td>
               <td class="text-caption py-3">
-                {{ format.toLocaleDate(new Date(Number(v.completionTime?.seconds) * 1000)) }}
+                <span v-if="!!v.completionTime?.seconds">{{ format.toLocaleDate(new Date(Number(v.completionTime.seconds) * 1000)) }}</span>
+                <span v-else>-</span>
               </td>
             </tr>
             <!-- <tr v-for="entry in v.entries">
