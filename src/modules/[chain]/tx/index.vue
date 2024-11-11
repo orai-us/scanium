@@ -48,7 +48,7 @@ const { result } = useQuery(query, variables);
 const transactions: any = computed(() => {
   let initTxs: never[] = []
   if (result.value && CHAIN_INDEXS.includes(props.chain)) {
-    initTxs = result.value?.transactions?.results?.map((item: any) => ({
+    initTxs = result.value.transactions?.results?.map((item: any) => ({
       hash: item.id,
       code: item.code,
       timestamp: item.timestamp,
@@ -57,8 +57,8 @@ const transactions: any = computed(() => {
       height: item.blockNumber,
       fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom?.toUpperCase()}`
     }))
-    return [...base.txsInRecents, ...initTxs]
-  } else return base.txsInRecents
+  }
+  return !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents
 })
 
 watch(transactions, () => {
