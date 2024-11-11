@@ -19,7 +19,6 @@ import type { Proposal, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   ProposalStatus,
   proposalStatusToJSON,
-  VoteOption,
   voteOptionToJSON,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import type { QueryDepositsResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
@@ -28,7 +27,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, reactive, ref, toRaw, watchEffect } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
@@ -242,10 +241,6 @@ function metaItem(metadata: string | undefined): {
 } {
   return metadata ? JSON.parse(metadata) : {};
 }
-
-watchEffect(()=>{
-  console.log({ proposal: toRaw(proposal.value) })
-})
 
 </script>
 
