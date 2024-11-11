@@ -67,7 +67,7 @@ watchEffect(() => {
 })
 
 function handlePagination(page: number) {
-  pagination.offset = page * pagination.limit
+  pagination.offset = (page - 1) * pagination.limit;
   refetch()
 }
 
