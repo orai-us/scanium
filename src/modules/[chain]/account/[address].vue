@@ -177,7 +177,7 @@ const isOwnerWallet = computed(() => {
     <!-- Assets -->
     <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded">
       <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
-        :unbondingTotal="unbondingTotal" :address="address" :chain="chain"/>
+        :unbondingTotal="unbondingTotal" :address="address" :chain="chain" />
     </div>
 
     <!-- Delegations -->
@@ -336,7 +336,8 @@ const isOwnerWallet = computed(() => {
                 }}
               </td>
               <td class="text-caption py-3">
-                <span v-if="!!v.completionTime?.seconds">{{ format.toLocaleDate(new Date(Number(v.completionTime.seconds) * 1000)) }}</span>
+                <span v-if="!isNaN(Number(v.completionTime?.seconds))">{{ format.toLocaleDate(new
+                  Date(Number(v.completionTime.seconds) * 1000)) }}</span>
                 <span v-else>-</span>
               </td>
             </tr>
