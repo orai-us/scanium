@@ -27,7 +27,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
@@ -44,6 +44,7 @@ const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const chainStore = useBlockchain();
 const summary = ref()
+const blockTime = ref(1);
 
 store.fetchProposal(props.proposal_id).then((res) => {
   summary.value = res.proposal.summary;
@@ -148,7 +149,7 @@ const upgradeCountdown = computed((): number => {
   if (height > 0) {
     const base = useBaseStore();
     const current = Number(base.latest?.block?.header?.height || 0);
-    return (height - current) * 1000;
+    return (height - current) * blockTime.value * 1000;
   }
   const now = new Date();
   const end = upgradeSoftware.plan?.time
@@ -241,6 +242,22 @@ function metaItem(metadata: string | undefined): {
 } {
   return metadata ? JSON.parse(metadata) : {};
 }
+
+onMounted(async() => {
+  const base = useBaseStore();
+  const currentHeight = Number(base.latest?.block?.header?.height || 0);
+  if(!!currentHeight){
+    const preHeight = currentHeight - 1000;
+    const [blockNew, blockOld] = await Promise.all([
+      base.fetchBlock(currentHeight),
+      base.fetchBlock(preHeight),
+    ]);
+    const blockTimeNew = new Date(blockNew.block?.header?.time?.toString()).getTime();
+    const blockTimeOld = new Date(blockOld.block?.header?.time?.toString()).getTime();
+    if (!isNaN(blockTimeNew) && !isNaN(blockTimeOld)) blockTime.value = (blockTimeNew - blockTimeOld) / (1000 * 1000);
+  }
+  
+})
 
 </script>
 
