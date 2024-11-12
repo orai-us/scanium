@@ -57,13 +57,13 @@ watchEffect(() => {
 })
 
 function handlePagination(page: number) {
-  pagination.offset = page * pagination.limit
+  pagination.offset = (page - 1) * pagination.limit
   refetch()
 }
 
 </script>
 
 <template>
-  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
+  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :limit="pagination.limit"
     :handlePagination="handlePagination" />
 </template>

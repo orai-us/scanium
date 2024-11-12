@@ -28,14 +28,33 @@ async function fetchTransaction() {
     }
     const response = await getHistoryTxs(params)
     if (!!response) {
-      txs.value = response.data.map((item: any) => ({
-        ...item,
-        result: item.status === 0 ? "Success" : "Failed",
-        blockNumber: item.height,
-        fee: `${Number(item.fee[0]) / 1e6} ORAI`,
-        token: item.tokenInfos[0].abbr.toUpperCase(),
-        timestamp:  format.toLocaleDate(new Date(Number(item.timestamp * 1000)))
-      }));
+      console.log({ response })
+      txs.value = response.data.map((item: any) => {
+        const result = item.status === 0 ? "Success" : "Failed";
+        const blockNumber = item.height || "-";
+
+        let fee = "-";
+        if (Array.isArray(item.fee))
+          if (!isNaN(Number(item.fee[0])))
+            fee = `${Number(item.fee[0]) / 1e6} ORAI`;
+
+        let token = "-";
+        if (Array.isArray(item.tokenInfos) && item.tokenInfos[0]?.abbr)
+          token = item.tokenInfos[0].abbr.toUpperCase()
+
+        let timestamp = "-";
+        if (!!item.timestamp)
+          timestamp = format.toLocaleDate(new Date(item.timestamp * 1000))
+
+        return {
+          ...item,
+          result,
+          blockNumber,
+          fee,
+          token,
+          timestamp
+        }
+      });
       txTotal.value = response.totalRecord;
     }
   } catch (error) {
@@ -67,7 +86,7 @@ function handlePagination(page: number) {
           </tr>
         </thead>
         <tbody class="text-sm">
-          <tr v-for="(v, index) in txs" :key="index">
+          <tr v-for="(v, index) in txs" :key="v.txhash">
             <td class="truncate py-3" style="max-width: 200px">
               <RouterLink :to="`/${chain}/tx/${v.txhash}`" class="text-primary dark:text-link">
                 {{ shortenTxHash(v.txhash) }}
