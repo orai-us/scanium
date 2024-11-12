@@ -39,6 +39,7 @@ const rewards = ref({} as QueryDelegationTotalRewardsResponse);
 const balances = ref([] as Coin[]);
 const recentReceived = ref([] as ExtraTxResponse[]);
 const unbonding = ref([] as UnbondingDelegation[]);
+const unbondingList = ref([] as any);
 const unbondingTotal = ref(0);
 
 const isBalancesLoaded = ref(false);
@@ -72,13 +73,30 @@ function loadAccount(address: string) {
     balances.value = x;
     isBalancesLoaded.value = true;
   });
+  const resultUnbondingList: any = [];
+  let totalUnbond = 0;
   blockchain.rpc.getStakingDelegatorUnbonding(address).then((x) => {
-    unbonding.value = x.unbondingResponses;
-    x.unbondingResponses?.forEach((y) => {
-      y.entries.forEach((z) => {
-        unbondingTotal.value += Number(z.balance);
+    if (!!x.unbondingResponses) {
+      unbonding.value = x.unbondingResponses;
+      x.unbondingResponses.forEach((y) => {
+        y.entries.forEach((z) => {
+          totalUnbond += Number(z.balance);
+        });
       });
-    });
+      unbondingTotal.value = totalUnbond;
+
+      for (const unbond of x.unbondingResponses) {
+        if (!!unbond) {
+          for (const entries of unbond.entries) {
+            resultUnbondingList.push({
+              ...entries,
+              validatorAddress: unbond.validatorAddress
+            })
+          }
+        }
+      }
+      unbondingList.value = resultUnbondingList
+    }
     isUnbodingLoaded.value = true;
   });
 
@@ -182,11 +200,11 @@ function getNameValidator(validatorAddress: string) {
         </h2>
         <div>
           <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
-            <label for="delegate" class="btn btn-third-sm btn-sm mr-2"
+            <label for="delegate" class="bg-base rounded-md text-white p-2 mr-2 xl:text-sm text-xs hover:cursor-pointer"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
               @click="() => { if (!isOwnerWallet) return; dialog.open('delegate', {}, updateEvent) }">{{
               $t('account.btn_delegate') }}</label>
-            <label for="withdraw" class="btn btn-third-sm btn-sm"
+            <label for="withdraw" class="bg-base rounded-md text-white p-2 xl:text-sm text-xs hover:cursor-pointer"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
               @click="() => { if (!isOwnerWallet) return; dialog.open('withdraw', {}, updateEvent) }">Claim
               Reward</label>
@@ -218,16 +236,16 @@ function getNameValidator(validatorAddress: string) {
               </td>
             </tr>
             <tr v-for="(v, index) in delegations" :key="index">
-              <td class="text-caption text-link py-3">
+              <td class="text-caption text-link py-3 !break-normal">
                 <RouterLink :to="`/${chain}/staking/${v.delegation.validatorAddress}`">{{
                   format.validatorFromBech32(v.delegation.validatorAddress) ||
                   v.delegation.validatorAddress
                   }}</RouterLink>
               </td>
-              <td class="py-3">
+              <td class="py-3 !break-normal">
                 {{ format.formatToken(v.balance, true, '0,0.[000000]') }}
               </td>
-              <td class="py-3">
+              <td class="py-3 !break-normal">
                 {{
                 format.formatTokens(
                 rewards?.rewards?.find(
@@ -241,7 +259,7 @@ function getNameValidator(validatorAddress: string) {
                 )
                 }}
               </td>
-              <td class="py-3">
+              <td class="py-3 !break-normal">
                 <div>
                   <div v-if="v.balance && walletStore.currentAddress" class="flex justify-start">
                     <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
@@ -310,7 +328,7 @@ function getNameValidator(validatorAddress: string) {
               <th class="py-3">Unbond Completed By</th>
             </tr>
           </thead>
-          <tbody class="text-sm" v-for="(v, index) in unbonding" :key="index">
+          <tbody class="text-sm" v-for="(v, index) in unbondingList" :key="index">
             <tr>
               <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
@@ -321,7 +339,7 @@ function getNameValidator(validatorAddress: string) {
                 {{
                 format.formatToken(
                 {
-                amount: v.entries[0]?.initialBalance,
+                amount: v.initialBalance,
                 denom: stakingStore.params.bondDenom,
                 },
                 true,
@@ -330,7 +348,9 @@ function getNameValidator(validatorAddress: string) {
                 }}
               </td>
               <td class="text-caption py-3">
-                {{ format.toLocaleDate(new Date(Number(v.entries[0]?.completionTime?.seconds) * 1000)) }}
+                <span v-if="!isNaN(Number(v.completionTime?.seconds))">{{ format.toLocaleDate(new
+                  Date(Number(v.completionTime.seconds) * 1000)) }}</span>
+                <span v-else>-</span>
               </td>
             </tr>
             <!-- <tr v-for="entry in v.entries">

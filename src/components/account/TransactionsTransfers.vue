@@ -86,9 +86,9 @@ function handlePagination(page: number) {
               <span class="text-xs">{{ v.fee || "-" }}</span>
             </td>
             <td class="py-3">
-              <span class="text-xs">{{ v.token }}</span>
+              <span>{{ v.token }}</span>
             </td>
-            <td>{{ v.timestamp || "-" }}</td>
+            <td class="!break-normal">{{ v.timestamp || "-" }}</td>
           </tr>
         </tbody>
       </table>

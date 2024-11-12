@@ -56,22 +56,22 @@ watchEffect(() => {
               {{ shortenTxHash(v.txhash) }}
             </RouterLink>
           </td>
-          <td class="text-sm py-3" :class="`${v.result === 'Success' ? 'text-[#39DD47]' : 'text-error'
+          <td class="text-sm py-3 !break-normal" :class="`${v.result === 'Success' ? 'text-[#39DD47]' : 'text-error'
             }`">
             {{ v.result }}
           </td>
-          <td class="flex items-center py-3">
-            <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">{{ v.message }}</span>
+          <td class="py-3 !break-normal">
+            <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
           </td>
-          <td class="text-sm py-3">
+          <td class="text-sm py-3 !break-normal">
             <RouterLink :to="`/${chain}/block/${v.height}`" class="text-primary dark:text-link">{{
               v.height }}
             </RouterLink>
           </td>
-          <td class="py-3">
-            <span class="text-xs">{{ v.fee || "-" }}</span>
+          <td class="py-3 !break-normal">
+            <span>{{ v.fee || "-" }}</span>
           </td>
-          <td>{{ v.timestamp || "-" }}</td>
+          <td class="!break-normal">{{ v.timestamp || "-" }}</td>
         </tr>
       </tbody>
     </table>

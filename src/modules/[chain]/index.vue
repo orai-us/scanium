@@ -445,7 +445,7 @@ const amount = computed({
                 )
                 }}
               </td>
-              <td>
+              <td class="!break-normal">
                 <div class="flex">
                   <label for="delegate"
                     class="text-link rounded mr-3 font-semibold filter hover:brightness-150 capitalize cursor-pointer"

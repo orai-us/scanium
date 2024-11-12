@@ -2,10 +2,9 @@
 import { CHAIN_INDEXS } from '@/constants';
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import { shortenTxHash } from '@/utils';
-import { Icon } from '@iconify/vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { computed, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 const props = defineProps(['chain']);
 
 const base = useBaseStore();
@@ -49,16 +48,17 @@ const { result } = useQuery(query, variables);
 const transactions: any = computed(() => {
   let initTxs: never[] = []
   if (result.value && CHAIN_INDEXS.includes(props.chain)) {
-    initTxs = result.value?.transactions?.results.map((item: any) => ({
+    initTxs = result.value.transactions?.results?.map((item: any) => ({
       hash: item.id,
       code: item.code,
       timestamp: item.timestamp,
-      messages: item.messages.nodes[0].type.split(".").slice(-1)[0],
+      messages: item.messages?.nodes?.map((item: any) =>
+        ({ "@type": item.type, typeUrl: item.type })),
       height: item.blockNumber,
-      fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom.toUpperCase()}`
+      fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom?.toUpperCase()}`
     }))
-    return [...base.txsInRecents, ...initTxs]
-  } else return base.txsInRecents
+  }
+  return !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents
 })
 
 watch(transactions, () => {
@@ -104,7 +104,7 @@ watch(transactions, () => {
                 }}</RouterLink>
             </td>
             <td>
-              <span class="text-xs truncate relative py-2 w-fit rounded inline-flex items-center" :class="`${detailTxs[item.hash]?.txResponse.code !== 0 ? 'text-error': 'text-[#39DD47]'
+              <span class="text-sm truncate relative w-fit rounded inline-flex items-center" :class="`${detailTxs[item.hash]?.txResponse.code !== 0 ? 'text-error': 'text-[#39DD47]'
                 }`" v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
                 <!-- <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp; -->
                 {{ detailTxs[item.hash]?.txResponse.code !== 0 ? 'Failed' : 'Success' }}
@@ -115,9 +115,9 @@ watch(transactions, () => {
               </span>
               <span v-else>-</span>
             </td>
-            <td>
+            <td class="!break-normal">
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">
-                {{ item.messages || format.messages(item.tx?.body?.messages) }}
+                {{ format.messages(item.tx?.body?.messages || item?.messages) }}
               </span>
             </td>
 
@@ -127,7 +127,7 @@ watch(transactions, () => {
                 item.height
                 }}</RouterLink>
             </td>
-            <td>
+            <td class="!break-normal">
               <span v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
                 {{ format.toLocaleDate(detailTxs[item.hash]?.txResponse?.timestamp) }} ({{
                 format.toDay(detailTxs[item.hash]?.txResponse?.timestamp, 'from')
