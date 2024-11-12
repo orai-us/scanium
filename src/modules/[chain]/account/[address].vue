@@ -135,7 +135,7 @@ function getNameValidator(validatorAddress: string) {
   let name = ""
   const validators = staking?.validators;
   if (Array.isArray(validators)) {
-    const validator = validators.filter((item: any) => item?.operatorAddress === validatorAddress)[0];
+    const validator = validators.find((item: any) => item?.operatorAddress === validatorAddress);
     if (!!validator) name = validator.description?.moniker
   }
   return name;

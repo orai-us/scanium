@@ -19,7 +19,6 @@ import type { Proposal, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   ProposalStatus,
   proposalStatusToJSON,
-  VoteOption,
   voteOptionToJSON,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import type { QueryDepositsResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
@@ -28,7 +27,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
   content: ParameterChangeProposal &
@@ -45,6 +44,7 @@ const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const chainStore = useBlockchain();
 const summary = ref()
+const blockTime = ref(1);
 
 store.fetchProposal(props.proposal_id).then((res) => {
   summary.value = res.proposal.summary;
@@ -63,7 +63,13 @@ store.fetchProposal(props.proposal_id).then((res) => {
     });
   }
   // @ts-ignore
-  proposal.value = proposalDetail;
+  // proposal.value = proposalDetail;
+  proposal.value = { ...proposalDetail, 
+    submitTime: proposalDetail.submitTime || proposalDetail.submit_time, 
+    depositEndTime: proposalDetail.depositEndTime || proposalDetail.deposit_end_time, 
+    votingStartTime: proposalDetail.votingStartTime || proposalDetail.voting_start_time,
+    votingEndTime: proposalDetail.votingEndTime || proposalDetail.voting_end_time,
+  }
 
   // load origin params if the proposal is param change
   if (changeProposal?.changes) {
@@ -119,7 +125,6 @@ const pageResponse = ref({} as PageResponse | undefined);
 store.fetchProposalVotes(props.proposal_id).then((x) => {
   votes.value = x.votes;
   pageResponse.value = x.pagination;
-  console.log({ votes: x.votes })
 });
 
 function shortTime(v: string | Date | Timestamp) {
@@ -144,7 +149,7 @@ const upgradeCountdown = computed((): number => {
   if (height > 0) {
     const base = useBaseStore();
     const current = Number(base.latest?.block?.header?.height || 0);
-    return (height - current) * 6 * 1000;
+    return (height - current) * blockTime.value * 1000;
   }
   const now = new Date();
   const end = upgradeSoftware.plan?.time
@@ -237,6 +242,22 @@ function metaItem(metadata: string | undefined): {
 } {
   return metadata ? JSON.parse(metadata) : {};
 }
+
+onMounted(async() => {
+  const base = useBaseStore();
+  const currentHeight = Number(base.latest?.block?.header?.height || 0);
+  if(!!currentHeight){
+    const preHeight = currentHeight - 1000;
+    const [blockNew, blockOld] = await Promise.all([
+      base.fetchBlock(currentHeight),
+      base.fetchBlock(preHeight),
+    ]);
+    const blockTimeNew = new Date(blockNew.block?.header?.time?.toString()).getTime();
+    const blockTimeOld = new Date(blockOld.block?.header?.time?.toString()).getTime();
+    if (!isNaN(blockTimeNew) && !isNaN(blockTimeOld)) blockTime.value = (blockTimeNew - blockTimeOld) / (1000 * 1000);
+  }
+  
+})
 
 </script>
 
@@ -380,7 +401,7 @@ function metaItem(metadata: string | undefined): {
                 {{ shortTime(proposal.votingEndTime) }}
               </div>
             </div>
-            <div class="pl-5 text-sm">
+            <div class="pl-5 text-sm" v-if="typeof proposal.status === 'number'">
               {{ $t('gov.current_status') }}:
               {{
               $t(
@@ -390,10 +411,14 @@ function metaItem(metadata: string | undefined): {
               )
               }}
             </div>
+            <div class="pl-5 text-sm" v-else>
+              {{ $t('gov.current_status') }}:
+              {{ $t(`gov.proposal_statuses.${proposal.status}`) }}
+            </div>
           </div>
 
           <div class="mt-4" v-if="
-            proposal?.content?.typeUrl.endsWith('SoftwareUpgradeProposal')
+            proposal?.content?.typeUrl?.endsWith('SoftwareUpgradeProposal')
           ">
             <div class="flex items-center">
               <div class="w-2 h-2 rounded-full bg-warning mr-3"></div>
@@ -425,7 +450,7 @@ function metaItem(metadata: string | undefined): {
           <tbody>
             <tr v-for="(item, index) of votes" :key="index">
               <td class="py-2 text-sm">{{ showValidatorName(item.voter) }}</td>
-              <td v-if="item.option" class="py-2 text-sm" :class="{
+              <!-- <td v-if="item.option" class="py-2 text-sm" :class="{
                 'text-yes': item.option === VoteOption.VOTE_OPTION_YES,
                 'text-gray-400':
                   item.option === VoteOption.VOTE_OPTION_ABSTAIN,
@@ -437,7 +462,7 @@ function metaItem(metadata: string | undefined): {
                 .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
                 .trim()
                 }}
-              </td>
+              </td> -->
               <td v-if="item.options" class="py-2 text-sm">
                 {{
                   item.options
@@ -447,7 +472,7 @@ function metaItem(metadata: string | undefined): {
                         .replace(/^vote_option/, '')
                         .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
                         .trim()}`
-                      if (result === "No With Vote") return "Vote"
+                      if (result === "No With Veto") return "Veto"
                     return result}).join(', ')
                 }}
               </td>

@@ -49,7 +49,7 @@ const variables = computed(() => {
         },
       },
     },
-    orderBy: "BLOCK_NUMBER_ASC",
+    orderBy: "BLOCK_NUMBER_DESC",
     first: pagination.limit,
     offset: pagination.offset
   }
