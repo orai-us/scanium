@@ -128,24 +128,10 @@ function metaItem(metadata: string | undefined): {
                 class="btn btn-xs btn-primary rounded-sm"
                 @click="
                   dialog.open('vote', {
-                    proposal_id: item?.proposalId,
+                    proposal_id: Number(item?.proposalId).toString(),
                   })
                 "
               >
-                <!-- <span
-                  v-if="
-                    item?.voterStatus !== VoteOption.VOTE_OPTION_NO_WITH_VETO
-                  "
-                  >{{
-                    voteOptionToJSON(item?.voterStatus)
-                      .toLowerCase()
-                      .replace(/^vote_option/, '')
-                      .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                      .trim()
-                  }}</span
-                >
-
-                <span v-else>Vote</span> -->
                 <span>Vote</span>
               </label>
             </div>
