@@ -42,14 +42,14 @@ const unbondList = ref([] as Validator[]);
 const slashing = ref({} as Params);
 const keywordSearchValidator = ref("");
 const sortDes = reactive({
-  field: "voting_power",
-  type: SORT_TYPE.DESC
+  field: "",
+  type: ""
 });
 
 onMounted(() => {
-  staking.fetchUnbondingValdiators().then((res) => {
-    unbondList.value = res.concat(unbondList.value);
-  });
+  // staking.fetchUnbondingValdiators().then((res) => {
+  //   unbondList.value = res.concat(unbondList.value);
+  // });
   staking.fetchInacitveValdiators().then((res) => {
     unbondList.value = unbondList.value.concat(res);
   });
@@ -161,12 +161,29 @@ const validators = computed(() => {
   return staking.validators.filter(item => item.description.moniker.toLowerCase().includes(keywordSearchValidator.value.toLowerCase()))
 })
 
+const rankActive = computed(() => {
+  const result: any = {};
+  staking.validators.forEach((item, index) => {
+    result[item.operatorAddress] = index + 1;
+  })
+  return result
+})
+
+const rankInActive = computed(() => {
+  const result: any = {};
+  unbondList.value.forEach((item, index) => {
+    result[item.operatorAddress] = index + 1;
+  })
+  return result
+})
+
 const list = computed(() => {
   let result: any[] = []
   if (tab.value === 'active') {
     result = validators.value.map((x, i) => ({
       v: x,
       rank: calculateRank(i),
+      rankNumber: rankActive.value[x.operatorAddress],
       logo: logo(x.description.identity),
       uptime: getUpTimeValidator(x),
       change24h: change24Text(x.consensusPubkey),
@@ -179,6 +196,7 @@ const list = computed(() => {
     result = unbondList.value.map((x, i) => ({
       v: x,
       rank: 'primary',
+      rankNumber: rankInActive.value[x.operatorAddress],
       logo: logo(x.description.identity),
       uptime: getUpTimeValidator(x),
       change24h: change24Text(x.consensusPubkey),
@@ -188,8 +206,7 @@ const list = computed(() => {
       )
     }));
   }
-  const resultSort = handleSortList(result, sortDes)
-  return resultSort
+  return result;
   // else if (tab.value === 'featured') {
   //   const endpoint = chainStore.current?.endpoints?.rpc?.map((x) => x.provider);
   //   if (endpoint) {
@@ -407,7 +424,7 @@ function handleChangeSort(field: string) {
   }
 }
 
-function handleSortList(validator: any[], sortDescription: any){
+function handleSortList(validator: any[], sortDescription: any) {
   let result: any[] = [];
   switch (sortDescription.field) {
     case "voting_power":
@@ -460,6 +477,59 @@ function handleSortList(validator: any[], sortDescription: any){
   }
   return result;
 }
+
+//sort random
+function shuffleArray(array: Array<any>) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function groupAndShuffle(array: Array<any>, groupSize: number) {
+  const sortedArray = array
+    .map(e => {
+      return { ...e, votingPowerMixUpTime: e.tokens * e.uptime };
+    })
+    .sort((a, b) => b.votingPowerMixUpTime - a.votingPowerMixUpTime);
+  const groups = [];
+  for (let i = 0; i < sortedArray.length; i += groupSize) {
+    groups.push(sortedArray.slice(i, i + groupSize));
+  }
+  const shuffledGroups = groups.map(group => shuffleArray(group));
+  return shuffledGroups;
+}
+
+const listRandom = ref([] as Array<any>);
+
+watch([sortDes], () => {
+  listRandom.value = handleSortList(list.value, sortDes)
+})
+
+watch([() => list.value.length], () => {
+  const result: Array<any> = [];
+  const groupValidator = groupAndShuffle(list.value, 10);
+  for (let group of groupValidator) {
+    for (let validator of group) {
+      result.push(validator)
+    }
+  }
+  listRandom.value = result
+})
+
+onMounted(() => {
+  if (Array.isArray(list.value)) {
+      const result: Array<any> = [];
+      const groupValidator = groupAndShuffle(list.value, 10);
+      for (let group of groupValidator) {
+        for (let validator of group) {
+          result.push(validator)
+        }
+      }
+      listRandom.value = result
+    }
+})
 
 </script>
 <template>
@@ -601,13 +671,13 @@ function handleSortList(validator: any[], sortDescription: any){
               </tr>
             </thead>
             <tbody>
-              <tr v-for="({ v, rank, logo, uptime,change24h, commission }, i) in list" :key="v.operatorAddress"
-                class="hover:bg-gray-100 dark:hover:bg-base-300">
+              <tr v-for="({ v, rank, logo, uptime, change24h, commission, rankNumber }, i) in listRandom"
+                :key="v.operatorAddress" class="hover:bg-gray-100 dark:hover:bg-base-300">
                 <!-- 👉 rank -->
                 <td>
                   <div class="text-xs truncate relative px-2 py-1 rounded-full w-fit" :class="`text-${rank}`">
                     <span class="inset-x-0 inset-y-0 opacity-10 absolute" :class="`bg-${rank}`"></span>
-                    {{ i + 1 }}
+                    {{ rankNumber }}
                   </div>
                 </td>
                 <!-- 👉 Validator -->
@@ -617,9 +687,9 @@ function handleSortList(validator: any[], sortDescription: any){
                       <div class="w-8 h-8 rounded-full bg-gray-400 absolute opacity-10"></div>
                       <div class="w-8 h-8 rounded-full">
                         <img v-if="logo" :src="logo" class="object-contain" @error="(e) => {
-                            const identity = v.description?.identity;
-                            if (identity) loadAvatar(identity);
-                          }
+                          const identity = v.description?.identity;
+                          if (identity) loadAvatar(identity);
+                        }
                           " />
                         <Icon v-else class="text-3xl" :icon="`mdi-help-circle-outline`" />
                       </div>
@@ -638,7 +708,7 @@ function handleSortList(validator: any[], sortDescription: any){
                       </span>
                       <span class="text-xs">{{
                         v.description?.website || v.description?.identity || '-'
-                        }}</span>
+                      }}</span>
                     </div>
                   </div>
                 </td>
@@ -648,22 +718,22 @@ function handleSortList(validator: any[], sortDescription: any){
                   <div class="flex flex-col">
                     <h6 class="text-sm font-weight-medium whitespace-nowrap">
                       {{
-                      format.formatToken(
-                      {
-                      amount: parseInt(v.tokens).toString(),
-                      denom: staking.params.bondDenom,
-                      },
-                      true,
-                      '0,0'
-                      )
+                        format.formatToken(
+                          {
+                            amount: parseInt(v.tokens).toString(),
+                            denom: staking.params.bondDenom,
+                          },
+                          true,
+                          '0,0'
+                        )
                       }}
                     </h6>
                     <span class="text-xs">{{
                       format.calculatePercent(
-                      v.delegatorShares,
-                      staking.totalPower
+                        v.delegatorShares,
+                        staking.totalPower
                       )
-                      }}</span>
+                    }}</span>
                   </div>
                 </td>
                 <!-- 👉 Uptime  -->
