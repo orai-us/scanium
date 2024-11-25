@@ -5,6 +5,7 @@ import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import { logs } from '@cosmjs/stargate';
 import { JsonViewer } from 'vue3-json-viewer';
+import type { GetTxResponse } from 'cosmjs-types/cosmos/tx/v1beta1/service';
 // if you used v1.0.5 or latster ,you should add import "vue3-json-viewer/dist/index.css"
 import 'vue3-json-viewer/dist/index.css';
 import { wrapBinary } from '@/libs/utils';
@@ -13,11 +14,11 @@ import { ref, computed, watch } from 'vue';
 
 const props = defineProps(['hash', 'chain']);
 
-const format = useFormatter();
-const baseStore = useBaseStore();
-const transaction = ref({} as any);
 const blockchain = useBlockchain();
-const tx = ref({} as any);
+const baseStore = useBaseStore();
+const format = useFormatter();
+const tx = ref({} as GetTxResponse | undefined);
+const transaction = ref({} as any);
 const tab = ref('msg');
 
 const query = gql`
@@ -171,7 +172,10 @@ const txLogs = computed(() => {
       </div>
 
       <div v-show="tab === 'msg'">
-        <div v-if="transaction" class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4">
+        <div
+          v-if="transaction"
+          class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4"
+        >
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
@@ -185,7 +189,10 @@ const txLogs = computed(() => {
       </div>
 
       <div v-show="tab === 'log'">
-        <div v-if="txLogs" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4">
+        <div
+          v-if="txLogs"
+          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4"
+        >
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.logs') }}: ({{ txLogs.length }})
           </h2> -->
@@ -199,7 +206,10 @@ const txLogs = computed(() => {
       </div>
 
       <div v-show="tab === 'json'">
-        <div v-if="transaction" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
+        <div
+          v-if="transaction"
+          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow"
+        >
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
           <JsonViewer
             :value="wrapBinary(tx)"
