@@ -14,12 +14,15 @@ const tab = ref('blocks');
 const lastHeight = ref(Number(base.latest?.block?.header.height || 0) + 10000);
 const target = ref(Number(lastHeight.value || 0));
 const current = ref({} as BlockResponse);
+const list = ref([] as Array<any>)
 
-const list = computed(() => {
+watchEffect(() => {
   const recents = base.recents;
-  return recents.sort(
+  const result = recents.sort(
     (a, b) => Number(b.block.header.height) - Number(a.block.header.height)
   );
+  const block = result[0];
+  if (block) list.value.unshift(block)
 });
 
 watchEffect(() => {
@@ -99,7 +102,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in list" :index="item.block.header.height" class="hover:bg-base-300">
+              <tr v-for="item in list.slice(0, 50)" :index="item.block.header.height" class="hover:bg-base-300">
                 <td>
                   <RouterLink :to="`/${chain}/block/${item.block.header.height}`"
                     class="text-link cursor-pointer hover:text-primary">
@@ -116,10 +119,10 @@ onBeforeRouteUpdate(async (to, from, next) => {
                   <div class="mt-2 text-sm text-white font-semibold">
                     <span>{{
                       format.validator(
-                        item.block?.header?.proposerAddress &&
-                        toBase64(item.block?.header?.proposerAddress)
+                      item.block?.header?.proposerAddress &&
+                      toBase64(item.block?.header?.proposerAddress)
                       )
-                    }}</span>
+                      }}</span>
                   </div>
                   <!-- </RouterLink> -->
                 </td>
@@ -131,7 +134,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
                 <td class="truncate text-right">
                   <span class="rounded text-xs whitespace-nowrap font-normal text-[#83838A] text-right">
                     {{
-                      format.toDay(item.block?.header?.time.toString(), 'from')
+                    format.toDay(item.block?.header?.time.toString(), 'from')
                     }}
                   </span>
                 </td>
@@ -150,7 +153,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
               {{ $t('block.estimated_time') }}:
               <span class="text-xl font-normal">{{
                 format.toLocaleDate(estimateDate)
-              }}</span>
+                }}</span>
             </div>
             <div class="pt-10 flex justify-center">
               <div class="box-content !p-6 rounded-2xl !bg-base">
@@ -229,13 +232,13 @@ onBeforeRouteUpdate(async (to, from, next) => {
               <td class="truncate text-link" width="50%">
                 <RouterLink :to="`/${props.chain}/tx/${item.hash}`">{{
                   item.hash
-                }}</RouterLink>
+                  }}</RouterLink>
               </td>
               <td>{{ format.formatTokens(item.tx.authInfo.fee?.amount) }}</td>
               <td class="text-sm text-link">
                 <RouterLink :to="`/${props.chain}/block/${item.height}`">{{
                   item.height
-                }}</RouterLink>
+                  }}</RouterLink>
               </td>
             </tr>
           </tbody>

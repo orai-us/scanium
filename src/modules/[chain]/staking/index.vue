@@ -42,8 +42,8 @@ const unbondList = ref([] as Validator[]);
 const slashing = ref({} as Params);
 const keywordSearchValidator = ref("");
 const sortDes = reactive({
-  field: "",
-  type: ""
+  field: "voting_power",
+  type: "desc"
 });
 
 onMounted(() => {
@@ -184,9 +184,9 @@ const list = computed(() => {
       v: x,
       rank: calculateRank(i),
       rankNumber: rankActive.value[x.operatorAddress],
-      logo: logo(x.description.identity),
       uptime: getUpTimeValidator(x),
       change24h: change24Text(x.consensusPubkey),
+      logo: logo(x.description.identity),
       commission: format.formatCommissionRate(
         x.commission?.commissionRates?.rate,
         1e18
@@ -416,6 +416,7 @@ loadAvatars();
 //sort
 function handleChangeSort(field: string) {
   if (field === sortDes.field) {
+    console.log({ sortDes })
     if (sortDes.type === SORT_TYPE.ASC) sortDes.type = SORT_TYPE.DESC
     else sortDes.type = SORT_TYPE.ASC
   } else {
@@ -504,6 +505,7 @@ function groupAndShuffle(array: Array<any>, groupSize: number) {
 const listRandom = ref([] as Array<any>);
 
 watch([sortDes], () => {
+  console.log({ sortDes })
   listRandom.value = handleSortList(list.value, sortDes)
 })
 
@@ -527,6 +529,7 @@ onMounted(() => {
           result.push(validator)
         }
       }
+    console.log({ result })
       listRandom.value = result
     }
 })
@@ -738,16 +741,16 @@ onMounted(() => {
                 </td>
                 <!-- 👉 Uptime  -->
                 <td class="text-[#39DD47] text-right text-xs">
-                  <span :class="uptime && uptime > 0.95 ? 'text-green-500' : 'text-red-500'
+                  <span :class="Number(getUpTimeValidator(v)) && Number(getUpTimeValidator(v)) > 0.95 ? 'text-green-500' : 'text-red-500'
                     ">
                     <div class="tooltip">
-                      {{ format.percent(Number(uptime)) }}
+                      {{ format.percent(Number(getUpTimeValidator(v))) }}
                     </div>
                   </span>
                 </td>
                 <!-- 👉 24h Changes -->
                 <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
-                  {{ change24h }}
+                  {{ change24Text(v.consensusPubkey) }}
                 </td>
                 <!-- 👉 commission -->
                 <td class="text-right text-xs">
@@ -786,7 +789,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div v-show="tab === 'uptime'">
+      <div v-if="tab === 'uptime'">
         <div class="flex flex-row flex-wrap gap-x-4 mt-4 justify-center">
           <div v-for="({ v, signing, hex }, i) in listUptime" :key="i">
             <div class="flex items-center justify-between py-0 w-[298px]">
