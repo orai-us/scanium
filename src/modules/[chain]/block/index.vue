@@ -119,10 +119,10 @@ onBeforeRouteUpdate(async (to, from, next) => {
                   <div class="mt-2 text-sm text-white font-semibold">
                     <span>{{
                       format.validator(
-                      item.block?.header?.proposerAddress &&
-                      toBase64(item.block?.header?.proposerAddress)
+                        item.block?.header?.proposerAddress &&
+                        toBase64(item.block?.header?.proposerAddress)
                       )
-                      }}</span>
+                    }}</span>
                   </div>
                   <!-- </RouterLink> -->
                 </td>
@@ -134,7 +134,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
                 <td class="truncate text-right">
                   <span class="rounded text-xs whitespace-nowrap font-normal text-[#83838A] text-right">
                     {{
-                    format.toDay(item.block?.header?.time.toString(), 'from')
+                      format.toDay(item.block?.header?.time.toString(), 'from')
                     }}
                   </span>
                 </td>
@@ -153,7 +153,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
               {{ $t('block.estimated_time') }}:
               <span class="text-xl font-normal">{{
                 format.toLocaleDate(estimateDate)
-                }}</span>
+              }}</span>
             </div>
             <div class="pt-10 flex justify-center">
               <div class="box-content !p-6 rounded-2xl !bg-base">
@@ -232,13 +232,13 @@ onBeforeRouteUpdate(async (to, from, next) => {
               <td class="truncate text-link" width="50%">
                 <RouterLink :to="`/${props.chain}/tx/${item.hash}`">{{
                   item.hash
-                  }}</RouterLink>
+                }}</RouterLink>
               </td>
               <td>{{ format.formatTokens(item.tx.authInfo.fee?.amount) }}</td>
               <td class="text-sm text-link">
                 <RouterLink :to="`/${props.chain}/block/${item.height}`">{{
                   item.height
-                  }}</RouterLink>
+                }}</RouterLink>
               </td>
             </tr>
           </tbody>

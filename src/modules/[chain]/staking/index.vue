@@ -43,7 +43,7 @@ const slashing = ref({} as Params);
 const keywordSearchValidator = ref("");
 const sortDes = reactive({
   field: "voting_power",
-  type: "desc"
+  type: SORT_TYPE.DESC
 });
 
 onMounted(() => {
@@ -183,10 +183,10 @@ const list = computed(() => {
     result = validators.value.map((x, i) => ({
       v: x,
       rank: calculateRank(i),
+      logo: logo(x.description.identity),
       rankNumber: rankActive.value[x.operatorAddress],
       uptime: getUpTimeValidator(x),
       change24h: change24Text(x.consensusPubkey),
-      logo: logo(x.description.identity),
       commission: format.formatCommissionRate(
         x.commission?.commissionRates?.rate,
         1e18
@@ -416,7 +416,6 @@ loadAvatars();
 //sort
 function handleChangeSort(field: string) {
   if (field === sortDes.field) {
-    console.log({ sortDes })
     if (sortDes.type === SORT_TYPE.ASC) sortDes.type = SORT_TYPE.DESC
     else sortDes.type = SORT_TYPE.ASC
   } else {
@@ -425,7 +424,7 @@ function handleChangeSort(field: string) {
   }
 }
 
-function handleSortList(validator: any[], sortDescription: any) {
+function handleSortList(validator: any[], sortDescription: any){
   let result: any[] = [];
   switch (sortDescription.field) {
     case "voting_power":
@@ -505,7 +504,6 @@ function groupAndShuffle(array: Array<any>, groupSize: number) {
 const listRandom = ref([] as Array<any>);
 
 watch([sortDes], () => {
-  console.log({ sortDes })
   listRandom.value = handleSortList(list.value, sortDes)
 })
 
@@ -529,7 +527,6 @@ onMounted(() => {
           result.push(validator)
         }
       }
-    console.log({ result })
       listRandom.value = result
     }
 })
@@ -690,9 +687,9 @@ onMounted(() => {
                       <div class="w-8 h-8 rounded-full bg-gray-400 absolute opacity-10"></div>
                       <div class="w-8 h-8 rounded-full">
                         <img v-if="logo" :src="logo" class="object-contain" @error="(e) => {
-                          const identity = v.description?.identity;
-                          if (identity) loadAvatar(identity);
-                        }
+                            const identity = v.description?.identity;
+                            if (identity) loadAvatar(identity);
+                          }
                           " />
                         <Icon v-else class="text-3xl" :icon="`mdi-help-circle-outline`" />
                       </div>
@@ -711,7 +708,7 @@ onMounted(() => {
                       </span>
                       <span class="text-xs">{{
                         v.description?.website || v.description?.identity || '-'
-                      }}</span>
+                        }}</span>
                     </div>
                   </div>
                 </td>
@@ -722,21 +719,21 @@ onMounted(() => {
                     <h6 class="text-sm font-weight-medium whitespace-nowrap">
                       {{
                         format.formatToken(
-                          {
-                            amount: parseInt(v.tokens).toString(),
-                            denom: staking.params.bondDenom,
-                          },
-                          true,
-                          '0,0'
+                        {
+                        amount: parseInt(v.tokens).toString(),
+                        denom: staking.params.bondDenom,
+                        },
+                        true,
+                        '0,0'
                         )
                       }}
                     </h6>
                     <span class="text-xs">{{
                       format.calculatePercent(
-                        v.delegatorShares,
-                        staking.totalPower
+                      v.delegatorShares,
+                      staking.totalPower
                       )
-                    }}</span>
+                      }}</span>
                   </div>
                 </td>
                 <!-- 👉 Uptime  -->
