@@ -148,13 +148,26 @@ const txLogs = computed(() => {
 
     <div class="border-t border-b border-base-200">
       <div
-        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none">
-        <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'msg' }"
-          @click="tab = 'msg'">Messages ({{ messages.length }})</a>
-        <a class="tab text-gray-400 capitalize !pb-2" :class="{ 'tab-active': tab === 'log' }" @click="tab = 'log'">Logs
-          ({{ txLogs.length }})</a>
-        <a class="tab text-gray-400 capitalize !pb-2" :class="{ 'tab-active': tab === 'json' }"
-          @click="tab = 'json'">JSON</a>
+        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
+      >
+        <a
+          class="tab text-gray-400 capitalize !pb-3"
+          :class="{ 'tab-active': tab === 'msg' }"
+          @click="tab = 'msg'"
+          >Messages ({{ messages.length }})</a
+        >
+        <a
+          class="tab text-gray-400 capitalize !pb-2"
+          :class="{ 'tab-active': tab === 'log' }"
+          @click="tab = 'log'"
+          >Logs ({{ txLogs.length }})</a
+        >
+        <a
+          class="tab text-gray-400 capitalize !pb-2"
+          :class="{ 'tab-active': tab === 'json' }"
+          @click="tab = 'json'"
+          >JSON</a
+        >
       </div>
 
       <div v-show="tab === 'msg'">
@@ -188,8 +201,15 @@ const txLogs = computed(() => {
       <div v-show="tab === 'json'">
         <div v-if="transaction" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
-          <JsonViewer :value="wrapBinary(tx)" :theme="baseStore.theme" style="background: transparent; border: none"
-            copyable sort expand-depth="5" boxed />
+          <JsonViewer
+            :value="wrapBinary(tx)"
+            :theme="baseStore.theme"
+            style="background: transparent; border: none"
+            copyable
+            sort
+            expand-depth="5"
+            boxed
+          />
         </div>
       </div>
     </div>
