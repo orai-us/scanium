@@ -14,12 +14,15 @@ const tab = ref('blocks');
 const lastHeight = ref(Number(base.latest?.block?.header.height || 0) + 10000);
 const target = ref(Number(lastHeight.value || 0));
 const current = ref({} as BlockResponse);
+const list = ref([] as Array<any>)
 
-const list = computed(() => {
+watchEffect(() => {
   const recents = base.recents;
-  return recents.sort(
+  const result = recents.sort(
     (a, b) => Number(b.block.header.height) - Number(a.block.header.height)
   );
+  const block = result[0];
+  if (block) list.value.unshift(block)
 });
 
 watchEffect(() => {
@@ -99,7 +102,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in list" :index="item.block.header.height" class="hover:bg-base-300">
+              <tr v-for="item in list.slice(0, 50)" :index="item.block.header.height" class="hover:bg-base-300">
                 <td>
                   <RouterLink :to="`/${chain}/block/${item.block.header.height}`"
                     class="text-link cursor-pointer hover:text-primary">
