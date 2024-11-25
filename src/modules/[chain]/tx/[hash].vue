@@ -58,8 +58,12 @@ const variables = computed(() => {
 const { result } = useQuery(query, variables);
 
 watch(result, () => {
-  const { __typename, fee, ...tx } = result.value?.transaction;
-  transaction.value = tx;
+  const txIndexer = result?.value?.transaction;
+  if (!!txIndexer) {
+    const { __typename, ...tx } = txIndexer;
+    transaction.value = tx;
+  }
+
 })
 
 const messages = computed(() => {
@@ -184,15 +188,8 @@ const txLogs = computed(() => {
       <div v-show="tab === 'json'">
         <div v-if="transaction" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
-          <JsonViewer
-            :value="wrapBinary(tx)"
-            :theme="baseStore.theme"
-            style="background: transparent; border: none"
-            copyable
-            sort
-            expand-depth="5"
-            boxed
-          />
+          <JsonViewer :value="wrapBinary(tx)" :theme="baseStore.theme" style="background: transparent; border: none"
+            copyable sort expand-depth="5" boxed />
         </div>
       </div>
     </div>
