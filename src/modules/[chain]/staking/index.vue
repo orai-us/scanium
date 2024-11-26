@@ -161,21 +161,21 @@ const validators = computed(() => {
   return staking.validators.filter(item => item.description.moniker.toLowerCase().includes(keywordSearchValidator.value.toLowerCase()))
 })
 
-const rankActive = computed(() => {
-  const result: any = {};
-  staking.validators.forEach((item, index) => {
-    result[item.operatorAddress] = index + 1;
-  })
-  return result
-})
+// const rankActive = computed(() => {
+//   const result: any = {};
+//   staking.validators.forEach((item, index) => {
+//     result[item.operatorAddress] = index + 1;
+//   })
+//   return result
+// })
 
-const rankInActive = computed(() => {
-  const result: any = {};
-  unbondList.value.forEach((item, index) => {
-    result[item.operatorAddress] = index + 1;
-  })
-  return result
-})
+// const rankInActive = computed(() => {
+//   const result: any = {};
+//   unbondList.value.forEach((item, index) => {
+//     result[item.operatorAddress] = index + 1;
+//   })
+//   return result
+// })
 
 const list = computed(() => {
   let result: any[] = []
@@ -184,7 +184,7 @@ const list = computed(() => {
       v: x,
       rank: calculateRank(i),
       logo: logo(x.description.identity),
-      rankNumber: rankActive.value[x.operatorAddress],
+      // rankNumber: rankActive.value[x.operatorAddress],
       uptime: getUpTimeValidator(x),
       change24h: change24Text(x.consensusPubkey),
       commission: format.formatCommissionRate(
@@ -196,7 +196,7 @@ const list = computed(() => {
     result = unbondList.value.map((x, i) => ({
       v: x,
       rank: 'primary',
-      rankNumber: rankInActive.value[x.operatorAddress],
+      // rankNumber: rankInActive.value[x.operatorAddress],
       logo: logo(x.description.identity),
       uptime: getUpTimeValidator(x),
       change24h: change24Text(x.consensusPubkey),
@@ -671,13 +671,13 @@ onMounted(() => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="({ v, rank, logo, uptime, change24h, commission, rankNumber }, i) in listRandom"
-                :key="v.operatorAddress" class="hover:bg-gray-100 dark:hover:bg-base-300">
+              <tr v-for="({ v, rank, logo, commission }, i) in listRandom" :key="v.operatorAddress"
+                class="hover:bg-gray-100 dark:hover:bg-base-300">
                 <!-- 👉 rank -->
                 <td>
-                  <div class="text-xs truncate relative px-2 py-1 rounded-full w-fit" :class="`text-${rank}`">
-                    <span class="inset-x-0 inset-y-0 opacity-10 absolute" :class="`bg-${rank}`"></span>
-                    {{ rankNumber }}
+                  <div class="text-xs truncate relative px-2 py-1 rounded-full w-fit" :class="`text-primary`">
+                    <span class="inset-x-0 inset-y-0 opacity-10 absolute" :class="`bg-primary`"></span>
+                    {{ i + 1 }}
                   </div>
                 </td>
                 <!-- 👉 Validator -->
@@ -718,14 +718,14 @@ onMounted(() => {
                   <div class="flex flex-col">
                     <h6 class="text-sm font-weight-medium whitespace-nowrap">
                       {{
-                        format.formatToken(
-                        {
-                        amount: parseInt(v.tokens).toString(),
-                        denom: staking.params.bondDenom,
-                        },
-                        true,
-                        '0,0'
-                        )
+                      format.formatToken(
+                      {
+                      amount: parseInt(v.tokens).toString(),
+                      denom: staking.params.bondDenom,
+                      },
+                      true,
+                      '0,0'
+                      )
                       }}
                     </h6>
                     <span class="text-xs">{{
