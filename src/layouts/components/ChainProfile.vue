@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useBlockchain, useBaseStore, type Endpoint } from '@/stores';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const chainStore = useBlockchain();
 const baseStore = useBaseStore();
@@ -11,6 +11,33 @@ function changeEndpoint(item: Endpoint) {
   if (chainStore.current) router.push(`/${chainStore.current.chainName}`);
 }
 let rpcModel = ref('');
+
+async function changeRpc() {
+  const chain = useBlockchain();
+  const base = useBaseStore();
+  chain.initial();
+
+  if (Array.isArray(chainStore.current?.endpoints?.rpc)) {
+    const rpcs = chainStore.current.endpoints.rpc;
+    for (const rpc of rpcs) {
+      chain.setRestEndpoint(rpc);
+      await new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+      if (base.connected) {
+        chainStore.setRestEndpoint(rpc);
+        return;
+      }
+    }
+  }
+}
+
+onMounted(() => {
+  changeRpc()
+})
+
 </script>
 
 <template>
