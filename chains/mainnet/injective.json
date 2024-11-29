@@ -2,6 +2,10 @@
   "chain_name": "injective",
   "api": [
     {
+      "provider": "Allnodes",
+      "address": "https://injective-rest.publicnode.com"
+    },
+    {
       "provider": "Injective",
       "address": "https://lcd.injective.network"
     },
@@ -12,10 +16,6 @@
     {
       "provider": "Golden Ratio Staking",
       "address": "https://rest-injective.goldenratiostaking.net"
-    },
-    {
-      "provider": "Allnodes",
-      "address": "https://injective-rest.publicnode.com"
     }
   ],
   "rpc": [
