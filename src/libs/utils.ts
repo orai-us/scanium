@@ -4,6 +4,7 @@ import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 
 export const formatTitle = (title: string) => {
   const upperCaseTitle = title
+    .replace(/(?<=.)[A-Z]/g, (m) => ` ${m}`)
     .replace(/_(\w)/g, (m, g1) => ' ' + g1.toUpperCase())
     .replace(/([A-Z])/g, ' $1')
     .trim();
