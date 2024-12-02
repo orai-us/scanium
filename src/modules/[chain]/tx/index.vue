@@ -5,7 +5,7 @@ import { shortenTxHash } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { parseJSONRecursive, wrapBinary } from '@/libs/utils';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import { toBase64 } from '@cosmjs/encoding';
 import { decodeProto } from '@/components/dynamic';
@@ -79,8 +79,8 @@ const transactions: any = computed(() => {
   return data
 })
 
-watch(transactions, () => {
-  for (let tx of base.txsInRecents) {
+function getDetailTxs(txs: Array<any>){
+  for (let tx of txs) {
     blockchain.rpc.getTx(tx.hash).then((x) => {
       const messages = x?.tx?.body?.messages[0];
       let subType;
@@ -98,6 +98,15 @@ watch(transactions, () => {
       detailTxs.value[tx.hash] = { ...x, subType };
     });
   }
+}
+
+onMounted(() => {
+  getDetailTxs(base.txsInRecents);
+})
+
+watch(transactions, (newTxs, oldTxs) => {
+  const txs = base.txsInRecents.slice(0, newTxs.length - oldTxs.length + 1);
+  getDetailTxs(txs);
 })
 
 function toTitleCase(str: string) {
