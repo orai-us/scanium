@@ -49,7 +49,7 @@ function getClass(value: string) {
         {{ text }}
       </span>
     </div>
-    <div class="btn-group mt-4 inline-block" role="group">
+    <!-- <div class="btn-group mt-4 inline-block" role="group">
       <button
         type="button"
         v-bind:class="getClass('utf8')"
@@ -74,6 +74,6 @@ function getClass(value: string) {
       >
         Hex
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
