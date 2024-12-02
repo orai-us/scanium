@@ -15,7 +15,7 @@ watchEffect(() => {
       txs.value = props?.transactions?.map((item: any) => ({
         txhash: item?.id,
         result: item.code === 0 ? "Success" : "Failed",
-        message: format.messages(item.messages?.nodes.map((item: any) =>
+        message: item.messages?.nodes[0]?.subType || format.messages(item.messages?.nodes.map((item: any) =>
           ({ "@type": item.type, typeUrl: item.type })
         )),
         height: item.blockNumber,
@@ -61,7 +61,8 @@ watchEffect(() => {
             {{ v.result }}
           </td>
           <td class="py-3 !break-normal">
-            <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
+            <span
+              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
           </td>
           <td class="text-sm py-3 !break-normal">
             <RouterLink :to="`/${chain}/block/${v.height}`" class="text-primary dark:text-link">{{

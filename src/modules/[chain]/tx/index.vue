@@ -4,7 +4,11 @@ import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import { shortenTxHash } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
+import { parseJSONRecursive, wrapBinary } from '@/libs/utils';
 import { computed, ref, watch } from 'vue';
+import { fromBinary } from '@cosmjs/cosmwasm-stargate';
+import { toBase64 } from '@cosmjs/encoding';
+import { decodeProto } from '@/components/dynamic';
 const props = defineProps(['chain']);
 
 const base = useBaseStore();
@@ -52,22 +56,61 @@ const transactions: any = computed(() => {
       hash: item.id,
       code: item.code,
       timestamp: item.timestamp,
-      messages: item.messages?.nodes?.map((item: any) =>
-        ({ "@type": item.type, typeUrl: item.type })),
+      tx: {
+        body: {
+          messages: item.messages?.nodes?.map((item: any) =>
+            ({ "@type": item.type, typeUrl: item.type }))
+        }
+      },
+      subType: item.messages?.nodes[0]?.subType,
       height: item.blockNumber,
       fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom?.toUpperCase()}`
     }))
   }
-  return !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents
+
+  const txs = !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents;
+  const data = txs.map((item) => {
+    const message = format.messages(item.tx?.body?.messages)?.split("×")[0];
+    return {
+      ...item,
+      message: message === "ExecuteContract" ? "-" : convertCamelCaseToWords(format.messages(item.tx?.body?.messages))
+    }
+  })
+  return data
 })
 
 watch(transactions, () => {
   for (let tx of base.txsInRecents) {
     blockchain.rpc.getTx(tx.hash).then((x) => {
-      detailTxs.value[tx.hash] = x;
+      const messages = x?.tx?.body?.messages[0];
+      let subType;
+      if (messages) {
+        const value = decodeProto(messages);
+        if (value.msg instanceof Uint8Array) {
+          try {
+            const jsonValue = fromBinary(toBase64(value.msg));
+            subType = Object.keys(parseJSONRecursive(jsonValue))[0];
+          } catch (error) {
+            console.log({ error });
+          }
+        }
+      }
+      detailTxs.value[tx.hash] = { ...x, subType };
     });
   }
 })
+
+function toTitleCase(str: string) {
+    return str.split('_')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ');
+}
+
+function convertCamelCaseToWords(str: any) {
+  const words = str.split(/(?=[A-Z])/);
+  const result = words.join(" ");
+  return result
+}
 
 </script>
 
@@ -116,8 +159,14 @@ watch(transactions, () => {
               <span v-else>-</span>
             </td>
             <td class="!break-normal">
-              <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">
-                {{ format.messages(item.tx?.body?.messages || item?.messages) }}
+              <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-if="item.subType">
+                {{ toTitleCase(item?.subType) }}
+              </span>
+              <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-else-if="detailTxs[item.hash]?.subType">
+                {{ toTitleCase(detailTxs[item.hash].subType) }}
+              </span>
+              <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-else>
+                {{ item.message }}
               </span>
             </td>
 
