@@ -184,7 +184,7 @@ const txLogs = computed(() => {
             <div class="rounded-md mt-4 border-solid border-stone-700 border">
               <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ msg.displayType }}
               </div>
-              <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" />
+              <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i].events" />
             </div>
           </div>
           <div v-if="messages.length === 0">{{ $t('tx.no_messages') }}</div>

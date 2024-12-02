@@ -3,13 +3,22 @@ import { computed } from 'vue';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { decodeBuffer, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
+import AmmV3Message from './AmmV3Message.vue';
+import { contractAddress } from '@/libs/amm-v3';
 
-const props = defineProps(['value', 'type']);
+const props = defineProps(['value', 'type', 'events']);
 const executeMsgParams = computed(() => {
   if (props.type !== MsgExecuteContract.typeUrl) {
     return null;
   }
-  return Object.values(decodeBuffer(props.value.msg))[0];
+  const decodedExecuteMsg = decodeBuffer(props.value.msg);
+  return {
+    action: Object.keys(decodedExecuteMsg)[0],
+    params: Object.values(decodedExecuteMsg)[0],
+  };
+});
+const isAmmV3ExecuteMessage = computed(() => {
+  return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddress;
 });
 </script>
 <template>
@@ -35,16 +44,20 @@ const executeMsgParams = computed(() => {
           </div>
           <div v-else="value.funds.length">None</div>
         </div>
-        <div v-for="(v, k) of executeMsgParams" class="mb-4">
-          <div>{{ formatTitle(k) }}:</div>
-          <div>
-            <DynamicComponent :value="v" direct="horizontal" />
+        <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
+          :events="events" />
+        <template v-else>
+          <div v-for="(v, k) of executeMsgParams.params" class="mb-4">
+            <div>{{ formatTitle(k) }}:</div>
+            <div>
+              <DynamicComponent :value="v" direct="horizontal" />
+            </div>
           </div>
-        </div>
+        </template>
       </div>
       <div v-else>
         <div v-for="(v, k) of value" class="mb-4">
-          <div>{{ formatTitle(k) }}:</div>
+          <div>{{ formatTitle(k.toString()) }}:</div>
           <div>
             <DynamicComponent :value="v" direct="horizontal" />
           </div>
