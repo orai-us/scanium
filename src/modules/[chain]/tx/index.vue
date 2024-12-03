@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { CHAIN_INDEXS } from '@/constants';
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
-import { shortenTxHash } from '@/utils';
+import { convertCamelCaseToWords, shortenTxHash, toTitleCase } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { parseJSONRecursive, wrapBinary } from '@/libs/utils';
@@ -108,18 +108,6 @@ watch(transactions, (newTxs, oldTxs) => {
   const txs = base.txsInRecents.slice(0, newTxs.length - oldTxs.length + 1);
   getDetailTxs(txs);
 })
-
-function toTitleCase(str: string) {
-    return str.split('_')
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-              .join(' ');
-}
-
-function convertCamelCaseToWords(str: any) {
-  const words = str.split(/(?=[A-Z])/);
-  const result = words.join(" ");
-  return result
-}
 
 </script>
 

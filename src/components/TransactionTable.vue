@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, toRaw, watch, watchEffect } from 'vue';
 import Pagination from './pagination/Pagination.vue';
-import { shortenTxHash } from '@/utils';
+import { convertCamelCaseToWords, shortenTxHash, toTitleCase } from '@/utils';
 import { useFormatter } from '@/stores';
 import { CHAIN_INDEXS } from '@/constants';
 
@@ -12,16 +12,19 @@ const txs = ref([] as Array<any>)
 watchEffect(() => {
   if (!!props?.transactions?.length) {
     if (CHAIN_INDEXS.includes(props.chain)) {
-      txs.value = props?.transactions?.map((item: any) => ({
-        txhash: item?.id,
-        result: item.code === 0 ? "Success" : "Failed",
-        message: item.messages?.nodes[0]?.subType || format.messages(item.messages?.nodes.map((item: any) =>
+      txs.value = props?.transactions?.map((item: any) => {
+        const message = item.messages?.nodes[0]?.subType || format.messages(item.messages?.nodes.map((item: any) =>
           ({ "@type": item.type, typeUrl: item.type })
-        )),
-        height: item.blockNumber,
-        fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
-        timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
-      }));
+        ))
+        return {
+          txhash: item?.id,
+          result: item.code === 0 ? "Success" : "Failed",
+          message: toTitleCase(convertCamelCaseToWords(message)),
+          height: item.blockNumber,
+          fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
+          timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
+        }
+      });
     } else {
       txs.value = props.transactions
     }
