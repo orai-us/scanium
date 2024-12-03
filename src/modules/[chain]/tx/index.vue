@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { CHAIN_INDEXS } from '@/constants';
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
-import { convertCamelCaseToWords, shortenTxHash, toTitleCase } from '@/utils';
+import { shortenTxHash } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { parseJSONRecursive, wrapBinary } from '@/libs/utils';
+import { formatTitle, parseJSONRecursive, wrapBinary } from '@/libs/utils';
 import { computed, onMounted, ref, watch } from 'vue';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import { toBase64 } from '@cosmjs/encoding';
@@ -50,7 +50,7 @@ const variables = computed(() => {
 const { result } = useQuery(query, variables);
 
 const transactions: any = computed(() => {
-  let initTxs: never[] = []
+  let initTxs: never[] = [];
   if (result.value && CHAIN_INDEXS.includes(props.chain)) {
     initTxs = result.value.transactions?.results?.map((item: any) => ({
       hash: item.id,
@@ -65,7 +65,7 @@ const transactions: any = computed(() => {
       subType: item.messages?.nodes[0]?.subType,
       height: item.blockNumber,
       fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom?.toUpperCase()}`
-    }))
+    }));
   }
 
   const txs = !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents;
@@ -73,10 +73,10 @@ const transactions: any = computed(() => {
     const message = format.messages(item.tx?.body?.messages)?.split("×")[0];
     return {
       ...item,
-      message: message === "ExecuteContract" ? "-" : convertCamelCaseToWords(format.messages(item.tx?.body?.messages))
-    }
-  })
-  return data
+      message: message === "ExecuteContract" ? "-" : formatTitle(format.messages(item.tx?.body?.messages) || "")
+    };
+  });
+  return data;
 })
 
 function getDetailTxs(txs: Array<any>){
@@ -157,10 +157,10 @@ watch(transactions, (newTxs, oldTxs) => {
             </td>
             <td class="!break-normal">
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-if="item.subType">
-                {{ toTitleCase(item?.subType) }}
+                {{ formatTitle(item?.subType) }}
               </span>
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-else-if="detailTxs[item.hash]?.subType">
-                {{ toTitleCase(detailTxs[item.hash].subType) }}
+                {{ formatTitle(detailTxs[item.hash].subType) }}
               </span>
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-else>
                 {{ item.message }}

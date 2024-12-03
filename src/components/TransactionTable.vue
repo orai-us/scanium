@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ref, toRaw, watch, watchEffect } from 'vue';
 import Pagination from './pagination/Pagination.vue';
-import { convertCamelCaseToWords, shortenTxHash, toTitleCase } from '@/utils';
+import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import { CHAIN_INDEXS } from '@/constants';
+import { formatTitle } from '@/libs/utils';
 
 const props = defineProps(['transactions', 'chain', 'txTotal', 'limit', 'handlePagination']);
 const format = useFormatter();
@@ -19,7 +20,7 @@ watchEffect(() => {
         return {
           txhash: item?.id,
           result: item.code === 0 ? "Success" : "Failed",
-          message: toTitleCase(convertCamelCaseToWords(message)),
+          message: formatTitle(message),
           height: item.blockNumber,
           fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
           timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
