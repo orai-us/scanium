@@ -951,8 +951,8 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     
     return {
       proposal: {
-        ...data1?.proposal,
         ...data2?.proposal,
+        ...data1?.proposal,
       },
     };
   }
