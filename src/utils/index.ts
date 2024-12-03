@@ -3,4 +3,3 @@ export const shortenTxHash = (txHash: string) => {
   const suffixHash = txHash.slice(-6);
   return `${prefixHash} . . . ${suffixHash}`;
 };
-
