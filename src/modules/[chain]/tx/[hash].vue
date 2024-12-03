@@ -3,12 +3,17 @@ import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import type { GetTxResponse } from 'cosmjs-types/cosmos/tx/v1beta1/service';
 import { logs } from '@cosmjs/stargate';
+import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import { JsonViewer } from 'vue3-json-viewer';
 // if you used v1.0.5 or latster ,you should add import "vue3-json-viewer/dist/index.css"
 import 'vue3-json-viewer/dist/index.css';
-import { wrapBinary } from '@/libs/utils';
 import { Icon } from '@iconify/vue';
 import { ref, computed } from 'vue';
+import { decodeProto } from '@/components/dynamic';
+import TransactionMessage from '@/components/transaction/TransactionMessage.vue';
+import { formatTitle, wrapBinary } from '@/libs/utils';
+import { Event } from 'cosmjs-types/tendermint/abci/types';
+import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -24,13 +29,50 @@ if (props.hash) {
   });
 }
 const messages = computed(() => {
-  return tx.value?.tx?.body?.messages || [];
+  return tx.value?.tx?.body?.messages.map((msg) => {
+    const decodedValue = decodeProto(msg);
+
+    let displayType = msg.typeUrl.split('.').slice(-1)[0].replace(/^Msg/, '').replaceAll(/(?<=.)([A-Z])/g, (match) => ` ${match}`);
+
+    if (msg.typeUrl === MsgExecuteContract.typeUrl) {
+      const decodedExecuteContractMsg = JSON.parse(Buffer.from(decodedValue.msg).toString());
+      const functionName = Object.keys(decodedExecuteContractMsg)[0];
+      displayType += `/${formatTitle(functionName)}`;
+    }
+    return {
+      decodedValue,
+      displayType,
+      typeUrl: msg.typeUrl,
+    }
+  }) || [];
 });
 
 const txLogs = computed(() => {
-  return (
-    tx.value?.txResponse?.logs || logs.parseRawLog(tx.value?.txResponse?.rawLog)
-  );
+  const eventLogsByIndex = {} as any;
+  tx.value?.txResponse?.events.forEach((event) => {
+    const msgIndex = event.attributes.find((attr) => attr.key === 'msg_index')?.value;
+    if (msgIndex === undefined) return;
+    if (!eventLogsByIndex[msgIndex]) {
+      eventLogsByIndex[msgIndex] = {
+        msgIndex,
+        events: [],
+      };
+    }
+    eventLogsByIndex[msgIndex].events.push(event);
+  });
+
+  if (tx.value?.txResponse?.logs && tx.value?.txResponse?.logs.length) {
+    return tx.value?.txResponse?.logs;
+  }
+  try {
+    const parsedRawLogs = logs?.parseRawLog(tx.value?.txResponse?.rawLog || '[]');
+    if (parsedRawLogs && parsedRawLogs.length) {
+      return parsedRawLogs;
+    }
+  } catch (error) {
+    return [];
+  }
+  return Object.values(eventLogsByIndex) as Array<{ msgIndex: string, events: Array<Event> }>;
 });
 
 </script>
@@ -139,8 +181,10 @@ const txLogs = computed(() => {
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
           <div v-for="(msg, i) in messages">
-            <div class="rounded-md mt-4">
-              <DynamicComponent :value="msg" />
+            <div class="rounded-md mt-4 border-solid border-stone-700 border">
+              <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ msg.displayType }}
+              </div>
+              <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i].events" />
             </div>
           </div>
           <div v-if="messages.length === 0">{{ $t('tx.no_messages') }}</div>
@@ -156,8 +200,11 @@ const txLogs = computed(() => {
             {{ $t('account.logs') }}: ({{ txLogs.length }})
           </h2> -->
           <div v-for="(msg, i) in txLogs">
-            <div class="rounded-md mt-4">
-              <DynamicComponent :value="msg" />
+            <div class="rounded-md mt-4 border-solid border-stone-700 border">
+              <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ messages[i].displayType
+                }}
+              </div>
+              <TransactionEvent :events="msg.events" />
             </div>
           </div>
           <div v-if="txLogs.length === 0">{{ $t('tx.no_logs') }}</div>
