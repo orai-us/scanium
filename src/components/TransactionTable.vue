@@ -4,6 +4,7 @@ import Pagination from './pagination/Pagination.vue';
 import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import { CHAIN_INDEXS } from '@/constants';
+import { formatTitle } from '@/libs/utils';
 
 const props = defineProps(['transactions', 'chain', 'txTotal', 'limit', 'handlePagination']);
 const format = useFormatter();
@@ -12,16 +13,19 @@ const txs = ref([] as Array<any>)
 watchEffect(() => {
   if (!!props?.transactions?.length) {
     if (CHAIN_INDEXS.includes(props.chain)) {
-      txs.value = props?.transactions?.map((item: any) => ({
-        txhash: item?.id,
-        result: item.code === 0 ? "Success" : "Failed",
-        message: format.messages(item.messages?.nodes.map((item: any) =>
+      txs.value = props?.transactions?.map((item: any) => {
+        const message = item.messages?.nodes[0]?.subType || format.messages(item.messages?.nodes.map((item: any) =>
           ({ "@type": item.type, typeUrl: item.type })
-        )),
-        height: item.blockNumber,
-        fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
-        timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
-      }));
+        ))
+        return {
+          txhash: item?.id,
+          result: item.code === 0 ? "Success" : "Failed",
+          message: formatTitle(message),
+          height: item.blockNumber,
+          fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
+          timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
+        }
+      });
     } else {
       txs.value = props.transactions
     }
@@ -61,7 +65,8 @@ watchEffect(() => {
             {{ v.result }}
           </td>
           <td class="py-3 !break-normal">
-            <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
+            <span
+              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
           </td>
           <td class="text-sm py-3 !break-normal">
             <RouterLink :to="`/${chain}/block/${v.height}`" class="text-primary dark:text-link">{{
