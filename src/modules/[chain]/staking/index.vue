@@ -531,6 +531,11 @@ onMounted(() => {
     }
 })
 
+//promote - owallet
+const promoteOwallet = computed(()=>{
+  return list.value.filter(item=> item.v.description?.moniker === "OWALLET")
+})
+
 </script>
 <template>
   <div>
@@ -612,6 +617,132 @@ onMounted(() => {
             {{ $t('staking.downtime_slashing') }}
           </div>
         </span>
+      </div>
+    </div>
+
+    <div class="p-6 bg-[#141416] border border-[#242627] rounded-2xl mx-4 md:mx-6 mb-5">
+      <h1 class="text-xl">Sponsored by Oraichain</h1>
+      <div class="w-full h-[1px] bg-[#242627] my-2"></div>
+      <div class="overflow-x-auto">
+        <table class="table staking-table w-full">
+          <thead>
+            <tr>
+              <th scope="col" class="uppercase hover:text-white hover:cursor-pointer">
+                {{ $t('staking.validator') }}
+              </th>
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                @click="handleChangeSort('voting_power')">
+                {{ $t('staking.voting_power') }}
+              </th>
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                @click="handleChangeSort('uptime')">
+                Uptime
+              </th>
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                @click="handleChangeSort('24h_changes')">
+                {{ $t('staking.24h_changes') }}
+              </th>
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                @click="handleChangeSort('commission')">
+                {{ $t('staking.commission') }}
+              </th>
+              <th scope="col" class="text-center uppercase" @click="handleChangeSort('voting_power')">
+                {{ $t('staking.actions') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="({ v, rank, logo, uptime, change24h, commission }, i) in promoteOwallet" :key="v.operatorAddress"
+              class="hover:bg-gray-100 dark:hover:bg-base-300">
+              <!-- 👉 Validator -->
+              <td>
+                <div class="flex items-center overflow-hidden" style="max-width: 300px">
+                  <div class="avatar mr-4 relative w-8 h-8 rounded-full">
+                    <div class="w-8 h-8 rounded-full bg-gray-400 absolute opacity-10"></div>
+                    <div class="w-8 h-8 rounded-full">
+                      <img v-if="logo" :src="logo" class="object-contain" @error="(e) => {
+                        const identity = v.description?.identity;
+                        if (identity) loadAvatar(identity);
+                      }
+                        " />
+                      <Icon v-else class="text-3xl" :icon="`mdi-help-circle-outline`" />
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col">
+                    <span class="text-sm text-primary dark:text-link whitespace-nowrap overflow-hidden">
+                      <RouterLink :to="{
+                        name: 'chain-staking-validator',
+                        params: {
+                          validator: v.operatorAddress,
+                        },
+                      }" class="font-weight-medium">
+                        {{ v.description?.moniker }}
+                      </RouterLink>
+                    </span>
+                    <span class="text-xs">{{
+                      v.description?.website || v.description?.identity || '-'
+                      }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- 👉 Voting Power -->
+              <td class="text-right">
+                <div class="flex flex-col">
+                  <h6 class="text-sm font-weight-medium whitespace-nowrap">
+                    {{
+                    format.formatToken(
+                    {
+                    amount: parseInt(v.tokens).toString(),
+                    denom: staking.params.bondDenom,
+                    },
+                    true,
+                    '0,0'
+                    )
+                    }}
+                  </h6>
+                  <span class="text-xs">{{
+                    format.calculatePercent(
+                    v.delegatorShares,
+                    staking.totalPower
+                    )
+                    }}</span>
+                </div>
+              </td>
+              <!-- 👉 Uptime  -->
+              <td class="text-[#39DD47] text-right text-xs">
+                <span :class="uptime && uptime > 0.95 ? 'text-green-500' : 'text-red-500'
+                  ">
+                  <div class="tooltip">
+                    {{ format.percent(Number(uptime)) }}
+                  </div>
+                </span>
+              </td>
+              <!-- 👉 24h Changes -->
+              <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
+                {{ change24h }}
+              </td>
+              <!-- 👉 commission -->
+              <td class="text-right text-xs">
+                {{ commission }}
+              </td>
+              <!-- 👉 Action -->
+              <td class="text-center">
+                <div class="flex items-center justify-center">
+                  <div v-if="v.jailed" class="badge badge-error gap-2 text-white">
+                    {{ $t('staking.jailed') }}
+                  </div>
+                  <label v-else for="delegate" class="btn-third !py-1 !px-3 capitalize !h-[unset]" @click="
+                    dialog.open('delegate', {
+                      validator_address: v.operatorAddress,
+                    })
+                    ">{{ $t('account.btn_delegate') }}</label>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
