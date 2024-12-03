@@ -22,6 +22,7 @@ const baseStore = useBaseStore();
 const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
 const tab = ref('msg');
+const sidebarOpen = ref(true);
 
 if (props.hash) {
   blockchain.rpc.getTx(props.hash).then((x) => {
@@ -74,6 +75,12 @@ const txLogs = computed(() => {
   }
   return Object.values(eventLogsByIndex) as Array<{ msgIndex: string, events: Array<Event> }>;
 });
+
+const changeOpen = (index: Number) => {
+  if (index === 0) {
+    sidebarOpen.value = !sidebarOpen.value;
+  }
+};
 
 </script>
 <template>
@@ -180,11 +187,18 @@ const txLogs = computed(() => {
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
-          <div v-for="(msg, i) in messages">
-            <div class="rounded-md mt-4 border-solid border-stone-700 border">
-              <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ msg.displayType }}
+          <div v-for="(msg, i) in messages" :key="i">
+            <div class="rounded-md mt-4 border-solid border-stone-700 border collapse collapse-arrow" :class="{
+              'collapse-open': i === 0 && sidebarOpen, 
+              'collapse-close': !sidebarOpen
+            }">
+              <input type="checkbox" class="cursor-pointer !h-10 block"  @click="changeOpen(i)"/>
+              <div class="flex justify-between p-5 border-b border-solid border-stone-700 collapse-title">
+                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
-              <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i].events" />
+              <div class="collapse-content">
+                <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i].events" />
+              </div>
             </div>
           </div>
           <div v-if="messages.length === 0">{{ $t('tx.no_messages') }}</div>
