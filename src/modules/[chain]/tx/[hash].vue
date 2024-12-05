@@ -22,7 +22,8 @@ const baseStore = useBaseStore();
 const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
 const tab = ref('msg');
-const sidebarOpen = ref(true);
+const messageOpens = ref([true] as Array<boolean>);
+const logOpens = ref([true] as Array<boolean>);
 
 if (props.hash) {
   blockchain.rpc.getTx(props.hash).then((x) => {
@@ -76,10 +77,13 @@ const txLogs = computed(() => {
   return Object.values(eventLogsByIndex) as Array<{ msgIndex: string, events: Array<Event> }>;
 });
 
-const changeOpen = (index: Number) => {
-  if (index === 0) {
-    sidebarOpen.value = !sidebarOpen.value;
-  }
+const changeMsgOpen = (index: number) => {
+  const status = messageOpens.value[index];
+  messageOpens.value[index] = !status;
+};
+const changeLogOpen = (index: number) => {
+  const status = logOpens.value[index];
+  logOpens.value[index] = !status
 };
 
 </script>
@@ -168,12 +172,12 @@ const changeOpen = (index: Number) => {
           </h2> -->
           <div v-for="(msg, i) in messages" :key="i">
             <div class="rounded-lg mt-4 collapse collapse-arrow bg-base-200" :class="{
-              'collapse-open': i === 0 && sidebarOpen, 
-              'collapse-close': !sidebarOpen
+              'collapse-open': i === 0 && messageOpens[i], 
+              'collapse-close': !messageOpens[i]
             }">
-              <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeOpen(i)" />
+              <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
               <div class="flex justify-between p-5 collapse-title"
-                :class="{ 'border-b border-solid border-stone-700': sidebarOpen }">
+                :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
                 <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
               <div class="collapse-content">
@@ -191,12 +195,19 @@ const changeOpen = (index: Number) => {
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.logs') }}: ({{ txLogs.length }})
           </h2> -->
-          <div v-for="(msg, i) in txLogs">
-            <div class="rounded-md mt-4 border-solid border-stone-700 border">
-              <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ messages[i].displayType
-                }}
+          <div v-for="(msg, i) in txLogs" :key="i">
+            <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
+              'collapse-open': i === 0 && logOpens[i],
+              'collapse-close': !logOpens[i]
+            }">
+              <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
+              <div class="flex justify-between p-5 collapse-title"
+                :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
+                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>
-              <TransactionEvent :events="msg.events" />
+              <div class="collapse-content">
+                <TransactionEvent :events="msg.events" />
+              </div>
             </div>
           </div>
           <div v-if="txLogs.length === 0">{{ $t('tx.no_logs') }}</div>
