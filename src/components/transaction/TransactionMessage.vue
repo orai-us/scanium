@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
-import { decodeBuffer, formatTitle } from '@/libs/utils';
+import { decodeBuffer, formatNumber, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import AmmV3Message from './AmmV3Message.vue';
 import { contractAddress } from '@/libs/amm-v3';
+import { Icon } from '@iconify/vue';
 
-const props = defineProps(['value', 'type', 'events']);
+const props = defineProps(['value', 'type', 'events', 'chain']);
+
+let showCopyToast = ref(0);
+
 const executeMsgParams = computed(() => {
   if (props.type !== MsgExecuteContract.typeUrl) {
     return null;
@@ -17,53 +21,101 @@ const executeMsgParams = computed(() => {
     params: Object.values(decodedExecuteMsg)[0],
   };
 });
+
 const isAmmV3ExecuteMessage = computed(() => {
   return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddress;
+});
+
+const copyWebsite = async (url: string) => {
+  if (!url) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showCopyToast.value = 1;
+    setTimeout(() => {
+      showCopyToast.value = 0;
+    }, 1000);
+  } catch (err) {
+    showCopyToast.value = 2;
+    setTimeout(() => {
+      showCopyToast.value = 0;
+    }, 1000);
+  }
+};
+
+const tipMsg = computed(() => {
+  return showCopyToast.value === 2
+    ? { class: 'error', msg: 'Copy Error!' }
+    : { class: 'success', msg: 'Copy Success!' };
 });
 </script>
 <template>
   <div>
     <div class="min-h-[25px] m-4">
       <div v-if="executeMsgParams">
-        <div class="mb-4">
-          <div>Contract:</div>
-          <div>
+        <div class="mb-4 flex flex-row gap-10">
+          <div class="w-40">Contract:</div>
+          <div class="flex flex-row justify-center items-center">
             <DynamicComponent :value="value.contract" />
+            <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="value.contract"
+              @click="copyWebsite(value.contract || '')" />
           </div>
         </div>
-        <div class="mb-4">
-          <div>Sender:</div>
-          <div>
+        <div class="mb-4 flex flex-row gap-10">
+          <div class="w-40">Sender:</div>
+          <div class="flex flex-row justify-center items-center">
             <DynamicComponent :value="value.sender" />
           </div>
         </div>
-        <div class="mb-4">
-          <div>Funds:</div>
+        <div class="mb-4 flex flex-row gap-10">
+          <div class="w-40">Funds:</div>
           <div v-if="value.funds.length">
             <DynamicComponent :value="value.funds" />
           </div>
-          <div v-else="value.funds.length">None</div>
+          <div v-else>None</div>
         </div>
         <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
           :events="events" />
         <template v-else>
-          <div v-for="(v, k) of executeMsgParams.params" class="mb-4">
-            <div>{{ formatTitle(k) }}:</div>
-            <div>
-              <DynamicComponent :value="v" direct="horizontal" />
+          <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex flex-row gap-10">
+            <div class="w-40">{{ formatTitle(k) }}:</div>
+            <div v-if="k === 'data'">
+              <div v-for="(value, key) in v" class="flex gap-2">
+                <div class="flex gap-1">
+                  <span class="text-white text-sm">{{ Number(value).toLocaleString("en-US", {}) }}</span>
+                  <span class="font-bold text-gray-400 text-sm">{{ key }}</span>
+                </div>
+              </div>
+            </div>
+            <div v-else>
+              <DynamicComponent :value="v" />
             </div>
           </div>
         </template>
       </div>
       <div v-else>
-        <div v-for="(v, k) of value" class="mb-4">
-          <div>{{ formatTitle(k.toString()) }}:</div>
-          <div>
-            <DynamicComponent :value="v" direct="horizontal" />
+        <div v-for="(v, k) of value" class="mb-4 flex flex-row gap-10">
+          <div class="w-40">{{ formatTitle(k.toString()) }}:</div>
+          <div class="w-full">
+            <DynamicComponent :value="v" />
           </div>
         </div>
       </div>
-
+    </div>
+    <div class="toast" v-show="showCopyToast === 1">
+      <div class="alert alert-success">
+        <div class="text-xs md:!text-sm">
+          <span>{{ tipMsg.msg }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="toast" v-show="showCopyToast === 2">
+      <div class="alert alert-error">
+        <div class="text-xs md:!text-sm">
+          <span>{{ tipMsg.msg }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>

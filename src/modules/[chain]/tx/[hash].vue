@@ -97,22 +97,17 @@ const changeOpen = (index: Number) => {
             <tr>
               <td>{{ $t('account.height') }}</td>
               <td>
-                <RouterLink
-                  :to="`/${props.chain}/block/${tx.txResponse.height}`"
-                  class="text-primary dark:text-link"
-                  >{{ tx.txResponse.height }}
+                <RouterLink :to="`/${props.chain}/block/${tx.txResponse.height}`" class="text-primary dark:text-link">{{
+                  tx.txResponse.height }}
                 </RouterLink>
               </td>
             </tr>
             <tr>
               <td>{{ $t('staking.status') }}</td>
               <td>
-                <span
-                  class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center"
-                  :class="`${
+                <span class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center" :class="`${
                     tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
-                  }`"
-                >
+                  }`">
                   <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
                   {{ tx.txResponse.code === 0 ? 'Success' : 'Failed' }}
                 </span>
@@ -125,7 +120,7 @@ const changeOpen = (index: Number) => {
               <td>{{ $t('account.time') }}</td>
               <td>
                 {{ format.toLocaleDate(tx.txResponse.timestamp) }} ({{
-                  format.toDay(tx.txResponse.timestamp, 'from')
+                format.toDay(tx.txResponse.timestamp, 'from')
                 }})
               </td>
             </tr>
@@ -139,11 +134,11 @@ const changeOpen = (index: Number) => {
               <td>{{ $t('tx.fee') }}</td>
               <td>
                 {{
-                  format.formatTokens(
-                    tx.tx?.authInfo?.fee?.amount,
-                    true,
-                    '0,0.[00]'
-                  )
+                format.formatTokens(
+                tx.tx?.authInfo?.fee?.amount,
+                true,
+                '0,0.[00]'
+                )
                 }}
               </td>
             </tr>
@@ -157,47 +152,33 @@ const changeOpen = (index: Number) => {
     </div>
     <div class="border-t border-b border-base-200">
       <div
-        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
-      >
-        <a
-          class="tab text-gray-400 capitalize !pb-3"
-          :class="{ 'tab-active': tab === 'msg' }"
-          @click="tab = 'msg'"
-          >Messages ({{ messages.length }})</a
-        >
-        <a
-          class="tab text-gray-400 capitalize !pb-2"
-          :class="{ 'tab-active': tab === 'log' }"
-          @click="tab = 'log'"
-          >Logs ({{ txLogs.length }})</a
-        >
-        <a
-          class="tab text-gray-400 capitalize !pb-2"
-          :class="{ 'tab-active': tab === 'json' }"
-          @click="tab = 'json'"
-          >JSON</a
-        >
+        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none">
+        <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'msg' }"
+          @click="tab = 'msg'">Messages ({{ messages.length }})</a>
+        <a class="tab text-gray-400 capitalize !pb-2" :class="{ 'tab-active': tab === 'log' }" @click="tab = 'log'">Logs
+          ({{ txLogs.length }})</a>
+        <a class="tab text-gray-400 capitalize !pb-2" :class="{ 'tab-active': tab === 'json' }"
+          @click="tab = 'json'">JSON</a>
       </div>
 
       <div v-show="tab === 'msg'">
-        <div
-          v-if="tx?.txResponse"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4"
-        >
+        <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4">
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
           <div v-for="(msg, i) in messages" :key="i">
-            <div class="rounded-md mt-4 border-solid border-stone-700 border collapse collapse-arrow" :class="{
+            <div class="rounded-lg mt-4 collapse collapse-arrow bg-base-200" :class="{
               'collapse-open': i === 0 && sidebarOpen, 
               'collapse-close': !sidebarOpen
             }">
-              <input type="checkbox" class="cursor-pointer !h-10 block"  @click="changeOpen(i)"/>
-              <div class="flex justify-between p-5 border-b border-solid border-stone-700 collapse-title">
+              <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeOpen(i)" />
+              <div class="flex justify-between p-5 collapse-title"
+                :class="{ 'border-b border-solid border-stone-700': sidebarOpen }">
                 <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
               <div class="collapse-content">
-                <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i].events" />
+                <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
+                  :chain="chain" />
               </div>
             </div>
           </div>
@@ -206,10 +187,7 @@ const changeOpen = (index: Number) => {
       </div>
 
       <div v-show="tab === 'log'">
-        <div
-          v-if="txLogs"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4"
-        >
+        <div v-if="txLogs" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4">
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.logs') }}: ({{ txLogs.length }})
           </h2> -->
@@ -226,20 +204,10 @@ const changeOpen = (index: Number) => {
       </div>
 
       <div v-show="tab === 'json'">
-        <div
-          v-if="tx?.txResponse"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow"
-        >
+        <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
-          <JsonViewer
-            :value="wrapBinary(tx)"
-            :theme="baseStore.theme"
-            style="background: transparent; border: none"
-            copyable
-            sort
-            expand-depth="5"
-            boxed
-          />
+          <JsonViewer :value="wrapBinary(tx)" :theme="baseStore.theme" style="background: transparent; border: none"
+            copyable sort expand-depth="5" boxed />
         </div>
       </div>
     </div>
