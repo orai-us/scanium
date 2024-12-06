@@ -8,12 +8,13 @@ import { JsonViewer } from 'vue3-json-viewer';
 // if you used v1.0.5 or latster ,you should add import "vue3-json-viewer/dist/index.css"
 import 'vue3-json-viewer/dist/index.css';
 import { Icon } from '@iconify/vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watchEffect, toRaw } from 'vue';
 import { decodeProto } from '@/components/dynamic';
 import TransactionMessage from '@/components/transaction/TransactionMessage.vue';
 import { formatTitle, wrapBinary } from '@/libs/utils';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
+import IBCMessage from '@/components/transaction/IBCMessage.vue';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -35,6 +36,7 @@ const messages = computed(() => {
     const decodedValue = decodeProto(msg);
 
     let displayType = msg.typeUrl.split('.').slice(-1)[0].replace(/^Msg/, '').replaceAll(/(?<=.)([A-Z])/g, (match) => ` ${match}`);
+    const typeMsg = msg.typeUrl.split('.')[0];
 
     if (msg.typeUrl === MsgExecuteContract.typeUrl) {
       const decodedExecuteContractMsg = JSON.parse(Buffer.from(decodedValue.msg).toString());
@@ -45,9 +47,15 @@ const messages = computed(() => {
       decodedValue,
       displayType,
       typeUrl: msg.typeUrl,
+      typeMsg
     }
   }) || [];
 });
+
+watchEffect(() => {
+  console.log({ messages: toRaw(messages.value) });
+  console.log({ messages: toRaw(tx.value?.tx?.body?.messages) });
+})
 
 const txLogs = computed(() => {
   const eventLogsByIndex = {} as any;
@@ -180,7 +188,10 @@ const changeLogOpen = (index: number) => {
                 :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
                 <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
-              <div class="collapse-content">
+              <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
+                <IBCMessage :value="msg.decodedValue" :type="msg.displayType"/>
+              </div>
+              <div class="collapse-content" v-else>
                 <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
                   :chain="chain" />
               </div>

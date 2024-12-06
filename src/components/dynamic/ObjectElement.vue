@@ -5,7 +5,7 @@ import { select } from './index';
 const props = defineProps(['value']);
 </script>
 <template>
-  <div class="overflow-auto border border-solid border-base-400 rounded-lg w-full p-2">
+  <div class="overflow-auto rounded-lg w-full p-2">
     <table class="table table-compact w-full text-sm">
       <tbody class="w-full">
         <tr v-for="(v, k) of value" class="w-full">

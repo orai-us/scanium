@@ -88,21 +88,21 @@ const tipMsg = computed(() => {
     : { class: 'success', msg: 'Copy Success!' };
 });
 
-const nameToken = ref("");
+// const nameToken = ref("");
 
-watchEffect(() => {
-  async function fetchName() {
-    if (text.value.includes("/")) {
-      const responseRegistry = await axios(`https://registry.ping.pub/osmosis/assetlist.json`);
-      const assets = responseRegistry.data.assets as Array<any>;
-      const name = assets.find((asset: any) => asset.base === text.value).display;
-      nameToken.value = name;
-    } else {
-      nameToken.value = text.value;
-    }
-  }
-  fetchName();
-})
+// watchEffect(() => {
+//   async function fetchName() {
+//     if (text.value.includes("/")) {
+//       const responseRegistry = await axios(`https://registry.ping.pub/osmosis/assetlist.json`);
+//       const assets = responseRegistry.data.assets as Array<any>;
+//       const name = assets.find((asset: any) => asset.base === text.value)?.display;
+//       nameToken.value = name;
+//     } else {
+//       nameToken.value = text.value;
+//     }
+//   }
+//   fetchName();
+// })
 
 </script>
 <template>
@@ -121,7 +121,7 @@ watchEffect(() => {
       </span>
     </div>
   </span>
-  <span v-else class="flex"><span class="break-words max-w-5xl">{{ nameToken }}</span>
+  <span v-else class="flex"><span class="break-words max-w-5xl">{{ text }}</span>
     <span v-if="isConvertable" @click="toHexOutput = !toHexOutput" class="ml-2 cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-4 h-4">
