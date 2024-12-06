@@ -173,7 +173,7 @@ const changeLogOpen = (index: number) => {
           @click="tab = 'json'">JSON</a>
       </div>
 
-      <div v-show="tab === 'msg'">
+      <div v-if="tab === 'msg'">
         <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4">
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
@@ -201,7 +201,7 @@ const changeLogOpen = (index: number) => {
         </div>
       </div>
 
-      <div v-show="tab === 'log'">
+      <div v-if="tab === 'log'">
         <div v-if="txLogs" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4">
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.logs') }}: ({{ txLogs.length }})
@@ -225,7 +225,7 @@ const changeLogOpen = (index: number) => {
         </div>
       </div>
 
-      <div v-show="tab === 'json'">
+      <div v-if="tab === 'json'">
         <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
           <JsonViewer :value="wrapBinary(tx)" :theme="baseStore.theme" style="background: transparent; border: none"
