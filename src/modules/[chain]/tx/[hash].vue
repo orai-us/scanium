@@ -15,6 +15,7 @@ import { formatTitle, wrapBinary } from '@/libs/utils';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
 import IBCMessage from '@/components/transaction/IBCMessage.vue';
+import ContractMessage from '@/components/transaction/ContractMessage.vue';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -189,7 +190,10 @@ const changeLogOpen = (index: number) => {
                 <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
               <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
-                <IBCMessage :value="msg.decodedValue" :type="msg.displayType"/>
+                <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
+              </div>
+              <div v-else-if="msg.typeUrl === '/cosmwasm.wasm.v1.MsgExecuteContract'">
+                <ContractMessage :value="msg.decodedValue"/>
               </div>
               <div class="collapse-content" v-else>
                 <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
