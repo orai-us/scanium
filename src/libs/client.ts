@@ -132,6 +132,7 @@ import { assert } from '@cosmjs/utils';
 
 export const DEFAULT_SDK_VERSION = '0.45.16';
 export const LCD_FALLBACK_CHAINS = ['OraiBtcMainnet'];
+export const PRUNED_CHAINS = ['Oraichain'];
 
 export type ExtraTxResponse = Omit<TxResponse, 'result'> & {
   txRaw: DecodedTxRaw;
@@ -1318,10 +1319,15 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     try {
       const blockchain = useBlockchain();
       // TODO:// hardcode for nomic sdk
-      if (LCD_FALLBACK_CHAINS.includes(blockchain.chainName)) {
+      if (
+        LCD_FALLBACK_CHAINS.includes(blockchain.chainName) ||
+        PRUNED_CHAINS.includes(blockchain.chainName)
+      ) {
         const tmRes = await this.tmClient.tx({ hash: fromHex(hash) });
         const tx = Tx.decode(tmRes.tx);
-        const block = await this.tmClient.block(tmRes.height);
+        const block = PRUNED_CHAINS.includes(blockchain.chainName)
+          ? { block: { header: { time: '' } } }
+          : await this.tmClient.block(tmRes.height);
         return {
           tx,
           txResponse: {
