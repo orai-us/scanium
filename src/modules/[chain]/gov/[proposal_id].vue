@@ -55,8 +55,6 @@ store.fetchProposal(props.proposal_id).then((res) => {
   Object.assign(proposalDetail.content!, changeProposal);
   // @ts-ignore
   delete proposalDetail.content.value;
-  console.log({ status: proposalDetail.status })
-  console.log({ data: res.proposal })
   // when status under the voting, final_tally_result are no data, should request fetchTally
   if (proposalDetail.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD || proposalDetail.status === "PROPOSAL_STATUS_VOTING_PERIOD") {
     // 'PROPOSAL_STATUS_VOTING_PERIOD') {
