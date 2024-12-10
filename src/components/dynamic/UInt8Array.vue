@@ -34,20 +34,20 @@ function getClass(value: string) {
 </script>
 <template>
   <div>
-    <div>
+    <div class="bg-base-100 rounded-lg">
       <JsonViewer
         v-if="typeof text === 'object'"
         :value="text"
         :theme="baseStore.theme || 'dark'"
-        style="background: transparent"
+        style="background: transparent; border:none"
         copyable
         boxed
         sort
         :expand-depth="5"
       />
-      <span v-else>
+      <div v-else class="p-2">
         {{ text }}
-      </span>
+      </div>
     </div>
     <!-- <div class="btn-group mt-4 inline-block" role="group">
       <button
@@ -77,3 +77,10 @@ function getClass(value: string) {
     </div> -->
   </div>
 </template>
+
+<style>
+.jv-container .jv-code.boxed {
+  max-height: fit-content;
+  overflow-y: auto;
+}
+</style>

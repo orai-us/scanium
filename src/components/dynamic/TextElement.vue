@@ -5,9 +5,12 @@ import MdEditor from 'md-editor-v3';
 import { computed, onMounted, ref } from 'vue';
 import nameMatcha from '@leapwallet/name-matcha';
 import { fromBase64, toHex } from '@cosmjs/encoding';
+import { Icon } from '@iconify/vue';
 
 const chainStore = useBlockchain();
 const props = defineProps(['value']);
+
+let resultCopy = ref();
 const format = useFormatter();
 function isMD() {
   if (
@@ -59,6 +62,24 @@ const toHexOutput = ref(false);
 const isConvertable = computed(() => {
   return String(props.value).endsWith('=') && props.value.length !== 28;
 });
+
+const copyWebsite = async (url: string) => {
+  if (!url) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    resultCopy.value = true;
+    setTimeout(() => {
+      resultCopy.value = null;
+    }, 1000);
+  } catch (err) {
+    resultCopy.value = false;
+    setTimeout(() => {
+      resultCopy.value = null;
+    }, 1000);
+  }
+};
 </script>
 <template>
   <MdEditor
@@ -68,9 +89,10 @@ const isConvertable = computed(() => {
     class="md-editor-recover"
   ></MdEditor>
   <span v-else-if="isAddress()" class="flex">
-    <RouterLink :to="`/${chainStore.chainName}/account/${text}`">{{
+    <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link">{{
       text
     }}</RouterLink>
+    <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="text" @click="copyWebsite(text || '')" />
     <div v-for="{ name, provider } in names">
       <span
         class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
@@ -105,6 +127,20 @@ const isConvertable = computed(() => {
       </svg>
     </span>
   </span>
+  <div class="toast" v-show="resultCopy === true">
+    <div class="alert alert-success">
+      <div class="text-xs md:!text-sm">
+        <span>Copy Success!</span>
+      </div>
+    </div>
+  </div>
+  <div class="toast" v-show="resultCopy === false">
+    <div class="alert alert-error">
+      <div class="text-xs md:!text-sm">
+        <span>Copy Error!</span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss">

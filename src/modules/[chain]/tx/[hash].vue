@@ -8,12 +8,13 @@ import { JsonViewer } from 'vue3-json-viewer';
 // if you used v1.0.5 or latster ,you should add import "vue3-json-viewer/dist/index.css"
 import 'vue3-json-viewer/dist/index.css';
 import { Icon } from '@iconify/vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watchEffect, toRaw } from 'vue';
 import { decodeProto } from '@/components/dynamic';
 import TransactionMessage from '@/components/transaction/TransactionMessage.vue';
 import { formatTitle, wrapBinary } from '@/libs/utils';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
+import IBCMessage from '@/components/transaction/IBCMessage.vue';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -22,6 +23,8 @@ const baseStore = useBaseStore();
 const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
 const tab = ref('msg');
+const messageOpens = ref([true] as Array<boolean>);
+const logOpens = ref([true] as Array<boolean>);
 
 if (props.hash) {
   blockchain.rpc.getTx(props.hash).then((x) => {
@@ -33,6 +36,7 @@ const messages = computed(() => {
     const decodedValue = decodeProto(msg);
 
     let displayType = msg.typeUrl.split('.').slice(-1)[0].replace(/^Msg/, '').replaceAll(/(?<=.)([A-Z])/g, (match) => ` ${match}`);
+    const typeMsg = msg.typeUrl.split('.')[0];
 
     if (msg.typeUrl === MsgExecuteContract.typeUrl) {
       const decodedExecuteContractMsg = JSON.parse(Buffer.from(decodedValue.msg).toString());
@@ -43,6 +47,7 @@ const messages = computed(() => {
       decodedValue,
       displayType,
       typeUrl: msg.typeUrl,
+      typeMsg
     }
   }) || [];
 });
@@ -74,6 +79,15 @@ const txLogs = computed(() => {
   }
   return Object.values(eventLogsByIndex) as Array<{ msgIndex: string, events: Array<Event> }>;
 });
+
+const changeMsgOpen = (index: number) => {
+  const status = messageOpens.value[index];
+  messageOpens.value[index] = !status;
+};
+const changeLogOpen = (index: number) => {
+  const status = logOpens.value[index];
+  logOpens.value[index] = !status
+};
 
 </script>
 <template>
@@ -172,7 +186,7 @@ const txLogs = computed(() => {
         >
       </div>
 
-      <div v-show="tab === 'msg'">
+      <div v-if="tab === 'msg'">
         <div
           v-if="tx?.txResponse"
           class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4"
@@ -180,31 +194,47 @@ const txLogs = computed(() => {
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
-          <div v-for="(msg, i) in messages">
-            <div class="rounded-md mt-4 border-solid border-stone-700 border">
-              <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ msg.displayType }}
+          <div v-for="(msg, i) in messages" :key="i">
+            <div class="rounded-lg mt-4 collapse collapse-arrow bg-base-200" :class="{
+              'collapse-open': i === 0 && messageOpens[i], 
+              'collapse-close': !messageOpens[i]
+            }">
+              <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
+              <div class="flex justify-between p-5 collapse-title"
+                :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
+                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
-              <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i].events" />
+              <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
+                <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
+              </div>
+              <div class="collapse-content" v-else>
+                <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
+                  :chain="chain" />
+              </div>
             </div>
           </div>
           <div v-if="messages.length === 0">{{ $t('tx.no_messages') }}</div>
         </div>
       </div>
 
-      <div v-show="tab === 'log'">
+      <div v-if="tab === 'log'">
         <div
           v-if="txLogs"
           class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4"
         >
-          <!-- <h2 class="card-title truncate mb-2">
-            {{ $t('account.logs') }}: ({{ txLogs.length }})
-          </h2> -->
-          <div v-for="(msg, i) in txLogs">
-            <div class="rounded-md mt-4 border-solid border-stone-700 border">
-              <div class="p-5 text-lg border-b border-solid border-stone-700">#{{ i + 1 }}. {{ messages[i].displayType
-                }}
+          <div v-for="(msg, i) in txLogs" :key="i">
+            <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
+              'collapse-open': i === 0 && logOpens[i],
+              'collapse-close': !logOpens[i]
+            }">
+              <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
+              <div class="flex justify-between p-5 collapse-title"
+                :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
+                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>
-              <TransactionEvent :events="msg.events" />
+              <div class="collapse-content">
+                <TransactionEvent :events="msg.events" />
+              </div>
             </div>
           </div>
           <div v-if="txLogs.length === 0">{{ $t('tx.no_logs') }}</div>
