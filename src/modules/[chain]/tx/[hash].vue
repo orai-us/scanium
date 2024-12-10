@@ -15,7 +15,6 @@ import { formatTitle, wrapBinary } from '@/libs/utils';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
 import IBCMessage from '@/components/transaction/IBCMessage.vue';
-import ContractMessage from '@/components/transaction/ContractMessage.vue';
 
 const props = defineProps(['hash', 'chain']);
 
