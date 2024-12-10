@@ -1380,9 +1380,16 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
       ) {
         const tmRes = await this.tmClient.tx({ hash: fromHex(hash) });
         const tx = Tx.decode(tmRes.tx);
-        const block = PRUNED_CHAINS.includes(blockchain.chainName)
-          ? { block: { header: { time: '' } } }
-          : await this.tmClient.block(tmRes.height);
+        // const block = PRUNED_CHAINS.includes(blockchain.chainName)
+        //   ? { block: { header: { time: '' } } }
+        //   : await this.tmClient.block(tmRes.height);
+        let block: any = null;
+        try {
+          block = await this.tmClient.block(tmRes.height);
+        } catch (error) {
+          console.log({ error });
+          block = { block: { header: { time: '' } } }
+        }
         return {
           tx,
           txResponse: {
