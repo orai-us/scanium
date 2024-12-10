@@ -27,10 +27,10 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, onMounted, reactive, ref, } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
-  title?: string 
+  title?: string
   content: ParameterChangeProposal &
   MsgSoftwareUpgrade & {
     current: Params[];
@@ -276,7 +276,7 @@ onMounted(async() => {
               ? 'text-no'
               : 'text-info'
           ">
-          {{ proposal.status }}x
+          {{ proposal.status }}
         </div> -->
       </h2>
 
@@ -309,12 +309,20 @@ onMounted(async() => {
         <div class="mb-1" v-for="(item, index) of processList" :key="index">
           <label class="block text-sm mb-1">{{ item.name }}</label>
           <div class="h-5 w-full relative">
-            <div class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm" :class="`${item.class}`"></div>
-            <div class="absolute inset-x-0 inset-y-0 rounded-sm" :class="`${item.class}`" :style="`width: ${
+            <div
+              class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm"
+              :class="`${item.class}`"
+            ></div>
+            <div
+              class="absolute inset-x-0 inset-y-0 rounded-sm"
+              :class="`${item.class}`"
+              :style="`width: ${
                 item.value === '-' || item.value === 'NaN%' ? '0%' : item.value
-              }`"></div>
+              }`"
+            ></div>
             <p
-              class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center">
+              class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center"
+            >
               {{ item.value }}
             </p>
           </div>
@@ -458,15 +466,15 @@ onMounted(async() => {
               </td> -->
               <td v-if="item.options" class="py-2 text-sm">
                 {{
-                item.options
-                .map((x:any) => {
-                const result = `${voteOptionToJSON(x.option)
-                .toLowerCase()
-                .replace(/^vote_option/, '')
-                .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                .trim()}`
-                if (result === "No With Veto") return "Veto"
-                return result}).join(', ')
+                  item.options
+                    .map((x:any) => {
+                      const result = `${voteOptionToJSON(x.option)
+                        .toLowerCase()
+                        .replace(/^vote_option/, '')
+                        .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
+                        .trim()}`
+                      if (result === "No With Veto") return "Veto"
+                    return result}).join(', ')
                 }}
               </td>
             </tr>
