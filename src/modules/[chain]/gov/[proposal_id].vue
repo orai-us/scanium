@@ -27,9 +27,10 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, toRaw, watchEffect } from 'vue';
 
 export type ExtraProposal = Proposal & {
+  title?: string 
   content: ParameterChangeProposal &
   MsgSoftwareUpgrade & {
     current: Params[];
@@ -86,6 +87,10 @@ store.fetchProposal(props.proposal_id).then((res) => {
     });
   }
 });
+
+watchEffect(()=>{
+  console.log({ proposal: toRaw(proposal.value) });
+})
 
 const proposalRest = computed(() => {
   if (!proposal.value.content) return;
@@ -267,7 +272,7 @@ onMounted(async() => {
       <h2 class="card-title flex flex-col md:!justify-between md:!flex-row mb-2 text-white">
         <p class="truncate w-full">
           #{{ proposal_id }}
-          {{ proposal.content?.title }}
+          {{ proposal.content?.title || proposal.title }}
         </p>
         <!-- <div class="badge badge-ghost" :class="color === 'success'
             ? 'text-yes'
@@ -275,7 +280,7 @@ onMounted(async() => {
               ? 'text-no'
               : 'text-info'
           ">
-          {{ proposal.status }}
+          {{ proposal.status }}x
         </div> -->
       </h2>
 
@@ -290,7 +295,7 @@ onMounted(async() => {
       <div v-if="proposal.content">
         <ObjectElement :value="proposal.content" />
       </div>
-      
+
       <div v-if="summary && !proposal.content?.description">
         <MdEditor :model-value="format.multiLine(summary)" previewOnly class="md-editor-recover">
         </MdEditor>
@@ -308,20 +313,12 @@ onMounted(async() => {
         <div class="mb-1" v-for="(item, index) of processList" :key="index">
           <label class="block text-sm mb-1">{{ item.name }}</label>
           <div class="h-5 w-full relative">
-            <div
-              class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm"
-              :class="`${item.class}`"
-            ></div>
-            <div
-              class="absolute inset-x-0 inset-y-0 rounded-sm"
-              :class="`${item.class}`"
-              :style="`width: ${
+            <div class="absolute inset-x-0 inset-y-0 w-full opacity-10 rounded-sm" :class="`${item.class}`"></div>
+            <div class="absolute inset-x-0 inset-y-0 rounded-sm" :class="`${item.class}`" :style="`width: ${
                 item.value === '-' || item.value === 'NaN%' ? '0%' : item.value
-              }`"
-            ></div>
+              }`"></div>
             <p
-              class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center"
-            >
+              class="absolute inset-x-0 inset-y-0 text-center text-sm text-[#666] dark:text-[#eee] flex items-center justify-center">
               {{ item.value }}
             </p>
           </div>
@@ -465,15 +462,15 @@ onMounted(async() => {
               </td> -->
               <td v-if="item.options" class="py-2 text-sm">
                 {{
-                  item.options
-                    .map((x:any) => {
-                      const result = `${voteOptionToJSON(x.option)
-                        .toLowerCase()
-                        .replace(/^vote_option/, '')
-                        .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
-                        .trim()}`
-                      if (result === "No With Veto") return "Veto"
-                    return result}).join(', ')
+                item.options
+                .map((x:any) => {
+                const result = `${voteOptionToJSON(x.option)
+                .toLowerCase()
+                .replace(/^vote_option/, '')
+                .replaceAll(/_(.)/g, (m, g) => ' ' + g.toUpperCase())
+                .trim()}`
+                if (result === "No With Veto") return "Veto"
+                return result}).join(', ')
                 }}
               </td>
             </tr>
