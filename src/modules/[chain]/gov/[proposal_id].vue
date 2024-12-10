@@ -27,7 +27,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, onMounted, reactive, ref, toRaw, watchEffect } from 'vue';
+import { computed, onMounted, reactive, ref, } from 'vue';
 
 export type ExtraProposal = Proposal & {
   title?: string 
@@ -87,10 +87,6 @@ store.fetchProposal(props.proposal_id).then((res) => {
     });
   }
 });
-
-watchEffect(()=>{
-  console.log({ proposal: toRaw(proposal.value) });
-})
 
 const proposalRest = computed(() => {
   if (!proposal.value.content) return;
@@ -295,7 +291,7 @@ onMounted(async() => {
       <div v-if="proposal.content">
         <ObjectElement :value="proposal.content" />
       </div>
-
+      
       <div v-if="summary && !proposal.content?.description">
         <MdEditor :model-value="format.multiLine(summary)" previewOnly class="md-editor-recover">
         </MdEditor>
