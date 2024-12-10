@@ -1,15 +1,17 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { decodeBuffer, formatNumber, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import AmmV3Message from './AmmV3Message.vue';
 import { contractAddress } from '@/libs/amm-v3';
 import { Icon } from '@iconify/vue';
+import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 
 let showCopyToast = ref(0);
+const encoder = new TextEncoder();
 
 const executeMsgParams = computed(() => {
   if (props.type !== MsgExecuteContract.typeUrl) {
@@ -87,6 +89,9 @@ const tipMsg = computed(() => {
                   <span class="font-bold text-gray-400 text-sm">{{ key }}</span>
                 </div>
               </div>
+            </div>
+            <div v-else-if="k === 'msg'" class="w-full">
+              <DynamicComponent :value="encoder.encode(JSON.stringify(fromBinary(v)))" />
             </div>
             <div v-else>
               <DynamicComponent :value="v" />

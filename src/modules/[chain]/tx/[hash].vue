@@ -53,11 +53,6 @@ const messages = computed(() => {
   }) || [];
 });
 
-watchEffect(() => {
-  console.log({ messages: toRaw(messages.value) });
-  console.log({ messages: toRaw(tx.value?.tx?.body?.messages) });
-})
-
 const txLogs = computed(() => {
   const eventLogsByIndex = {} as any;
   tx.value?.txResponse?.events.forEach((event) => {
@@ -192,9 +187,6 @@ const changeLogOpen = (index: number) => {
               <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
                 <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
               </div>
-              <div v-else-if="msg.typeUrl === '/cosmwasm.wasm.v1.MsgExecuteContract'">
-                <ContractMessage :value="msg.decodedValue"/>
-              </div>
               <div class="collapse-content" v-else>
                 <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
                   :chain="chain" />
@@ -207,9 +199,7 @@ const changeLogOpen = (index: number) => {
 
       <div v-if="tab === 'log'">
         <div v-if="txLogs" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4">
-          <!-- <h2 class="card-title truncate mb-2">
-            {{ $t('account.logs') }}: ({{ txLogs.length }})
-          </h2> -->
+          
           <div v-for="(msg, i) in txLogs" :key="i">
             <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
               'collapse-open': i === 0 && logOpens[i],
