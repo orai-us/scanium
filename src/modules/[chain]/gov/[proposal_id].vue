@@ -55,8 +55,10 @@ store.fetchProposal(props.proposal_id).then((res) => {
   Object.assign(proposalDetail.content!, changeProposal);
   // @ts-ignore
   delete proposalDetail.content.value;
+  console.log({ status: proposalDetail.status })
+  console.log({ data: res.proposal })
   // when status under the voting, final_tally_result are no data, should request fetchTally
-  if (proposalDetail.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD) {
+  if (proposalDetail.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD || proposalDetail.status === "PROPOSAL_STATUS_VOTING_PERIOD") {
     // 'PROPOSAL_STATUS_VOTING_PERIOD') {
     store.fetchTally(props.proposal_id).then((tallRes) => {
       proposal.value = { ...proposal.value, finalTallyResult: tallRes.tally };
@@ -269,14 +271,14 @@ onMounted(async() => {
           #{{ proposal_id }}
           {{ proposal.content?.title }}
         </p>
-        <div class="badge badge-ghost" :class="color === 'success'
+        <!-- <div class="badge badge-ghost" :class="color === 'success'
             ? 'text-yes'
             : color === 'error'
               ? 'text-no'
               : 'text-info'
           ">
           {{ proposal.status }}
-        </div>
+        </div> -->
       </h2>
 
       <!-- <div v-if="proposal.content?.description">
