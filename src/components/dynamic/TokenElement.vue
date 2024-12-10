@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import axios from 'axios';
-import { ref, toRaw, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 
 const props = defineProps(['value']);
@@ -10,7 +10,6 @@ const nameToken = ref("");
 let exponent = ref(0);
 
 watchEffect(() => {
-  console.log({amount: toRaw(props.value)})
   async function fetchName() {
     const denom = props.value["denom"];
     if (denom?.includes("/")) {
