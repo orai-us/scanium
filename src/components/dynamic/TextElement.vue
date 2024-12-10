@@ -2,17 +2,15 @@
 import { isBech32Address } from '@/libs/utils';
 import { useBlockchain, useFormatter } from '@/stores';
 import MdEditor from 'md-editor-v3';
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import nameMatcha from '@leapwallet/name-matcha';
 import { fromBase64, toHex } from '@cosmjs/encoding';
 import { Icon } from '@iconify/vue';
-import axios from 'axios';
-import { watch } from 'vue';
 
 const chainStore = useBlockchain();
 const props = defineProps(['value']);
 
-let showCopyToast = ref(0);
+let resultCopy = ref();
 const format = useFormatter();
 function isMD() {
   if (
@@ -71,22 +69,17 @@ const copyWebsite = async (url: string) => {
   }
   try {
     await navigator.clipboard.writeText(url);
-    showCopyToast.value = 1;
+    resultCopy.value = true;
     setTimeout(() => {
-      showCopyToast.value = 0;
+      resultCopy.value = null;
     }, 1000);
   } catch (err) {
-    showCopyToast.value = 2;
+    resultCopy.value = false;
     setTimeout(() => {
-      showCopyToast.value = 0;
+      resultCopy.value = null;
     }, 1000);
   }
 };
-const tipMsg = computed(() => {
-  return showCopyToast.value === 2
-    ? { class: 'error', msg: 'Copy Error!' }
-    : { class: 'success', msg: 'Copy Success!' };
-});
 </script>
 <template>
   <MdEditor
@@ -134,17 +127,17 @@ const tipMsg = computed(() => {
       </svg>
     </span>
   </span>
-  <div class="toast" v-show="showCopyToast === 1">
+  <div class="toast" v-show="resultCopy === true">
     <div class="alert alert-success">
       <div class="text-xs md:!text-sm">
-        <span>{{ tipMsg.msg }}</span>
+        <span>Copy Success!</span>
       </div>
     </div>
   </div>
-  <div class="toast" v-show="showCopyToast === 2">
+  <div class="toast" v-show="resultCopy === false">
     <div class="alert alert-error">
       <div class="text-xs md:!text-sm">
-        <span>{{ tipMsg.msg }}</span>
+        <span>Copy Error!</span>
       </div>
     </div>
   </div>
