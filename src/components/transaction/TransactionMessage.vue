@@ -59,7 +59,7 @@ const tipMsg = computed(() => {
         <div class="mb-4 flex flex-row gap-10">
           <div class="w-40">Contract:</div>
           <div class="flex flex-row justify-center items-center">
-            <DynamicComponent :value="value.contract" />
+            <span>{{ value.contract }}</span>
             <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="value.contract"
               @click="copyWebsite(value.contract || '')" />
           </div>
