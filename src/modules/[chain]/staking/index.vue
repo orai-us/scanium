@@ -620,8 +620,8 @@ const promoteOwallet = computed(()=>{
       </div>
     </div>
 
-    <div class="p-6 bg-[#141416] border border-[#242627] rounded-2xl mx-4 md:mx-6 mb-5">
-      <h1 class="text-xl">Sponsored by Oraichain</h1>
+    <div class="p-6 bg-[#141416] border border-[#242627] rounded-2xl mx-4 md:mx-6 mb-5" v-if="promoteOwallet.length">
+      <h1 class="text-xl">Sponsor</h1>
       <div class="w-full h-[1px] bg-[#242627] my-2"></div>
       <div class="overflow-x-auto">
         <table class="table staking-table w-full">
