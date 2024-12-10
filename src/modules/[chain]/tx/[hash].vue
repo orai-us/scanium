@@ -105,15 +105,19 @@ const changeLogOpen = (index: number) => {
             <tr>
               <td>{{ $t('account.height') }}</td>
               <td>
-                <RouterLink :to="`/${props.chain}/block/${tx.txResponse.height}`" class="text-primary dark:text-link">{{
-                  tx.txResponse.height }}
+                <RouterLink
+                  :to="`/${props.chain}/block/${tx.txResponse.height}`"
+                  class="text-primary dark:text-link"
+                  >{{ tx.txResponse.height }}
                 </RouterLink>
               </td>
             </tr>
             <tr>
               <td>{{ $t('staking.status') }}</td>
               <td>
-                <span class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center" :class="`${
+                <span
+                  class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center"
+                  :class="`${
                     tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
                   }`">
                   <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
@@ -128,7 +132,7 @@ const changeLogOpen = (index: number) => {
               <td>{{ $t('account.time') }}</td>
               <td>
                 {{ format.toLocaleDate(tx.txResponse.timestamp) }} ({{
-                format.toDay(tx.txResponse.timestamp, 'from')
+                  format.toDay(tx.txResponse.timestamp, 'from')
                 }})
               </td>
             </tr>
@@ -142,11 +146,11 @@ const changeLogOpen = (index: number) => {
               <td>{{ $t('tx.fee') }}</td>
               <td>
                 {{
-                format.formatTokens(
-                tx.tx?.authInfo?.fee?.amount,
-                true,
-                '0,0.[00]'
-                )
+                  format.formatTokens(
+                    tx.tx?.authInfo?.fee?.amount,
+                    true,
+                    '0,0.[00]'
+                  )
                 }}
               </td>
             </tr>
@@ -160,13 +164,26 @@ const changeLogOpen = (index: number) => {
     </div>
     <div class="border-t border-b border-base-200">
       <div
-        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none">
-        <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'msg' }"
-          @click="tab = 'msg'">Messages ({{ messages.length }})</a>
-        <a class="tab text-gray-400 capitalize !pb-2" :class="{ 'tab-active': tab === 'log' }" @click="tab = 'log'">Logs
-          ({{ txLogs.length }})</a>
-        <a class="tab text-gray-400 capitalize !pb-2" :class="{ 'tab-active': tab === 'json' }"
-          @click="tab = 'json'">JSON</a>
+        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
+      >
+        <a
+          class="tab text-gray-400 capitalize !pb-3"
+          :class="{ 'tab-active': tab === 'msg' }"
+          @click="tab = 'msg'"
+          >Messages ({{ messages.length }})</a
+        >
+        <a
+          class="tab text-gray-400 capitalize !pb-2"
+          :class="{ 'tab-active': tab === 'log' }"
+          @click="tab = 'log'"
+          >Logs ({{ txLogs.length }})</a
+        >
+        <a
+          class="tab text-gray-400 capitalize !pb-2"
+          :class="{ 'tab-active': tab === 'json' }"
+          @click="tab = 'json'"
+          >JSON</a
+        >
       </div>
 
       <div v-if="tab === 'msg'">
@@ -222,8 +239,15 @@ const changeLogOpen = (index: number) => {
       <div v-if="tab === 'json'">
         <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
-          <JsonViewer :value="wrapBinary(tx)" :theme="baseStore.theme" style="background: transparent; border: none"
-            copyable sort expand-depth="5" boxed />
+          <JsonViewer
+            :value="wrapBinary(tx)"
+            :theme="baseStore.theme"
+            style="background: transparent; border: none"
+            copyable
+            sort
+            expand-depth="5"
+            boxed
+          />
         </div>
       </div>
     </div>

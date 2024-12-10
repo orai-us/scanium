@@ -9,7 +9,7 @@ const props = defineProps(['value']);
     <table class="table table-compact w-full text-sm">
       <tbody class="w-full">
         <tr v-for="(v, k) of value" class="w-full">
-          <td class=" whitespace-break-spaces min-w-max">
+          <td class="whitespace-break-spaces min-w-max">
             {{ formatTitle(String(k)) }}:
           </td>
           <td class="w-4/5">
@@ -22,15 +22,3 @@ const props = defineProps(['value']);
     </table>
   </div>
 </template>
-
-
-<!-- <template>
-  <div class="bg-base">
-    <div v-for="(v, k) of value" class="flex gap-2">
-      <div class="flex gap-1">
-        <span class="text-white">{{ formatTitle(k.toString()) }}</span>
-        <span class="font-bold text-gray-400">{{ v }}</span>
-      </div>
-    </div>
-  </div>
-</template> -->

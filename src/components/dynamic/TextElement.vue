@@ -87,46 +87,50 @@ const tipMsg = computed(() => {
     ? { class: 'error', msg: 'Copy Error!' }
     : { class: 'success', msg: 'Copy Success!' };
 });
-
-// const nameToken = ref("");
-
-// watchEffect(() => {
-//   async function fetchName() {
-//     if (text.value.includes("/")) {
-//       const responseRegistry = await axios(`https://registry.ping.pub/osmosis/assetlist.json`);
-//       const assets = responseRegistry.data.assets as Array<any>;
-//       const name = assets.find((asset: any) => asset.base === text.value)?.display;
-//       nameToken.value = name;
-//     } else {
-//       nameToken.value = text.value;
-//     }
-//   }
-//   fetchName();
-// })
-
 </script>
 <template>
-  <MdEditor v-if="isMD()" :model-value="format.multiLine(value)" previewOnly class="md-editor-recover"></MdEditor>
-  <span v-else-if="isAddress()" class="flex items-center">
-
+  <MdEditor
+    v-if="isMD()"
+    :model-value="format.multiLine(value)"
+    previewOnly
+    class="md-editor-recover"
+  ></MdEditor>
+  <span v-else-if="isAddress()" class="flex">
     <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link">{{
       text
-      }}</RouterLink>
+    }}</RouterLink>
     <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="text" @click="copyWebsite(text || '')" />
     <div v-for="{ name, provider } in names">
-      <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
-        :data-tip="provider" :title="provider">
+      <span
+      class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
+      :data-tip="provider"
+      :title="provider"
+      >
         <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
         <button>{{ name }}</button>
       </span>
     </div>
   </span>
-  <span v-else class="flex"><span class="break-words max-w-5xl">{{ text }}</span>
-    <span v-if="isConvertable" @click="toHexOutput = !toHexOutput" class="ml-2 cursor-pointer">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="w-4 h-4">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+  <span v-else class="flex"
+    ><span class="break-words max-w-5xl">{{ text }}</span>
+    <span
+      v-if="isConvertable"
+      @click="toHexOutput = !toHexOutput"
+      class="ml-2 cursor-pointer"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-4 h-4"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+        />
       </svg>
     </span>
   </span>
