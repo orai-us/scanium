@@ -119,7 +119,8 @@ const changeLogOpen = (index: number) => {
                   class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center"
                   :class="`${
                     tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
-                  }`">
+                  }`"
+                >
                   <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
                   {{ tx.txResponse.code === 0 ? 'Success' : 'Failed' }}
                 </span>
@@ -187,7 +188,10 @@ const changeLogOpen = (index: number) => {
       </div>
 
       <div v-if="tab === 'msg'">
-        <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4">
+        <div
+          v-if="tx?.txResponse"
+          class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4"
+        >
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
@@ -215,8 +219,10 @@ const changeLogOpen = (index: number) => {
       </div>
 
       <div v-if="tab === 'log'">
-        <div v-if="txLogs" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4">
-          
+        <div
+          v-if="txLogs"
+          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4"
+        >
           <div v-for="(msg, i) in txLogs" :key="i">
             <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
               'collapse-open': i === 0 && logOpens[i],
@@ -236,8 +242,11 @@ const changeLogOpen = (index: number) => {
         </div>
       </div>
 
-      <div v-if="tab === 'json'">
-        <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
+      <div v-show="tab === 'json'">
+        <div
+          v-if="tx?.txResponse"
+          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow"
+        >
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
           <JsonViewer
             :value="wrapBinary(tx)"
