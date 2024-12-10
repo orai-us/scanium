@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref } from 'vue';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
-import { decodeBuffer, formatNumber, formatTitle } from '@/libs/utils';
+import { decodeBuffer, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import AmmV3Message from './AmmV3Message.vue';
 import { contractAddress } from '@/libs/amm-v3';

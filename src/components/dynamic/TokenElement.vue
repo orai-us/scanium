@@ -23,7 +23,6 @@ watchEffect(() => {
   fetchName();
 })
 
-
 </script>
 <template>
   <div class="overflow-auto">
