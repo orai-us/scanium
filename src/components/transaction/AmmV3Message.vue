@@ -61,8 +61,8 @@ const value = computed(() => {
 });
 </script>
 <template>
-  <div v-for="(v, k) of value" class="mb-4">
-    <div>{{ formatTitle(k.toString()) }}:</div>
+  <div v-for="(v, k) of value" class="mb-4 flex flex-row gap-10">
+    <div class="w-40">{{ formatTitle(k.toString()) }}:</div>
     <div>
       <DynamicComponent :value="v" direct="horizontal" />
     </div>
