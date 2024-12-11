@@ -30,6 +30,7 @@ import MdEditor from 'md-editor-v3';
 import { computed, onMounted, reactive, ref } from 'vue';
 
 export type ExtraProposal = Proposal & {
+  title?: string
   content: ParameterChangeProposal &
   MsgSoftwareUpgrade & {
     current: Params[];
@@ -56,7 +57,7 @@ store.fetchProposal(props.proposal_id).then((res) => {
   // @ts-ignore
   delete proposalDetail.content.value;
   // when status under the voting, final_tally_result are no data, should request fetchTally
-  if (proposalDetail.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD) {
+  if (proposalDetail.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD || proposalDetail.status === "PROPOSAL_STATUS_VOTING_PERIOD") {
     // 'PROPOSAL_STATUS_VOTING_PERIOD') {
     store.fetchTally(props.proposal_id).then((tallRes) => {
       proposal.value = { ...proposal.value, finalTallyResult: tallRes.tally };
@@ -267,16 +268,16 @@ onMounted(async() => {
       <h2 class="card-title flex flex-col md:!justify-between md:!flex-row mb-2 text-white">
         <p class="truncate w-full">
           #{{ proposal_id }}
-          {{ proposal.content?.title }}
+          {{ proposal.content?.title || proposal.title }}
         </p>
-        <div class="badge badge-ghost" :class="color === 'success'
+        <!-- <div class="badge badge-ghost" :class="color === 'success'
             ? 'text-yes'
             : color === 'error'
               ? 'text-no'
               : 'text-info'
           ">
           {{ proposal.status }}
-        </div>
+        </div> -->
       </h2>
 
       <!-- <div v-if="proposal.content?.description">
