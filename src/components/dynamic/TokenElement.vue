@@ -19,7 +19,9 @@ watchEffect(() => {
       if (asset) {
         const name = asset.display;
         const denomUnits = asset.denom_units;
-        exponent.value = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
+        if (Array.isArray(denomUnits)) {
+          exponent.value = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
+        }
         nameToken.value = name;
       }
     } else {
