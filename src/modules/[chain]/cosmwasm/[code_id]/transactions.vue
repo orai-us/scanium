@@ -1,7 +1,11 @@
 <script lang="ts" setup>
+import { fromUtf8 } from '@cosmjs/encoding';
+import { JsonViewer } from 'vue3-json-viewer';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import {
+  useBaseStore,
   useBlockchain,
+  useFormatter,
   useTxDialog,
 } from '@/stores';
 import { PageRequest } from '@/types';
@@ -17,11 +21,13 @@ import 'vue3-json-viewer/dist/index.css';
 import TransactionContractIndexs from '@/components/contracts/TransactionContractIndexs.vue';
 import TransactionContractRpc from '@/components/contracts/TransactionContractRpc.vue';
 import { CHAIN_INDEXS } from '@/constants';
+import { decodeBuffer } from '@/libs/utils';
 
 const props = defineProps(['chain'])
 const chainStore = useBlockchain();
 const wasmStore = useWasmStore();
-
+const baseStore = useBaseStore();
+const format = useFormatter();
 const route = useRoute();
 const pageRequest = ref(new PageRequest());
 
@@ -109,47 +115,43 @@ function showQuery() {
   result.value = '';
 }
 
-// function queryContract() {
-//   try {
-//     if (selectedRadio.value === 'raw') {
-//       wasmStore.wasmClient
-//         .getWasmContractRawQuery(contractAddress, query.value)
-//         .then((x) => {
-//           result.value = x;
-//         })
-//         .catch((err) => {
-//           result.value = err;
-//         });
-//     } else {
-//       wasmStore.wasmClient
-//         .getWasmContractSmartQuery(contractAddress, query.value)
-//         .then((x) => {
-//           result.value = x;
-//         })
-//         .catch((err) => {
-//           result.value = err;
-//         });
-//     }
-//   } catch (err) {
-//     result.value = JSON.stringify(err); // not works for now
-//   }
-//   // TODO, show error in the result.
-// }
+function queryContract() {
+  try {
+    (
+      selectedRadio.value === 'raw' ?
+        wasmStore.wasmClient.getWasmContractRawQuery(contractAddress.value, query.value) :
+        wasmStore.wasmClient.getWasmContractSmartQuery(contractAddress.value, query.value)
+    ).then((x) => {
+      const valueStr = fromUtf8(x.data);
+      try {
+        result.value = JSON.parse(valueStr);
+      } catch (e) {
+        result.value = valueStr;
+      }
+    })
+      .catch((err) => {
+        result.value = JSON.stringify(err.message);
+      });
+  } catch (err) {
+    result.value = JSON.stringify(err); // not works for now
+  }
+  // TODO: show error in the result.
+}
 
-// const radioContent = [
-//   {
-//     title: 'Raw Query',
-//     desc: 'Return raw result',
-//     value: 'raw',
-//   },
-//   {
-//     title: 'Smart Query',
-//     desc: 'Return structure result if possible',
-//     value: 'smart',
-//   },
-// ];
+const radioContent = [
+  {
+    title: 'Raw Query',
+    desc: 'Return raw result',
+    value: 'raw',
+  },
+  {
+    title: 'Smart Query',
+    desc: 'Return structure result if possible',
+    value: 'smart',
+  },
+];
 
-// const selectedRadio = ref('raw');
+const selectedRadio = ref('raw');
 </script>
 <template>
   <div class="p-5">
@@ -254,7 +256,7 @@ function showQuery() {
 
     <!-- <WasmVerification :contract="contractAddress" /> -->
 
-    <!-- <div>
+    <div>
       <input type="checkbox" id="modal-contract-funds" class="modal-toggle" />
       <label for="modal-contract-funds" class="modal cursor-pointer">
         <label class="modal-box relative p-2" for="">
@@ -388,6 +390,6 @@ function showQuery() {
           </div>
         </label>
       </label>
-    </div> -->
+    </div>
   </div>
 </template>

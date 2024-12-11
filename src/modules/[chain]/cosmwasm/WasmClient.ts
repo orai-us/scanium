@@ -10,7 +10,7 @@ import type {
   PaginabledContractStates,
   WasmParam,
 } from './types';
-import { toAscii,} from '@cosmjs/encoding';
+import { toAscii, toUtf8 } from '@cosmjs/encoding';
 import type { PageRequest } from '@/types';
 import type {
   QueryAllContractStateResponse,
@@ -150,7 +150,7 @@ export class WasmRestClient extends BaseRestClient<WasmRequestRegistry> {
     // );
     const res = await this.queryClient.wasm.queryContractSmart(
       address,
-      JSON.parse(query)
+      toUtf8(query)
     );
     return res;
   }
