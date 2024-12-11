@@ -7,6 +7,7 @@ const props = defineProps(['value']);
 
 const route = useRoute();
 const nameToken = ref("");
+let exponent = ref(0);
 
 watchEffect(() => {
   async function fetchName() {
@@ -14,8 +15,15 @@ watchEffect(() => {
     if (denom?.includes("/")) {
       const responseRegistry = await axios(`https://registry.ping.pub/${route.params?.chain?.toString().toLowerCase()}/assetlist.json`);
       const assets = responseRegistry.data.assets as Array<any>;
-      const name = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom))?.display;
-      nameToken.value = name;
+      const asset = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
+      if (asset) {
+        const name = asset.display;
+        const denomUnits = asset.denom_units;
+        if (Array.isArray(denomUnits)) {
+          exponent.value = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
+        }
+        nameToken.value = name;
+      }
     } else {
       nameToken.value = denom;
     }
@@ -26,6 +34,6 @@ watchEffect(() => {
 </script>
 <template>
   <div class="overflow-auto">
-      {{ Number(value["amount"]).toLocaleString("en-US", {}) }} {{ nameToken }}
+    {{ (Number(value["amount"]) / Math.pow(10, exponent)).toLocaleString("en-US", {}) }} {{ nameToken }}
   </div>
 </template>
