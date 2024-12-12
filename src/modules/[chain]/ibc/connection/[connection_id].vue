@@ -305,38 +305,14 @@ function color(v: string) {
             <tr v-for="v in ibcStore.registryChannels">
               <td>
                 <div class="flex gap-1">
-                  <button
-                    class="btn btn-xs !bg-[rgba(39,120,77,0.20)] border border-[rgba(39,120,77,0.20)] rounded-lg !text-[#39DD47]"
-                    @click="
-                      fetchRecevingTxs(
-                        v[ibcStore.sourceField].channel_id,
-                        v[ibcStore.sourceField].port_id
-                      )
-                    "
-                    :disabled="loading"
-                  >
-                    <span
-                      v-if="loading"
-                      class="loading loading-spinner loading-sm !text-[#39DD47]"
-                    ></span>
+                  <RouterLink :to="`/${chain}/ibc/connection/in/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`"
+                    class="btn btn-xs !bg-[rgba(39,120,77,0.20)] border border-[rgba(39,120,77,0.20)] rounded-lg !text-[#39DD47]">
                     {{ $t('ibc.btn_in') }}
-                  </button>
-                  <button
-                    class="btn btn-xs !bg-[rgba(255,82,82,0.20)] border border-[rgba(255,82,82,0.20)] rounded-lg !text-[#FF5252]"
-                    @click="
-                      fetchSendingTxs(
-                        v[ibcStore.sourceField].channel_id,
-                        v[ibcStore.sourceField].port_id
-                      )
-                    "
-                    :disabled="loading"
-                  >
-                    <span
-                      v-if="loading"
-                      class="loading loading-spinner loading-sm !text-[#FF5252]"
-                    ></span>
+                  </RouterLink>
+                  <RouterLink :to="`/${chain}/ibc/connection/out/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`"
+                    class="btn btn-xs !bg-[rgba(255,82,82,0.20)] border border-[rgba(255,82,82,0.20)] rounded-lg !text-[#FF5252]">
                     {{ $t('ibc.btn_out') }}
-                  </button>
+                  </RouterLink>
                 </div>
               </td>
               <td class="text-white">
@@ -347,28 +323,14 @@ function color(v: string) {
             <tr v-for="v in channels">
               <td>
                 <div class="flex gap-1">
-                  <button
-                    class="btn btn-xs !bg-[rgba(39,120,77,0.20)] border border-[rgba(39,120,77,0.20)] rounded-lg !text-[#39DD47]"
-                    @click="fetchRecevingTxs(v.channelId, v.portId)"
-                    :disabled="loading"
-                  >
-                    <span
-                      v-if="loading"
-                      class="loading loading-spinner loading-sm !text-[#39DD47]"
-                    ></span>
+                  <RouterLink :to="`/${chain}/ibc/connection/in/${v.channelId}/${v.portId}`"
+                    class="btn btn-xs !bg-[rgba(39,120,77,0.20)] border border-[rgba(39,120,77,0.20)] rounded-lg !text-[#39DD47]">
                     {{ $t('ibc.btn_in') }}
-                  </button>
-                  <button
-                    class="btn btn-xs !bg-[rgba(255,82,82,0.20)] border border-[rgba(255,82,82,0.20)] rounded-lg !text-[#FF5252]"
-                    @click="fetchSendingTxs(v.channelId, v.portId)"
-                    :disabled="loading"
-                  >
-                    <span
-                      v-if="loading"
-                      class="loading loading-spinner loading-sm !text-[#FF5252]"
-                    ></span>
+                  </RouterLink>
+                  <RouterLink :to="`/${chain}/ibc/connection/out/${v.channelId}/${v.portId}`"
+                    class="btn btn-xs !bg-[rgba(255,82,82,0.20)] border border-[rgba(255,82,82,0.20)] rounded-lg !text-[#FF5252]">
                     {{ $t('ibc.btn_out') }}
-                  </button>
+                  </RouterLink>
                 </div>
               </td>
               <td class="text-white">
