@@ -1,10 +1,6 @@
 <script lang="ts" setup>
-import PaginationBar from '@/components/PaginationBar.vue';
-import type { ExtraTxSearchResponse } from '@/libs/client';
 import { formatSeconds } from '@/libs/utils';
-import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
-import { PageRequest } from '@/types';
-import { toHex } from '@cosmjs/encoding';
+import { useBaseStore, useBlockchain } from '@/stores';
 import { Icon } from '@iconify/vue';
 import type { IdentifiedChannel } from 'cosmjs-types/ibc/core/channel/v1/channel';
 import { State } from 'cosmjs-types/ibc/core/channel/v1/channel';
@@ -13,29 +9,32 @@ import type { ConnectionEnd } from 'cosmjs-types/ibc/core/connection/v1/connecti
 import { ClientState as TendermintClientState } from 'cosmjs-types/ibc/lightclients/tendermint/v1/tendermint';
 import { computed, onMounted, ref } from 'vue';
 import { useIBCModule } from '../connStore';
+import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
+import { JsonViewer } from 'vue3-json-viewer';
+import { wrapBinary } from '@/libs/utils';
 
 const props = defineProps(['chain', 'connection_id']);
 const chainStore = useBlockchain();
 const baseStore = useBaseStore();
-const format = useFormatter();
 const ibcStore = useIBCModule();
 const conn = ref({} as ConnectionEnd | undefined);
 const clientState = ref(
   {} as (IdentifiedClientState & TendermintClientState) | undefined
 );
 const channels = ref([] as IdentifiedChannel[]);
+const encoder = new TextEncoder();
 
 const connId = computed(() => {
   return props.connection_id || 0;
 });
 
-const loading = ref(false);
-const txs = ref({} as ExtraTxSearchResponse);
-const direction = ref('');
-const channel_id = ref('');
-const port_id = ref('');
-const page = ref(new PageRequest());
-page.value.limit = 5;
+const STATE = {
+  "1": "INIT",
+  "2": "TRY OPEN",
+  "3": "OPEN",
+  "4": "CLOSED",
+  "-1": "UNRECOGNIZED"
+}
 
 onMounted(() => {
   if (connId.value) {
@@ -55,7 +54,20 @@ onMounted(() => {
       }
     });
     chainStore.rpc.getIBCConnectionsChannels(connId.value).then((x) => {
-      channels.value = x.channels;
+      channels.value = x.channels.map((channel)=>{
+        let version: any = "";
+        try {
+          version = JSON.parse(channel.version);
+        } catch (error) {
+          version = channel.version;
+        }
+
+        console.log({ version })
+        return {
+          ...channel,
+          version
+        }
+      })
     });
   }
 });
@@ -66,69 +78,8 @@ function loadChannel(channel: string, port: string) {
   });
 }
 
-function pageload(pageNum: number) {
-  if (direction.value === 'In') {
-    fetchSendingTxs(channel_id.value, port_id.value, pageNum - 1);
-  } else {
-    fetchSendingTxs(channel_id.value, port_id.value, pageNum - 1);
-  }
-}
-
-function fetchSendingTxs(channel: string, port: string, pageNum = 0) {
-  page.value.setPage(pageNum);
-  loading.value = true;
-  direction.value = 'Out';
-  channel_id.value = channel;
-  port_id.value = port;
-  txs.value = {} as ExtraTxSearchResponse;
-  chainStore.rpc
-    .getTxs(
-      [
-        {
-          key: 'send_packet.packet_src_channel',
-          value: channel,
-        },
-        {
-          key: 'send_packet.packet_src_port',
-          value: port,
-        },
-      ],
-      page.value
-    )
-    .then((res) => {
-      txs.value = res;
-    })
-    .finally(() => (loading.value = false));
-}
-function fetchRecevingTxs(channel: string, port: string, pageNum = 0) {
-  page.value.setPage(pageNum);
-  loading.value = true;
-  direction.value = 'In';
-  channel_id.value = channel;
-  port_id.value = port;
-  txs.value = {} as ExtraTxSearchResponse;
-  chainStore.rpc
-    .getTxs(
-      [
-        {
-          key: 'recv_packet.packet_dst_channel',
-          value: channel,
-        },
-        {
-          key: 'recv_packet.packet_dst_port',
-          value: port,
-        },
-      ],
-      page.value
-    )
-    .then((res) => {
-      txs.value = res;
-    })
-    .finally(() => (loading.value = false));
-}
-
 function color(v: string) {
-  if (v && v.indexOf('_OPEN') > -1) {
+  if (v === "3") {
     return 'success';
   }
   return 'warning';
@@ -341,73 +292,28 @@ function color(v: string) {
               <td class="text-white">{{ v.portId }}</td>
               <td>
                 <div
-                  class="text-xs truncate relative py-2 px-4 rounded-full w-fit text-white"
+                  class="text-x font-bold truncate relative py-2 px-4 rounded-full w-fit"
                   :class="`text-${color(v.state.toString())}`"
                 >
                   <!-- <span
                     class="inset-x-0 inset-y-0 opacity-10 absolute"
                     :class="`bg-${color(v.state.toString())}`"
                   ></span> -->
-                  {{ v.state }}
+                  {{ STATE[v.state||-1] }}
                 </div>
               </td>
               <td>
                 {{ v.counterparty?.portId }}/{{ v.counterparty?.channelId }}
               </td>
               <td class="text-white">{{ v.connectionHops.join(', ') }}</td>
-              <td>{{ v.version }}</td>
+              <td>
+                {{ v.version }}
+              </td>
               <td class="text-right text-white">{{ v.ordering }}</td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
-    <div v-if="channel_id">
-      <h3 class="card-title capitalize">
-        Transactions ({{ channel_id }} {{ port_id }} {{ direction }})
-      </h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <td class="text-white">{{ $t('ibc.height') }}</td>
-            <td class="text-white">{{ $t('ibc.txhash') }}</td>
-            <td class="text-white">{{ $t('ibc.messages') }}</td>
-            <td class="text-white">{{ $t('ibc.time') }}</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="resp in txs?.txs">
-            <td>{{ resp.height }}</td>
-            <td>
-              <div class="text-xs truncate text-primary dark:text-link">
-                <RouterLink
-                  :to="`/${chainStore.chainName}/tx/${toHex(resp.hash)}`"
-                  >{{ toHex(resp.hash) }}</RouterLink
-                >
-              </div>
-            </td>
-            <td>
-              <div class="flex">
-                {{ format.messages(resp.txRaw.body.messages) }}
-                <Icon
-                  v-if="resp.result.code === 0"
-                  icon="mdi-check"
-                  class="text-success text-lg"
-                />
-                <Icon v-else icon="mdi-multiply" class="text-error text-lg" />
-              </div>
-            </td>
-            <td>
-              {{ resp.timestamp ? format.toLocaleDate(resp.timestamp) : '-' }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <PaginationBar
-        :limit="page.limit"
-        :total="txs?.totalCount?.toString()"
-        :callback="pageload"
-      />
     </div>
   </div>
 </template>

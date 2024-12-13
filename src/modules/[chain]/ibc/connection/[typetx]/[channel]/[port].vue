@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useBlockchain, useFormatter } from '@/stores';
-import { onMounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { onMounted, ref} from 'vue';
 import { PageRequest } from '@/types';
 import { toHex } from '@cosmjs/encoding';
 import { shortenTxHash } from '@/utils';
