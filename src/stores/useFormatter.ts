@@ -348,7 +348,7 @@ export const useFormatter = defineStore('formatter', {
         if (amount < 0.000001) {
           return {
             amount: 0,
-            denom: `${denom.substring(0, 10).toLowerCase()}`,
+            denom: `${denom.toLowerCase()}`,
             amountDisplay: "0"
           }
         }
@@ -360,7 +360,7 @@ export const useFormatter = defineStore('formatter', {
         }
         return {
           amount: amount,
-          denom: withDenom ? denom.substring(0, 10).toLowerCase() : '',
+          denom: withDenom ? denom.toLowerCase() : '',
           amountDisplay: `${numeral(amount).format(fmt)}`,
         };
       }
