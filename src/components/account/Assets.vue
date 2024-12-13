@@ -67,22 +67,19 @@ watch([() => props.address], () => {
   getBalancesCw20()
 })
 
-watchEffect(()=>{
-  console.log({delegations: toRaw(props.delegations)})
-})
-
 function checkFormatTokenMax(formatToken: any) {
-  console.log({ formatToken })
-  console.log(formatToken.denom === MAX_TOKEN.denom)
-  if (formatToken.denom === MAX_TOKEN.denom) {
+  if (formatToken.denom === MAX_TOKEN.base) {
     const amount = formatToken.amount / Math.pow(10, MAX_TOKEN.exponent);
     return {
-      denom: MAX_TOKEN.name,
+      denom: MAX_TOKEN.display,
       amount,
       amountDisplay: amount.toString()
     };
   }
-  return formatToken;
+  return {
+    ...formatToken,
+    denom: formatToken.denom.substring(0, 10)
+  };
 }
 
 const balancesAssets = computed(() => {

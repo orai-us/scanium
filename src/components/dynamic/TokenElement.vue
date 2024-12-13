@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { MAX_TOKEN } from '@/constants';
 import axios from 'axios';
 import { ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
@@ -15,6 +16,7 @@ watchEffect(() => {
     if (denom?.includes("/")) {
       const responseRegistry = await axios(`https://registry.ping.pub/${route.params?.chain?.toString().toLowerCase()}/assetlist.json`);
       const assets = responseRegistry.data.assets as Array<any>;
+      assets.push(MAX_TOKEN);
       const asset = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
       if (asset) {
         const name = asset.display;
