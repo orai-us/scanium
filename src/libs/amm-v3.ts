@@ -70,16 +70,20 @@ export function toDecimal(amount: string | bigint | number, decimal: number) {
     .replace(/\.?0+$/, '');
 }
 
-function parsePoolKey(poolKeyStr: string): PoolKey {
-  const [token_x, token_y, fee, tick_spacing] = poolKeyStr.split('-');
-  return {
-    token_x,
-    token_y,
-    fee_tier: {
-      fee: +fee,
-      tick_spacing: +tick_spacing,
-    },
-  };
+function parsePoolKey(poolKeyStr: any): PoolKey {
+  if (typeof poolKeyStr === 'object') {
+    return poolKeyStr;
+  } else {
+    const [token_x, token_y, fee, tick_spacing] = poolKeyStr.split('-');
+    return {
+      token_x,
+      token_y,
+      fee_tier: {
+        fee: +fee,
+        tick_spacing: +tick_spacing,
+      },
+    };
+  }
 }
 
 export function displayPoolName(poolKey: any) {
