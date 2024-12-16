@@ -40,6 +40,13 @@
       "exponent": "6",
       "coingecko_id": "osmosis",
       "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/12220.png"
+    },
+    {
+      "base": "factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuqk9ezgyeugxql3mhqyndrw1huvo5h",
+      "symbol": "MAX",
+      "exponent": "6",
+      "coingecko_id": "max-2",
+      "logo": "https://assets.coingecko.com/coins/images/52378/standard/btc.png?1733257730"
     }
   ]
 }
