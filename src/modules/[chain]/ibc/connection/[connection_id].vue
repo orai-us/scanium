@@ -12,6 +12,7 @@ import { useIBCModule } from '../connStore';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import { JsonViewer } from 'vue3-json-viewer';
 import { wrapBinary } from '@/libs/utils';
+import router from '@/router';
 
 const props = defineProps(['chain', 'connection_id']);
 const chainStore = useBlockchain();
@@ -240,7 +241,6 @@ function color(v: string) {
         <table class="table w-full mt-4">
           <thead>
             <tr class="text-white">
-              <th>{{ $t('ibc.txs') }}</th>
               <th style="position: relative; z-index: 2">
                 {{ $t('ibc.channel_id') }}
               </th>
@@ -253,37 +253,13 @@ function color(v: string) {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="v in ibcStore.registryChannels">
-              <td>
-                <div class="flex gap-1">
-                  <RouterLink :to="`/${chain}/ibc/connection/in/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`"
-                    class="btn btn-xs !bg-[rgba(39,120,77,0.20)] border border-[rgba(39,120,77,0.20)] rounded-lg !text-[#39DD47]">
-                    {{ $t('ibc.btn_in') }}
-                  </RouterLink>
-                  <RouterLink :to="`/${chain}/ibc/connection/out/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`"
-                    class="btn btn-xs !bg-[rgba(255,82,82,0.20)] border border-[rgba(255,82,82,0.20)] rounded-lg !text-[#FF5252]">
-                    {{ $t('ibc.btn_out') }}
-                  </RouterLink>
-                </div>
-              </td>
+            <tr v-for="v in ibcStore.registryChannels" class="cursor-pointer" @click="router.push(`/${chain}/ibc/connection/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`)">
               <td class="text-white">
                 <a href="#">{{ v[ibcStore.sourceField].channel_id }}</a>
               </td>
               <td>{{ v[ibcStore.sourceField].port_id }}</td>
             </tr>
-            <tr v-for="v in channels">
-              <td>
-                <div class="flex gap-1">
-                  <RouterLink :to="`/${chain}/ibc/connection/in/${v.channelId}/${v.portId}`"
-                    class="btn btn-xs !bg-[rgba(39,120,77,0.20)] border border-[rgba(39,120,77,0.20)] rounded-lg !text-[#39DD47]">
-                    {{ $t('ibc.btn_in') }}
-                  </RouterLink>
-                  <RouterLink :to="`/${chain}/ibc/connection/out/${v.channelId}/${v.portId}`"
-                    class="btn btn-xs !bg-[rgba(255,82,82,0.20)] border border-[rgba(255,82,82,0.20)] rounded-lg !text-[#FF5252]">
-                    {{ $t('ibc.btn_out') }}
-                  </RouterLink>
-                </div>
-              </td>
+            <tr v-for="v in channels" class="cursor-pointer" @click="router.push(`/${chain}/ibc/connection/${v.channelId}/${v.portId}`)">
               <td class="text-white">
                 <a href="#" @click="loadChannel(v.channelId, v.portId)">{{
                   v.channelId
