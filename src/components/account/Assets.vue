@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
-import { LIST_COIN, MAX_TOKEN } from '@/constants';
+import { LIST_COIN } from '@/constants';
 import { getCw20Balances, getPriceByIds } from '@/service/assetsService';
 import numeral from 'numeral';
 import ChainRegistryClient from '@ping-pub/chain-registry-client';
 import axios from 'axios';
+import { formatAmountToken } from '@/utils';
 
 const props = defineProps(['balances', 'delegations', 'rewards', 'unbondingTotal', 'address', 'chain']);
 
@@ -67,27 +68,12 @@ watch([() => props.address], () => {
   getBalancesCw20()
 })
 
-function checkFormatTokenMax(formatToken: any) {
-  if (formatToken.denom === MAX_TOKEN.base) {
-    const amount = formatToken.amount / Math.pow(10, MAX_TOKEN.exponent);
-    return {
-      denom: MAX_TOKEN.display,
-      amount,
-      amountDisplay: amount.toString()
-    };
-  }
-  return {
-    ...formatToken,
-    denom: formatToken.denom.substring(0, 10)
-  };
-}
-
 const balancesAssets = computed(() => {
   const balances = [...props.balances, ...balancesChain.value];
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   for (const balance of balances) {
-    const formatToken = checkFormatTokenMax(format.formatToken3(balance));
+    const formatToken = formatAmountToken(format.formatToken3(balance));
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
@@ -103,7 +89,7 @@ const delegatesAssets = computed(() => {
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   for (let delegation of props.delegations) {
-    const formatToken = checkFormatTokenMax(format.formatToken3(delegation.balance));
+    const formatToken = formatAmountToken(format.formatToken3(delegation.balance));
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
@@ -120,7 +106,7 @@ const rewardsTotalAssets = computed(() => {
   const resultUnSupported: Array<any> = [];
   if (!!props.rewards?.total) {
     for (let reward of props.rewards?.total) {
-      const formatToken = checkFormatTokenMax(format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18));
+      const formatToken = formatAmountToken(format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18));
       const denom = formatToken.denom;
       const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
       if (coingeckoSymbols.includes(denom)) {
@@ -146,7 +132,7 @@ const unbondingAssets = computed(() => {
   // );
   const totalUnbonding = Number(props.unbondingTotal);
   if (!!totalUnbonding) {
-    const formatToken = checkFormatTokenMax({
+    const formatToken = formatAmountToken({
       amount: totalUnbonding / 1e6,
       denom: stakingStore.params.bondDenom,
       amountDisplay: String(totalUnbonding / 1e6)

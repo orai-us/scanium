@@ -24,6 +24,7 @@ import type { DenomTrace } from 'cosmjs-types/ibc/applications/transfer/v1/trans
 import type { Coin } from '@cosmjs/stargate';
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
+import { formatAmountToken } from '@/utils';
 
 dayjs.extend(localeData);
 dayjs.extend(duration);
@@ -379,7 +380,10 @@ export const useFormatter = defineStore('formatter', {
     ): string {
       if (!tokens) return '';
       return tokens
-        .map((x) => this.formatToken(x, withDenom, fmt, mode, decimal))
+        .map((x) => {
+          const amount = formatAmountToken(this.formatToken3(x, withDenom, fmt, mode, decimal)); 
+          return `${amount.amount.toLocaleString("en-US")} ${amount.denom}`;
+        })
         .join(', ');
     },
     calculateBondedRatio(
