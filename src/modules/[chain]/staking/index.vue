@@ -7,12 +7,12 @@ import {
   useStakingStore,
   useTxDialog,
 } from '@/stores';
-import { computed, onMounted, onUnmounted, reactive, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
 import type { Key, SigningInfo } from '@/types';
 import { formatSeconds } from '@/libs/utils';
 import type { Validator } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
-import type { Params, ValidatorSigningInfo } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
+import type { Params } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
 import { toBase64 } from '@cosmjs/encoding';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { consensusPubkeyToHexAddress, decodeKey, valconsToBase64 } from '@/libs';
@@ -517,9 +517,6 @@ function groupAndShuffle(array: Array<any>, groupSize: number) {
 
 const listRandom = ref([] as Array<any>);
 
-  watchEffect(()=>[
-    console.log({ listRandom: toRaw(listRandom.value) })
-  ])
 watch([sortDes], () => {
   listRandom.value = handleSortList(list.value, sortDes)
 })
@@ -647,23 +644,22 @@ const promoteOwallet = computed(()=>{
               <th scope="col" class="uppercase hover:text-white hover:cursor-pointer">
                 {{ $t('staking.validator') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('voting_power')">
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
                 {{ $t('staking.voting_power') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('uptime')">
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
                 Uptime
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('24h_changes')">
+              <th scope="col" class="text-right uppercase">
+                APR
+              </th>
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
                 {{ $t('staking.24h_changes') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('commission')">
+              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
                 {{ $t('staking.commission') }}
               </th>
-              <th scope="col" class="text-center uppercase" @click="handleChangeSort('voting_power')">
+              <th scope="col" class="text-center uppercase">
                 {{ $t('staking.actions') }}
               </th>
             </tr>
@@ -736,8 +732,10 @@ const promoteOwallet = computed(()=>{
                   </div>
                 </span>
               </td>
-              <td>
-
+              <!-- 👉 APR  -->
+              <td class="text-right text-xs">
+                <span v-if="aprs[v.operatorAddress]">{{ aprs[v.operatorAddress]?.toLocaleString("en-US",{}) }}%</span>
+                <span v-else>-</span>
               </td>
               <!-- 👉 24h Changes -->
               <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
@@ -797,25 +795,25 @@ const promoteOwallet = computed(()=>{
                 <th scope="col" class="uppercase" style="width: 3rem; position: relative">
                   {{ $t('staking.rank') }}
                 </th>
-                <th scope="col" class="uppercase hover:text-white hover:cursor-pointer">
+                <th scope="col" class="uppercase hover:cursor-pointer">
                   {{ $t('staking.validator') }}
                 </th>
-                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:cursor-pointer"
                   @click="handleChangeSort('voting_power')">
                   {{ $t('staking.voting_power') }}
                 </th>
-                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:cursor-pointer"
                   @click="handleChangeSort('uptime')">
                   Uptime
                 </th>
-                <th scope="col" class="text-right uppercase hover:text-white">
+                <th scope="col" class="text-right uppercase">
                   APR
                 </th>
-                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:cursor-pointer"
                   @click="handleChangeSort('24h_changes')">
                   {{ $t('staking.24h_changes') }}
                 </th>
-                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:cursor-pointer"
                   @click="handleChangeSort('commission')">
                   {{ $t('staking.commission') }}
                 </th>
