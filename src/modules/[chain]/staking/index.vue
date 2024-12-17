@@ -7,7 +7,7 @@ import {
   useStakingStore,
   useTxDialog,
 } from '@/stores';
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, toRaw, watch, watchEffect } from 'vue';
 import { Icon } from '@iconify/vue';
 import type { Key, SigningInfo } from '@/types';
 import { formatSeconds } from '@/libs/utils';
@@ -18,6 +18,7 @@ import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { consensusPubkeyToHexAddress, decodeKey, valconsToBase64 } from '@/libs';
 import { Commit } from '@cosmjs/tendermint-rpc';
 import UptimeBar from '@/components/UptimeBar.vue';
+import axios from 'axios';
 
 enum SORT_TYPE {
   ASC = "asc",
@@ -41,10 +42,23 @@ const tab = ref('active');
 const unbondList = ref([] as Validator[]);
 const slashing = ref({} as Params);
 const keywordSearchValidator = ref("");
+const aprs = ref({} as any);
 const sortDes = reactive({
   field: "voting_power",
   type: SORT_TYPE.DESC
 });
+
+onMounted(async () => {
+  try {
+    const res = await axios.get("https://api.scan.orai.io/v1/validators?limit=100");
+    const data = res.data?.data;
+    data.forEach((element:any) => {
+      aprs.value[element.operator_address] = element.apr * 1.05
+    });
+  } catch (error) {
+
+  }
+})
 
 onMounted(() => {
   // staking.fetchUnbondingValdiators().then((res) => {
@@ -503,6 +517,9 @@ function groupAndShuffle(array: Array<any>, groupSize: number) {
 
 const listRandom = ref([] as Array<any>);
 
+  watchEffect(()=>[
+    console.log({ listRandom: toRaw(listRandom.value) })
+  ])
 watch([sortDes], () => {
   listRandom.value = handleSortList(list.value, sortDes)
 })
@@ -719,6 +736,9 @@ const promoteOwallet = computed(()=>{
                   </div>
                 </span>
               </td>
+              <td>
+
+              </td>
               <!-- 👉 24h Changes -->
               <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
                 {{ change24h }}
@@ -787,6 +807,9 @@ const promoteOwallet = computed(()=>{
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('uptime')">
                   Uptime
+                </th>
+                <th scope="col" class="text-right uppercase hover:text-white">
+                  APR
                 </th>
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('24h_changes')">
@@ -876,6 +899,11 @@ const promoteOwallet = computed(()=>{
                     </div>
                   </span>
                 </td>
+                <!-- 👉 APR  -->
+                 <td class="text-right text-xs">
+                  <span v-if="aprs[v.operatorAddress]">{{ aprs[v.operatorAddress]?.toLocaleString("en-US",{}) }}%</span>
+                  <span v-else>-</span>
+                 </td>
                 <!-- 👉 24h Changes -->
                 <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
                   {{ change24Text(v.consensusPubkey) }}
