@@ -19,7 +19,8 @@ const statusIbc = ref({} as any);
 const channelObj = ref({} as any);
 
 const ibcs = computed(() => {
-  const originChain = route.params.chain?.toString().toLowerCase();
+  let originChain = route.params.chain?.toString().toLowerCase();
+  if(originChain === "cosmos") originChain = "cosmoshub";
   return props.commonIBCs.map((ibc: any) => {
     let chainName = ibc.from;
     if (chainName === originChain) chainName = ibc.to;
@@ -37,42 +38,78 @@ const ibcs = computed(() => {
 });
 
 watchEffect(async () => {
-  for (let ibc of ibcs.value) {
+  const ibcPathInfoPromises = [];
+  const ibcChannelPromises = [];
+  const ibcConnectionPromises = [];
+  for (const ibc of ibcs.value) {
     const path = ibc.path;
-    const resIbcPathInfo = await client.fetchIBCPathInfo(path);
-    const connId =
-      resIbcPathInfo.chain_1.chain_name === chainStore.current?.prettyName ||
-        chainStore.chainName
-        ? resIbcPathInfo.chain_1.connection_id
-        : resIbcPathInfo.chain_2.connection_id;
-    let channels: Array<any> = [];
-    let registryChannels = resIbcPathInfo.channels;
-    try {
-      const resIbcChannel = await chainStore.rpc.getIBCConnectionsChannels(connId);
-      channels = [...registryChannels, ...resIbcChannel.channels];
-    } catch (error) {
-      channels = registryChannels;
-    }
+    const resIbcPathInfo = client.fetchIBCPathInfo(path).then((res) => {
+      const connId =
+        res.chain_1.chain_name === chainStore.current?.prettyName ||
+          chainStore.chainName
+          ? res.chain_1.connection_id
+          : res.chain_2.connection_id;
+      let registryChannels = res.channels;
 
-    const channelOpen = channels.filter((item: any) => item?.state === State.STATE_OPEN);
+      return {
+        chainName: ibc.chainName,
+        connId,
+        registryChannels
+      };
+    });
+    ibcPathInfoPromises.push(resIbcPathInfo);
+  }
+  const ibcPathInfos = await Promise.all(ibcPathInfoPromises);
+
+  for (const ibcPath of ibcPathInfos) {
+    const connId = ibcPath.connId;
+    const resIbcChannel = chainStore.rpc.getIBCConnectionsChannels(connId).then(res => {
+      return {
+        chainName: ibcPath.chainName,
+        channels: [...ibcPath.registryChannels, ...res.channels],
+        exitChannels: res.channels
+      };
+    }).catch(() => {
+      return {
+        chainName: ibcPath.chainName,
+        channels: ibcPath.registryChannels,
+        exitChannels: []
+
+      };
+    });
+    const resIbcConnection = chainStore.rpc.getIBCConnectionsById(connId).then((res) => {
+      return {
+        chainName: ibcPath.chainName,
+        connection: res.connection
+      };
+    }).catch(() => {
+      return {
+        chainName: ibcPath.chainName,
+        connection: false
+      };
+    });
+    ibcChannelPromises.push(resIbcChannel);
+    ibcConnectionPromises.push(resIbcConnection);
+  }
+  const ibcChannels = await Promise.all(ibcChannelPromises);
+
+  for (const ibcChannel of ibcChannels) {
+    const { chainName, channels, exitChannels } = ibcChannel;
+    const channelOpen = exitChannels.filter((item: any) => item?.state === State.STATE_OPEN);
     const numChannelOpen = channelOpen?.length || 0;
     const channelWellKnown = channelOpen[0]?.channelId || "-";
-    channelObj.value[ibc.chainName] = {
+    channelObj.value[chainName] = {
       channel: `${numChannelOpen}/${channels.length}`,
       channelWellKnown
     };
-
-    let connection = null;
-    try {
-      const resIbcConnection = await chainStore.rpc.getIBCConnectionsById(connId);
-      connection = resIbcConnection.connection;
-
-    } catch (error) {
-      console.log({ error });
-    }
-    statusIbc.value[ibc.chainName] = connection;
   }
-});
+
+  const ibcConnections = await Promise.all(ibcConnectionPromises);
+  for (let connection of ibcConnections) {
+    statusIbc.value[connection.chainName] = connection.connection;
+  }
+})
+
 </script>
 <template>
   <div class="overflow-x-auto w-full">

@@ -37,6 +37,13 @@ const STATE = {
   "-1": "UNRECOGNIZED"
 }
 
+const ORDERING = {
+  "0":"NONE UNSPECIFIED",
+  "1":"UNORDERED",
+  "2":"ORDERED",
+  "-1":"UNRECOGNIZED",
+}
+
 onMounted(() => {
   if (connId.value) {
     chainStore.rpc.getIBCConnectionsById(connId.value).then((x) => {
@@ -55,7 +62,10 @@ onMounted(() => {
       }
     });
     chainStore.rpc.getIBCConnectionsChannels(connId.value).then((x) => {
-      channels.value = x.channels.map((channel)=>{
+      const channelOpens = x.channels.filter((item)=> item.state === State.STATE_OPEN);
+      const channelNonOpens = x.channels.filter((item)=> item.state !== State.STATE_OPEN);
+      const resChannels = [...channelOpens, ...channelNonOpens];
+      channels.value = resChannels.map((channel)=>{
         let version: any = "";
         try {
           version = JSON.parse(channel.version);
@@ -253,12 +263,6 @@ function color(v: string) {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="v in ibcStore.registryChannels" class="cursor-pointer" @click="router.push(`/${chain}/ibc/connection/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`)">
-              <td class="text-white">
-                <a href="#">{{ v[ibcStore.sourceField].channel_id }}</a>
-              </td>
-              <td>{{ v[ibcStore.sourceField].port_id }}</td>
-            </tr>
             <tr v-for="v in channels" class="cursor-pointer" @click="router.push(`/${chain}/ibc/connection/${v.channelId}/${v.portId}`)">
               <td class="text-white">
                 <a href="#" @click="loadChannel(v.channelId, v.portId)">{{
@@ -285,7 +289,13 @@ function color(v: string) {
               <td>
                 {{ v.version }}
               </td>
-              <td class="text-right text-white">{{ v.ordering }}</td>
+              <td class="text-right text-white">{{ ORDERING[v.ordering] }}</td>
+            </tr>
+            <tr v-for="v in ibcStore.registryChannels" class="cursor-pointer" @click="router.push(`/${chain}/ibc/connection/${v[ibcStore.sourceField].channel_id}/${v[ibcStore.sourceField].port_id}`)">
+              <td class="text-white">
+                <a href="#">{{ v[ibcStore.sourceField].channel_id }}</a>
+              </td>
+              <td>{{ v[ibcStore.sourceField].port_id }}</td>
             </tr>
           </tbody>
         </table>
