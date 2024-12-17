@@ -21,71 +21,72 @@ export default defineConfig({
   },
   plugins: [
     vue({
-    template: {
-      compilerOptions: {
-        isCustomElement: (tag) =>
-          [
-            'ping-connect-wallet',
-            'ping-token-convert',
-            'ping-tx-dialog',
-          ].includes(tag),
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) =>
+            [
+              'ping-connect-wallet',
+              'ping-token-convert',
+              'ping-tx-dialog',
+            ].includes(tag),
+        },
       },
-    },
-  }), 
-  vueJsx(), 
-  Pages({
-    dirs: ['./src/modules', './src/pages'],
-    exclude: ['**/*.ts'], // only load .vue as modules
-  }), 
-  Layouts({
-    layoutsDirs: './src/layouts/',
-  }), 
-  AutoImport({
-    imports: [
-      'vue',
-      'vue-router',
-      '@vueuse/core',
-      '@vueuse/math',
-      'vue-i18n',
-      'pinia',
-    ],
-    vueTemplate: true,
-  }), 
-  VueI18nPlugin({
-    runtimeOnly: true,
-    compositionOnly: true,
-    include: [
-      fileURLToPath(
-        new URL('./src/plugins/i18n/locales/**', import.meta.url)
-      ),
-    ],
-  }), 
-  DefineOptions(), 
+    }), 
+    vueJsx(), 
+    Pages({
+      dirs: ['./src/modules', './src/pages'],
+      exclude: ['**/*.ts'], // only load .vue as modules
+    }), 
+    Layouts({
+      layoutsDirs: './src/layouts/',
+    }), 
+    AutoImport({
+      imports: [
+        'vue',
+        'vue-router',
+        '@vueuse/core',
+        '@vueuse/math',
+        'vue-i18n',
+        'pinia',
+      ],
+      vueTemplate: true,
+    }), 
+    VueI18nPlugin({
+      runtimeOnly: true,
+      compositionOnly: true,
+      include: [
+        fileURLToPath(
+         new URL('./src/plugins/i18n/locales/**', import.meta.url)
+        ),
+      ],
+    }), 
+    DefineOptions(), 
   
-  // createHtmlPlugin({
-  //   inject: {
-  //     // Inject data into ejs template
-  //     ejsOptions: {
-  //       customCss: () => {
-  //         const filepath = path.resolve(__dirname, './src/style.output.css');
-  //         if (fs.existsSync(filepath)) {
-  //           const css = fs.readFileSync(filepath, 'utf-8');
-  //           console.log('css', css);
-  //           return `<style>${css}</style>`;
-  //         }
-  //         return '';
-  //       },
-  //     },
-  //   },
-  // }),
-  cssInjectedByJsPlugin({
-    styleId: 'app-styles',
-  }), 
-  sentryVitePlugin({
-    org: "oraichain",
-    project: "scanium",
-    authToken: process.env.SENTRY_AUTH_TOKEN
-  })],
+    // createHtmlPlugin({
+    //   inject: {
+    //     // Inject data into ejs template
+    //     ejsOptions: {
+    //       customCss: () => {
+    //         const filepath = path.resolve(__dirname, './src/style.output.css');
+    //         if (fs.existsSync(filepath)) {
+    //           const css = fs.readFileSync(filepath, 'utf-8');
+    //           console.log('css', css);
+    //           return `<style>${css}</style>`;
+    //         }
+    //         return '';
+    //       },
+    //     },
+    //   },
+    // }),
+    cssInjectedByJsPlugin({
+      styleId: 'app-styles',
+    }), 
+    sentryVitePlugin({
+      org: "oraichain",
+      project: "scanium",
+      authToken: process.env.SENTRY_AUTH_TOKEN
+    })
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
