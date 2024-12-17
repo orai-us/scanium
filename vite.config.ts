@@ -31,15 +31,15 @@ export default defineConfig({
             ].includes(tag),
         },
       },
-    }), 
-    vueJsx(), 
+    }),
+    vueJsx(),
     Pages({
       dirs: ['./src/modules', './src/pages'],
       exclude: ['**/*.ts'], // only load .vue as modules
-    }), 
+    }),
     Layouts({
       layoutsDirs: './src/layouts/',
-    }), 
+    }),
     AutoImport({
       imports: [
         'vue',
@@ -50,7 +50,7 @@ export default defineConfig({
         'pinia',
       ],
       vueTemplate: true,
-    }), 
+    }),
     VueI18nPlugin({
       runtimeOnly: true,
       compositionOnly: true,
@@ -59,9 +59,9 @@ export default defineConfig({
          new URL('./src/plugins/i18n/locales/**', import.meta.url)
         ),
       ],
-    }), 
-    DefineOptions(), 
-  
+    }),
+    DefineOptions(),
+
     // createHtmlPlugin({
     //   inject: {
     //     // Inject data into ejs template
