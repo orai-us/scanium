@@ -54,10 +54,6 @@ onMounted(() => {
   fetchSendingTxs(props.channel, props.port);
 });
 
-watch([props.port, props.channel], () => {
-  fetchSendingTxs(props.channel, props.port);
-})
-
 function handlePagination(page: number) {
   fetchSendingTxs(props.channel, props.port, page + 1);
 }
