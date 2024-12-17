@@ -641,22 +641,22 @@ const promoteOwallet = computed(()=>{
         <table class="table staking-table w-full">
           <thead>
             <tr>
-              <th scope="col" class="uppercase hover:text-white hover:cursor-pointer">
+              <th scope="col" class="uppercase">
                 {{ $t('staking.validator') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
+              <th scope="col" class="text-right uppercase">
                 {{ $t('staking.voting_power') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
+              <th scope="col" class="text-right uppercase">
                 Uptime
               </th>
               <th scope="col" class="text-right uppercase">
                 APR
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
+              <th scope="col" class="text-right uppercase">
                 {{ $t('staking.24h_changes') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer">
+              <th scope="col" class="text-right uppercase">
                 {{ $t('staking.commission') }}
               </th>
               <th scope="col" class="text-center uppercase">
@@ -795,25 +795,25 @@ const promoteOwallet = computed(()=>{
                 <th scope="col" class="uppercase" style="width: 3rem; position: relative">
                   {{ $t('staking.rank') }}
                 </th>
-                <th scope="col" class="uppercase hover:cursor-pointer">
+                <th scope="col" class="uppercase hover:text-white hover:cursor-pointer">
                   {{ $t('staking.validator') }}
                 </th>
-                <th scope="col" class="text-right uppercase hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('voting_power')">
                   {{ $t('staking.voting_power') }}
                 </th>
-                <th scope="col" class="text-right uppercase hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('uptime')">
                   Uptime
                 </th>
                 <th scope="col" class="text-right uppercase">
                   APR
                 </th>
-                <th scope="col" class="text-right uppercase hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('24h_changes')">
                   {{ $t('staking.24h_changes') }}
                 </th>
-                <th scope="col" class="text-right uppercase hover:cursor-pointer"
+                <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('commission')">
                   {{ $t('staking.commission') }}
                 </th>
