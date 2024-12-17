@@ -12,9 +12,11 @@ import router from './router';
 import { useBaseStore } from './stores/useBaseStore';
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
 import { DefaultApolloClient } from '@vue/apollo-composable';
+import * as Sentry from "@sentry/vue";
 
 // apollo
 const cache = new InMemoryCache();
+const sentryDns = import.meta.env.VITE_SENTRY_DNS;
 
 const httpLink = createHttpLink({
   uri: 'https://indexer.scanium.io/',
@@ -36,6 +38,24 @@ const app = createApp({
   },
   render: () => h(App),
 });
+
+// Sentry config
+Sentry.init({
+  app,
+  dsn: sentryDns,
+  integrations: [
+    Sentry.browserTracingIntegration({ router }),
+    Sentry.replayIntegration(),
+  ],
+  // Tracing
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+  tracePropagationTargets: [/^https:\/\/yourserver\.io\/api/],
+  // Session Replay
+  replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+  replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+});
+
 // Use plugins
 app.use(i18n);
 app.use(createPinia());
