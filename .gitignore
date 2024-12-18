@@ -20,3 +20,5 @@ dist
 .yarn/install-state.gz
 
 .env
+# Sentry Config File
+.env.sentry-build-plugin
