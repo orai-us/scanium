@@ -56,7 +56,7 @@ export default defineConfig({
       compositionOnly: true,
       include: [
         fileURLToPath(
-         new URL('./src/plugins/i18n/locales/**', import.meta.url)
+          new URL('./src/plugins/i18n/locales/**', import.meta.url)
         ),
       ],
     }),
