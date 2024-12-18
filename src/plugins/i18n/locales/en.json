@@ -3,6 +3,7 @@
     "dashboard": "Dashboard",
     "blocks": "Blocks",
     "transactions":"Transactions",
+    "assets":"Assets",
     "staking": "Staking",
     "governance": "Governance",
     "parameters": "Parameters",

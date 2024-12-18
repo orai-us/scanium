@@ -3,6 +3,7 @@
     "dashboard": "面板首页",
     "blocks": "区块和交易",
     "transactions":"交易",
+    "assets":"Assets",
     "staking": "质押生息",
     "governance": "社区治理",
     "parameters": "参数",
