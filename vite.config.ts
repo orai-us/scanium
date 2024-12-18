@@ -1,5 +1,5 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { fileURLToPath, URL } from 'node:url';
-
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
@@ -7,20 +7,18 @@ import Layouts from 'vite-plugin-vue-layouts';
 import DefineOptions from 'unplugin-vue-define-options/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import Pages from 'vite-plugin-pages';
-import fs from 'fs';
-import path from 'path';
-
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
-
-import { createHtmlPlugin } from 'vite-plugin-html';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   define: {
     'process.env': {},
   },
-  build: { chunkSizeWarningLimit: 20000 },
+  build: {
+    chunkSizeWarningLimit: 20000,
+    sourcemap: true
+  },
   plugins: [
     vue({
       template: {
@@ -82,7 +80,12 @@ export default defineConfig({
     // }),
     cssInjectedByJsPlugin({
       styleId: 'app-styles',
-    }),
+    }), 
+    sentryVitePlugin({
+      org: "oraichain",
+      project: "scanium",
+      authToken: process.env.SENTRY_AUTH_TOKEN
+    })
   ],
   resolve: {
     alias: {
