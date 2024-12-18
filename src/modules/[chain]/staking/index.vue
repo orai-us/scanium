@@ -56,7 +56,7 @@ onMounted(async () => {
       aprs.value[element.operator_address] = element.apr * 1.05
     });
   } catch (error) {
-
+    console.log({ error });
   }
 })
 
