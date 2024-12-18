@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { MAX_TOKEN } from '@/constants';
 import { getListAsset } from '@/service/assetsService';
 import axios from 'axios';
 import { ref, watchEffect } from 'vue';

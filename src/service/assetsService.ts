@@ -81,6 +81,7 @@ export const getListAsset = async (chain: string) => {
     const assets = res.data.assets as Array<any>;
     return [...assets, ...NEW_ASSETS];
   } catch (error) {
+    console.log({ error });
     return NEW_ASSETS
   }
 };
