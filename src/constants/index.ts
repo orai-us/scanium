@@ -13,6 +13,21 @@ export const MAX_TOKEN = {
   ],
 };
 
+export const NEW_ASSETS = [
+  {
+    display: 'MAX',
+    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuqk9ezgyeugxql3mhqyndrw1huvo5h',
+    id: 'max-2',
+    exponent: 6,
+    denom_units: [
+      {
+        denom: 'MAX',
+        exponent: 6,
+      },
+    ],
+  },
+];
+
 // id: symbol
 export const LIST_COIN = {
   'max-2': MAX_TOKEN.display,
