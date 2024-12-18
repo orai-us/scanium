@@ -1,3 +1,4 @@
+import { NEW_ASSETS } from '@/constants';
 import { api, METHODS } from './api';
 
 const baseMarketOrai = 'https://price.market.orai.io';
@@ -69,3 +70,17 @@ export const getCw20Balances= async(address: string, denoms: Array<string>)=>{
   return res?.data;
 }
 
+export const getListAsset = async (chain: string) => {
+  try {
+    const config = {
+      baseURL: 'https://registry.ping.pub',
+      url: `${chain.toLowerCase()}/assetlist.json`,
+      method: METHODS.GET,
+    };
+    const res = await api.request(config);
+    const assets = res.data.assets as Array<any>;
+    return [...assets, ...NEW_ASSETS];
+  } catch (error) {
+    return NEW_ASSETS
+  }
+};
