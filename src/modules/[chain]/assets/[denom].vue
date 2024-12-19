@@ -10,6 +10,7 @@ import {
 } from "cosmjs-types/cosmos/bank/v1beta1/query";
 import { reactive, ref, watchEffect } from 'vue';
 import Pagination from "@/components/pagination/Pagination.vue";
+import DetailAsset from "@/components/assets/DetailAsset.vue";
 
 const props = defineProps(["denom", "chain"]);
 const owners = ref([] as Array<any>);
@@ -38,7 +39,6 @@ watchEffect(async () => {
       requestData
     );
     const res = QueryDenomOwnersResponse.decode(value);
-    console.log({ res })
     owners.value = res.denomOwners;
     totalHolder.value = res.pagination?.total;
   } catch (error) {
@@ -52,33 +52,36 @@ function handlePagination(page: number) {
 
 </script>
 <template>
-  <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
-    <div class="text-white font-bold text-lg">Holder</div>
-    <div class="w-full h-[1px] bg-base-300"></div>
-    <table class="table w-full text-sm" v-if="owners.length > 0">
-      <thead>
-        <tr>
-          <th class="text-white font-bold text-sm">Address</th>
-          <th class="text-white font-bold text-sm">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(owner, index) in owners" :key="index">
-          <td>
-            <RouterLink :to="`/${chain}/account/${owner.address}`" class="text-primary dark:text-link">
-              {{ owner.address }}
-            </RouterLink>
-          </td>
-          <td>
-            <span v-if="owner.balance?.amount / Math.pow(10, 6) >= 0.00001">{{ (owner.balance?.amount / Math.pow(10,
-              6)).toLocaleString("en-US", {}) }}</span>
-            <span v-else>{{ `< 0.00001` }} </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="mt-4 text-center" v-if="totalHolder">
-      <Pagination :totalItems="totalHolder" :limit="pagination.limit" :onPagination="handlePagination" />
+  <div>
+    <DetailAsset :denom="denom" />
+    <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
+      <div class="text-white font-bold text-lg">Holder</div>
+      <div class="w-full h-[1px] bg-base-300"></div>
+      <table class="table w-full text-sm" v-if="owners.length > 0">
+        <thead>
+          <tr>
+            <th class="text-white font-bold text-sm">Address</th>
+            <th class="text-white font-bold text-sm">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(owner, index) in owners" :key="index">
+            <td>
+              <RouterLink :to="`/${chain}/account/${owner.address}`" class="text-primary dark:text-link">
+                {{ owner.address }}
+              </RouterLink>
+            </td>
+            <td>
+              <span v-if="owner.balance?.amount / Math.pow(10, 6) >= 0.00001">{{ (owner.balance?.amount / Math.pow(10,
+                6)).toLocaleString("en-US", {}) }}</span>
+              <span v-else>{{ `< 0.00001` }} </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="mt-4 text-center" v-if="totalHolder">
+        <Pagination :totalItems="totalHolder" :limit="pagination.limit" :onPagination="handlePagination" />
+      </div>
     </div>
   </div>
 </template>

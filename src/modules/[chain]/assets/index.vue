@@ -32,42 +32,47 @@ const pagination = reactive({
 const searchQuery = ref("");
 
 onMounted(async () => {
-  const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
-  const queryClient = QueryClient.withExtensions(
-    cometClient as any,
-    setupBankExtension,
-  );
-  const requestData = Uint8Array.from(
-    QueryDenomsMetadataRequest.encode(
-      QueryDenomsMetadataRequest.fromPartial({})
-    ).finish()
-  );
-  const { value } = await queryClient.queryAbci(
-    "/cosmos.bank.v1beta1.Query/DenomsMetadata",
-    requestData
-  );
-  const bankAssets = QueryDenomsMetadataResponse.decode(value);
-  const registryAssets = await getListAsset("oraichain");
-  const assets = [...bankAssets.metadatas, ...registryAssets];
+  try {
+    const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
+    const queryClient = QueryClient.withExtensions(
+      cometClient as any,
+      setupBankExtension,
+    );
+    const requestData = Uint8Array.from(
+      QueryDenomsMetadataRequest.encode(
+        QueryDenomsMetadataRequest.fromPartial({})
+      ).finish()
+    );
+    const { value } = await queryClient.queryAbci(
+      "/cosmos.bank.v1beta1.Query/DenomsMetadata",
+      requestData
+    );
+    const bankAssets = QueryDenomsMetadataResponse.decode(value);
+    const registryAssets = await getListAsset("oraichain");
+    const assets = [...bankAssets.metadatas, ...registryAssets];
 
-  const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
-    .map(asset => ({ ...asset, id: asset.denom_units ? coingeckoIds[coingeckoSymbols.indexOf(asset.denom_units?.slice(-1)[0].denom.toLowerCase())] : coingeckoIds[coingeckoSymbols.indexOf(asset.denomUnits?.slice(-1)[0].denom.toLowerCase())] }));
-  const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
-  assetsAll.value = [...assetsSupported, ...assetsUnSupported];
-  assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
-  const ids = assetsSupported.map((item: any) => item?.id);
-  if (ids?.length > 0) {
-    try {
-      const res = await getInfoToken({ ids: ids.join(",") });
-      const prices: any = {};
-      for (let item of res) {
-        prices[item.id] = item;
+    const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
+      .map(asset => ({ ...asset, id: asset.denom_units ? coingeckoIds[coingeckoSymbols.indexOf(asset.denom_units?.slice(-1)[0].denom.toLowerCase())] : coingeckoIds[coingeckoSymbols.indexOf(asset.denomUnits?.slice(-1)[0].denom.toLowerCase())] }));
+    const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
+    assetsAll.value = [...assetsSupported, ...assetsUnSupported];
+    assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
+    const ids = assetsSupported.map((item: any) => item?.id);
+    if (ids?.length > 0) {
+      try {
+        const res = await getInfoToken({ ids: ids.join(",") });
+        const prices: any = {};
+        for (let item of res) {
+          prices[item.id] = item;
+        }
+        priceTokens.value = prices;
+      } catch (error) {
+        console.log({ error });
       }
-      priceTokens.value = prices;
-    } catch (error) {
-      console.log({ error });
     }
+  } catch (error) {
+    console.log({ error });
   }
+
 });
 
 const totalAssets = computed(() => { return assetsSearch.value.length; });
@@ -103,15 +108,16 @@ function searchAssets() {
       <thead>
         <tr>
           <th class="text-white font-bold text-sm">Name</th>
-          <th class="text-white font-bold text-sm">Denom</th>
-          <th class="text-white font-bold text-sm">Price</th>
-          <th class="text-white font-bold text-sm">Total Supply</th>
-          <th class="text-white font-bold text-sm">Circulating Supply</th>
-          <th class="text-white font-bold text-sm">Market Cap</th>
+          <th class="text-white font-bold text-sm text-right">Denom</th>
+          <th class="text-white font-bold text-sm text-right">Price</th>
+          <th class="text-white font-bold text-sm text-right">Total Supply</th>
+          <th class="text-white font-bold text-sm text-right">Circulating Supply</th>
+          <th class="text-white font-bold text-sm text-right">Market Cap</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(v, index) in assets" :key="index" class="cursor-pointer" @click="router.push(`/${chain}/assets/${v.base}`)">
+        <tr v-for="(v, index) in assets" :key="index" class="cursor-pointer"
+          @click="router.push(`/${chain}/assets/${v.base}`)">
           <td>
             <div class="flex flex-row items-center gap-3">
               <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"
@@ -121,30 +127,36 @@ function searchAssets() {
               <span v-else>-</span>
             </div>
           </td>
-          <td>
+          <td class="text-right">
             <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base" />
           </td>
-          <td>
+          <td class="text-right">
             <span v-if="priceTokens[v.id]?.current_price" class="text-white">
-              {{ formatNumber(priceTokens[v.id].current_price) }} $
+              $ {{ formatNumber(priceTokens[v.id].current_price) }}
             </span>
             <span v-else>-</span>
           </td>
-          <td>
-            <span v-if="priceTokens[v.id]?.total_supply" class="text-white">
-              {{ formatNumber(priceTokens[v.id].total_supply) }}
-            </span>
+          <td class="text-right">
+            <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
+              <div v-if="priceTokens[v.id]?.current_price">$ {{ formatNumber(priceTokens[v.id].total_supply *
+                priceTokens[v.id].current_price) }}</div>
+              <div v-else>-</div>
+              <span>{{ formatNumber(priceTokens[v.id].total_supply) }}</span>
+            </div>
             <span v-else>-</span>
           </td>
-          <td>
-            <span v-if="priceTokens[v.id]?.circulating_supply" class="text-white">
-              {{ formatNumber(priceTokens[v.id].circulating_supply) }}
-            </span>
+          <td class="text-right">
+            <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
+              <div v-if="priceTokens[v.id]?.current_price">$ {{ formatNumber(priceTokens[v.id].circulating_supply *
+                priceTokens[v.id].current_price) }}</div>
+              <div v-else>-</div>
+              <span>{{ formatNumber(priceTokens[v.id].circulating_supply) }}</span>
+            </div>
             <span v-else>-</span>
           </td>
-          <td>
+          <td class="text-right">
             <span v-if="priceTokens[v.id]?.market_cap" class="text-white">
-              {{ formatNumber(priceTokens[v.id].market_cap) }} $
+              $ {{ formatNumber(priceTokens[v.id].market_cap) }}
             </span>
             <span v-else>-</span>
           </td>
