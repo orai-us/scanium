@@ -6,6 +6,7 @@ const props = defineProps(['totalItems', 'limit', 'onPagination']);
 const currentPage = ref(1);
 const onClickHandler = (page: number) => {
   props.onPagination(page)
+  currentPage.value = page;
 };
 
 </script>

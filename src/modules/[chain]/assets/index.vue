@@ -19,11 +19,13 @@ const coingeckoSymbols = Object.values(LIST_COIN);
 const coingeckoIds = Object.keys(LIST_COIN);
 
 const assetsAll = ref([] as Array<any>);
+const assetsSearch = ref([] as Array<any>);
 const priceTokens = ref({} as any);
 const pagination = reactive({
   limit: 10,
   offset: 0
 })
+const searchQuery = ref("");
 
 onMounted(async () => {
   const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
@@ -48,7 +50,7 @@ onMounted(async () => {
   .map(asset => ({ ...asset, id: asset.denom_units ? coingeckoIds[coingeckoSymbols.indexOf(asset.denom_units?.slice(-1)[0].denom.toLowerCase())] : coingeckoIds[coingeckoSymbols.indexOf(asset.denomUnits?.slice(-1)[0].denom.toLowerCase())] }));
   const assetsUnSupported = assets.filter(item=>  !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
   assetsAll.value = [...assetsSupported, ...assetsUnSupported];
-
+  assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
   const ids = assetsSupported.map((item:any) => item?.id);
   if (ids?.length > 0) {
     const res = await getPriceByIds({ ids: ids.join(",")});
@@ -56,25 +58,34 @@ onMounted(async () => {
   }
 });
 
-const totalAssets = computed(() => { return assetsAll.value.length; })
-
-watchEffect(()=>{
-  console.log({ data: toRaw(assetsAll.value) });
-})
+const totalAssets = computed(() => { return assetsSearch.value.length; })
 
 function handlePagination(page: number) {
   pagination.offset = (page - 1) * pagination.limit;
 }
 
 const assets = computed(()=>{
-  return assetsAll.value.slice(pagination.offset, pagination.offset + pagination.limit);
+  return assetsSearch.value.slice(pagination.offset, pagination.offset + pagination.limit);
 })
 
+function searchAssets(){
+  handlePagination(1)
+  const keyword = searchQuery.value.toLowerCase();
+  if(keyword.length === 0) assetsSearch.value = assetsAll.value;
+  assetsSearch.value = assetsAll.value.filter((item) => item.symbol?.toLowerCase().includes(keyword) || item.base?.toLowerCase().includes(keyword));
+}
 
 </script>
 <template>
   <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex xl:gap-5 gap-2 flex-col">
-    <div class="text-white font-bold text-lg">Assets Dashboard</div>
+    <div class="flex flex-row justify-between items-center">
+      <div class="text-white font-bold text-lg">Assets Dashboard</div>
+      <input
+        class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
+        v-model="searchQuery" placeholder="Search by Name, Denom"
+        v-on:keyup.enter="searchAssets" />
+    </div>
+
     <table class="table w-full text-sm" v-if="assets.length > 0">
       <thead>
         <tr>
