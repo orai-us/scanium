@@ -7,7 +7,7 @@ const hoverElement = ref(false);
 
 <template>
   <div class="relative">
-    <div v-if="hoverElement" class="absolute -top-14 -left-10 bg-base-300 p-2 rounded-md">
+    <div v-if="hoverElement" class="absolute -top-14 -right-16 bg-base-300 p-2 rounded-md">
       <span class="text-white">{{ description }}</span>
     </div>
     <div>
