@@ -10,10 +10,11 @@ import {
   QueryDenomsMetadataResponse,
   QueryDenomsMetadataRequest,
 } from "cosmjs-types/cosmos/bank/v1beta1/query";
-import { getListAsset, getPriceByIds } from '@/service/assetsService';
+import { getInfoToken, getListAsset, getPriceByIds } from '@/service/assetsService';
 import { LIST_COIN } from '@/constants';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
+import TooltipComponent from '@/components/TooltipComponent.vue';
 
 const coingeckoSymbols = Object.values(LIST_COIN);
 const coingeckoIds = Object.keys(LIST_COIN);
@@ -26,6 +27,7 @@ const pagination = reactive({
   offset: 0
 })
 const searchQuery = ref("");
+const showDenom = ref(false);
 
 onMounted(async () => {
   const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
@@ -53,8 +55,16 @@ onMounted(async () => {
   assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
   const ids = assetsSupported.map((item:any) => item?.id);
   if (ids?.length > 0) {
-    const res = await getPriceByIds({ ids: ids.join(",")});
-    priceTokens.value = res;
+    try {
+      const res = await getInfoToken({ ids: ids.join(",") });
+      const prices: any = {};
+      for (let item of res) {
+        prices[item.id] = item;
+      }
+      priceTokens.value = prices;
+    } catch (error) {
+      console.log({ error });
+    }
   }
 });
 
@@ -82,8 +92,7 @@ function searchAssets(){
       <div class="text-white font-bold text-lg">Assets Dashboard</div>
       <input
         class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
-        v-model="searchQuery" placeholder="Search by Name, Denom"
-        v-on:keyup.enter="searchAssets" />
+        v-model="searchQuery" placeholder="Search by Name, Denom" v-on:keyup.enter="searchAssets" />
     </div>
 
     <table class="table w-full text-sm" v-if="assets.length > 0">
@@ -92,13 +101,13 @@ function searchAssets(){
           <th class="text-white font-bold text-sm">Name</th>
           <th class="text-white font-bold text-sm">Denom</th>
           <th class="text-white font-bold text-sm">Price</th>
-          <th class="text-white font-bold text-sm">24h Change</th>
-          <th class="text-white font-bold text-sm">24h Vol</th>
+          <th class="text-white font-bold text-sm">Total Supply</th>
+          <th class="text-white font-bold text-sm">Circulating Supply</th>
           <th class="text-white font-bold text-sm">Market Cap</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(v, index) in assets" :key="index">
+        <tr v-for="(v, index) in assets" :key="index" class="cursor-pointer">
           <td>
             <div class="flex flex-row items-center gap-3">
               <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"
@@ -109,36 +118,38 @@ function searchAssets(){
             </div>
           </td>
           <td>
-            <span class="text-white" v-if="v.base">{{ shortenDenom(v.base) }}</span>
-            <span v-else>-</span>
+            <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base"/>
           </td>
           <td>
-            <span v-if="priceTokens[v.id]?.usd" class="text-white">
-              {{ formatNumber(priceTokens[v.id].usd) }} $
+            <span v-if="priceTokens[v.id]?.current_price" class="text-white">
+              {{ formatNumber(priceTokens[v.id].current_price) }} $
             </span>
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="priceTokens[v.id]?.usd_24h_change" class="text-white">
-              {{ priceTokens[v.id].usd_24h_change.toFixed(2) }} %
+            <span v-if="priceTokens[v.id]?.total_supply" class="text-white">
+              {{ formatNumber(priceTokens[v.id].total_supply) }}
             </span>
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="priceTokens[v.id]?.usd_24h_vol" class="text-white">
-              {{ formatNumber(priceTokens[v.id].usd_24h_vol) }} $
+            <span v-if="priceTokens[v.id]?.circulating_supply" class="text-white">
+              {{ formatNumber(priceTokens[v.id].circulating_supply) }}
             </span>
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="priceTokens[v.id]?.usd_market_cap" class="text-white">
-              {{ formatNumber(priceTokens[v.id].usd_market_cap) }} $
+            <span v-if="priceTokens[v.id]?.market_cap" class="text-white">
+              {{ formatNumber(priceTokens[v.id].market_cap) }} $
             </span>
             <span v-else>-</span>
           </td>
         </tr>
       </tbody>
     </table>
+    <div v-else class="w-full h-full justify-center items-center">
+      No Assets
+    </div>
     <div class="mt-4 text-center" v-if="totalAssets">
       <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination" />
     </div>
