@@ -2,6 +2,7 @@ import { NEW_ASSETS } from '@/constants';
 import { api, METHODS } from './api';
 
 const baseMarketOrai = 'https://price.market.orai.io';
+const baseCoingecko = 'https://api.coingecko.com/api/v3';
 const baseLcdOraiBank = 'https://lcd.orai.io/cosmos/bank';
 const baseCosmwasm = 'https://lcd.orai.io/cosmwasm/wasm';
 const multiCallContractAddress = 'orai1q7x644gmf7h8u8y6y8t9z9nnwl8djkmspypr6mxavsk9ual7dj0sxpmgwd';
@@ -9,6 +10,7 @@ export interface ParamsSimplePrice {
   ids: string;
 }
 const simplePrice = '/simple/price';
+const coinsMarket = '/coins/markets'
 
 export const getPriceByIds = async (params: ParamsSimplePrice) => {
   const config = {
@@ -22,6 +24,20 @@ export const getPriceByIds = async (params: ParamsSimplePrice) => {
       include_24hr_vol: true,
       include_24hr_change: true,
       include_last_updated_at: true,
+    },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const getInfoToken = async (params: ParamsSimplePrice) => {
+  const config = {
+    baseURL: baseCoingecko,
+    url: coinsMarket,
+    method: METHODS.GET,
+    params: {
+      ...params,
+      vs_currency: 'usd',
     },
   };
   const res = await api.request(config);
