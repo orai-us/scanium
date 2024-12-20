@@ -33,14 +33,10 @@ onMounted(async () => {
   }
 });
 watch([() => props.denom, () => assets.value], async () => {
-  console.log({ assets: toRaw(assets.value) });
-  console.log({ denom: toRaw(props.denom) });
   const info = assets.value.find((item) => item.base === props.denom);
   const id = info?.coingecko_id || coingeckoIds[coingeckoSymbols.indexOf(info?.display)];
-  console.log({ id });
   if (id) {
     const res = await getInfoToken({ ids: id });
-    console.log({ res });
     if (Array.isArray(res))
       asset.value = { ...res[0], ...info };
     else asset.value = info;

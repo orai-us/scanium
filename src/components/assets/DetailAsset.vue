@@ -37,13 +37,23 @@ const props = defineProps(['asset']);
     <div class="w-full h-[1px] bg-base-300"></div>
     <div class="flex flex-col gap-2">
       <div class="flex flex-row">
-        <div class="w-[200px]">Onchain Amount</div>
+        <div class="w-[200px]">Total Supply</div>
         <span class="text-white font-semibold">{{ formatNumber(asset.total_supply) }} {{
           asset.symbol?.toUpperCase() }}</span>
       </div>
       <div class="flex flex-row">
-        <div class="w-[200px]">Onchain Value</div>
+        <div class="w-[200px]">Fully distributed MC</div>
         <span class="text-white font-semibold">$ {{ formatNumber(asset.total_supply * asset.current_price)
+          }}</span>
+      </div>
+      <div class="flex flex-row">
+        <div class="w-[200px]">Circulating Supply</div>
+        <span class="text-white font-semibold">{{ formatNumber(asset.circulating_supply) }} {{
+          asset.symbol?.toUpperCase() }}</span>
+      </div>
+      <div class="flex flex-row">
+        <div class="w-[200px]">Market cap</div>
+        <span class="text-white font-semibold">$ {{ formatNumber(asset.circulating_supply * asset.current_price)
           }}</span>
       </div>
       <div class="flex flex-row">
