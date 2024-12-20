@@ -10,7 +10,7 @@ import {
   QueryDenomsMetadataResponse,
   QueryDenomsMetadataRequest,
 } from "cosmjs-types/cosmos/bank/v1beta1/query";
-import { getInfoToken, getListAsset } from '@/service/assetsService';
+import { getInfoToken, getListAsset, getListAssetOnChainAndRegistry } from '@/service/assetsService';
 import { LIST_COIN } from '@/constants';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
@@ -33,30 +33,14 @@ const searchQuery = ref("");
 
 onMounted(async () => {
   try {
-    const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
-    const queryClient = QueryClient.withExtensions(
-      cometClient as any,
-      setupBankExtension,
-    );
-    const requestData = Uint8Array.from(
-      QueryDenomsMetadataRequest.encode(
-        QueryDenomsMetadataRequest.fromPartial({})
-      ).finish()
-    );
-    const { value } = await queryClient.queryAbci(
-      "/cosmos.bank.v1beta1.Query/DenomsMetadata",
-      requestData
-    );
-    const bankAssets = QueryDenomsMetadataResponse.decode(value);
-    const registryAssets = await getListAsset("oraichain");
-    const assets = [...bankAssets.metadatas, ...registryAssets];
-
+    const assets = await getListAssetOnChainAndRegistry();
     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
-      .map(asset => ({ ...asset, id: asset.denom_units ? coingeckoIds[coingeckoSymbols.indexOf(asset.denom_units?.slice(-1)[0].denom.toLowerCase())] : coingeckoIds[coingeckoSymbols.indexOf(asset.denomUnits?.slice(-1)[0].denom.toLowerCase())] }));
+      .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
     const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
     assetsAll.value = [...assetsSupported, ...assetsUnSupported];
     assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
     const ids = assetsSupported.map((item: any) => item?.id);
+    console.log({ ids })
     if (ids?.length > 0) {
       try {
         const res = await getInfoToken({ ids: ids.join(",") });
@@ -112,12 +96,11 @@ function searchAssets() {
           <th class="text-white font-bold text-sm text-right">Price</th>
           <th class="text-white font-bold text-sm text-right">Total Supply</th>
           <th class="text-white font-bold text-sm text-right">Circulating Supply</th>
-          <th class="text-white font-bold text-sm text-right">Market Cap</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(v, index) in assets" :key="index" class="cursor-pointer"
-          @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}?sector=transactions`)">
+          @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}`)">
           <td>
             <div class="flex flex-row items-center gap-3">
               <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"
@@ -138,26 +121,21 @@ function searchAssets() {
           </td>
           <td class="text-right">
             <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
-              <div v-if="priceTokens[v.id]?.current_price">$ {{ formatNumber(priceTokens[v.id].total_supply *
-                priceTokens[v.id].current_price) }}</div>
+              <div v-if="priceTokens[v.id]?.current_price">{{ formatNumber(priceTokens[v.id].total_supply) }}</div>
               <div v-else>-</div>
-              <span>{{ formatNumber(priceTokens[v.id].total_supply) }}</span>
+              <span>$ {{ formatNumber(priceTokens[v.id].total_supply *
+                priceTokens[v.id].current_price) }}</span>
             </div>
             <span v-else>-</span>
           </td>
           <td class="text-right">
             <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
-              <div v-if="priceTokens[v.id]?.current_price">$ {{ formatNumber(priceTokens[v.id].circulating_supply *
-                priceTokens[v.id].current_price) }}</div>
+              <div v-if="priceTokens[v.id]?.current_price">{{ formatNumber(priceTokens[v.id].circulating_supply) }}
+              </div>
               <div v-else>-</div>
-              <span>{{ formatNumber(priceTokens[v.id].circulating_supply) }}</span>
+              <span>$ {{ formatNumber(priceTokens[v.id].circulating_supply *
+                priceTokens[v.id].current_price) }}</span>
             </div>
-            <span v-else>-</span>
-          </td>
-          <td class="text-right">
-            <span v-if="priceTokens[v.id]?.market_cap" class="text-white">
-              $ {{ formatNumber(priceTokens[v.id].market_cap) }}
-            </span>
             <span v-else>-</span>
           </td>
         </tr>

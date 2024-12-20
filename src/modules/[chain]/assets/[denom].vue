@@ -1,19 +1,11 @@
 <script lang="ts" setup>
-import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
-import {
-  QueryClient,
-  setupBankExtension,
-} from "@cosmjs/stargate";
-import {
-  QueryDenomsMetadataRequest,
-  QueryDenomsMetadataResponse,
-} from "cosmjs-types/cosmos/bank/v1beta1/query";
-import { computed, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
-import { getInfoToken, getListAsset } from "@/service/assetsService";
+import { computed, onMounted, ref, toRaw, watch } from 'vue';
+import { getInfoToken, getListAssetOnChainAndRegistry } from "@/service/assetsService";
 import DetailAsset from "@/components/assets/DetailAsset.vue";
 import HolderAsset from "@/components/assets/HolderAsset.vue";
 import TransactionsAsset from "@/components/assets/TransactionsAsset.vue";
 import { RouterLink, useRoute } from "vue-router";
+import { LIST_COIN } from '@/constants';
 
 enum SECTOR {
   TRANSACTIONS = 'transactions',
@@ -25,36 +17,30 @@ const props = defineProps(["denom", "chain"]);
 const assets = ref([] as Array<any>);
 const asset = ref({} as any);
 const route = useRoute();
-const sector = computed(() => { return route.query.sector; });
+const sector = computed(() => {
+  if (route.query.sector) return route.query.sector;
+  else return SECTOR.TRANSACTIONS;
+});
+
+const coingeckoSymbols = Object.values(LIST_COIN);
+const coingeckoIds = Object.keys(LIST_COIN);
 
 onMounted(async () => {
   try {
-    const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
-    const queryClient = QueryClient.withExtensions(
-      cometClient as any,
-      setupBankExtension,
-    );
-    const requestData = Uint8Array.from(
-      QueryDenomsMetadataRequest.encode(
-        QueryDenomsMetadataRequest.fromPartial({})
-      ).finish()
-    );
-    const { value } = await queryClient.queryAbci(
-      "/cosmos.bank.v1beta1.Query/DenomsMetadata",
-      requestData
-    );
-    const bankAssets = QueryDenomsMetadataResponse.decode(value);
-    const registryAssets = await getListAsset("oraichain");
-    assets.value = [...bankAssets.metadatas, ...registryAssets];
+    assets.value = await getListAssetOnChainAndRegistry();
   } catch (error) {
     console.log({ error });
   }
 });
 watch([() => props.denom, () => assets.value], async () => {
+  console.log({ assets: toRaw(assets.value) });
+  console.log({ denom: toRaw(props.denom) });
   const info = assets.value.find((item) => item.base === props.denom);
-  const id = info?.coingecko_id;
+  const id = info?.coingecko_id || coingeckoIds[coingeckoSymbols.indexOf(info?.display)];
+  console.log({ id });
   if (id) {
     const res = await getInfoToken({ ids: id });
+    console.log({ res });
     if (Array.isArray(res))
       asset.value = { ...res[0], ...info };
     else asset.value = info;
@@ -63,22 +49,18 @@ watch([() => props.denom, () => assets.value], async () => {
   }
 });
 
-watchEffect(() => {
-  console.log({ asset: toRaw(asset.value) });
-});
-
 </script>
 <template>
   <div>
     <DetailAsset :asset="asset" />
     <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
       <div class="flex gap-5">
-        <RouterLink :to="`/${chain}/assets/${denom}?sector=${SECTOR.TRANSACTIONS}`"
+        <RouterLink :to="`/${chain}/assets/${encodeURIComponent(denom)}?sector=${SECTOR.TRANSACTIONS}`"
           class="font-bold text-lg hover:cursor-pointer"
           :class="{ 'border-b-2 border-[#CBAEFF] text-white': sector === SECTOR.TRANSACTIONS }">
           <div>Transactions</div>
         </RouterLink>
-        <RouterLink :to="`/${chain}/assets/${denom}?sector=${SECTOR.HOLDERS}`"
+        <RouterLink :to="`/${chain}/assets/${encodeURIComponent(denom)}?sector=${SECTOR.HOLDERS}`"
           class="font-bold text-lg hover:cursor-pointer"
           :class="{ 'border-b-2 border-[#CBAEFF] text-white': sector === SECTOR.HOLDERS }">
           <div>Holders</div>

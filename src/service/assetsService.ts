@@ -1,5 +1,14 @@
 import { NEW_ASSETS } from '@/constants';
 import { api, METHODS } from './api';
+import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
+import {
+  QueryClient,
+  setupBankExtension,
+} from "@cosmjs/stargate";
+import {
+  QueryDenomsMetadataRequest,
+  QueryDenomsMetadataResponse,
+} from "cosmjs-types/cosmos/bank/v1beta1/query";
 
 const baseMarketOrai = 'https://price.market.orai.io';
 const baseCoingecko = 'https://api.coingecko.com/api/v3';
@@ -104,4 +113,31 @@ export const getListAsset = async (chain: string) => {
     console.log({ error });
     return NEW_ASSETS
   }
+};
+
+export const getListAssetOnChainAndRegistry = async () => {
+  const cometClient = await Tendermint37Client.connect('https://rpc.orai.io');
+  const queryClient = QueryClient.withExtensions(
+    cometClient as any,
+    setupBankExtension
+  );
+  const requestData = Uint8Array.from(
+    QueryDenomsMetadataRequest.encode(
+      QueryDenomsMetadataRequest.fromPartial({})
+    ).finish()
+  );
+  const { value } = await queryClient.queryAbci(
+    '/cosmos.bank.v1beta1.Query/DenomsMetadata',
+    requestData
+  );
+  const bankAssets = QueryDenomsMetadataResponse.decode(value);
+  const registryAssets = await getListAsset('oraichain');
+  const seenBase = new Set();
+  return [...registryAssets, ...bankAssets.metadatas].filter((item) => {
+    if (!seenBase.has(item.base)) {
+      seenBase.add(item.base);
+      return true;
+    }
+    return false;
+  });
 };
