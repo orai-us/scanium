@@ -1,22 +1,15 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-
-import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
-import {
-  QueryClient,
-  setupBankExtension,
-} from "@cosmjs/stargate";
-import {
-  QueryDenomsMetadataResponse,
-  QueryDenomsMetadataRequest,
-} from "cosmjs-types/cosmos/bank/v1beta1/query";
-import { getInfoToken, getListAsset, getListAssetOnChainAndRegistry } from '@/service/assetsService';
+import { getInfoToken, getListAssetOnChainAndRegistry } from '@/service/assetsService';
 import { LIST_COIN } from '@/constants';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
 import TooltipComponent from '@/components/TooltipComponent.vue';
 import router from '@/router';
+import { useBlockchain } from '@/stores';
 
+const chainStore = useBlockchain();
+const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const props = defineProps(["chain"]);
 
 const coingeckoSymbols = Object.values(LIST_COIN);
@@ -33,7 +26,7 @@ const searchQuery = ref("");
 
 onMounted(async () => {
   try {
-    const assets = await getListAssetOnChainAndRegistry();
+    const assets = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
       .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
     const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));

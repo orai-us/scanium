@@ -1,18 +1,12 @@
 <script lang="ts" setup>
-import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
-import {
-  QueryClient,
-  setupBankExtension,
-} from "@cosmjs/stargate";
-import {
-  QueryDenomOwnersRequest,
-  QueryDenomOwnersResponse,
-} from "cosmjs-types/cosmos/bank/v1beta1/query";
 import { reactive, ref, watchEffect } from 'vue';
 import Pagination from "@/components/pagination/Pagination.vue";
 import { formatNumber } from "@/utils";
 import { getListHolderAssets } from "@/service/assetsService";
+import { useBlockchain } from '@/stores';
 
+const chainStore = useBlockchain();
+const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const props = defineProps(["denom", "chain", "currentPrice", "decimals"]);
 const owners = ref([] as Array<any>);
 const pagination = reactive({
@@ -23,7 +17,7 @@ const totalHolder = ref(0 as any);
 
 watchEffect(async () => {
   try {
-    const res = await getListHolderAssets(pagination, props.denom);
+    const res = await getListHolderAssets(pagination, props.denom, endpointAddress);
     owners.value = res.denomOwners;
     totalHolder.value = Number(res.pagination?.total);
   } catch (error) {
@@ -38,7 +32,7 @@ function handlePagination(page: number) {
 <template>
   <div>
     <div class="mb-3">
-      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalHolder) }}</span> holders</span>
+      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalHolder || 0) }}</span> holders</span>
     </div>
     <table class="table w-full text-sm" v-if="owners.length > 0">
       <thead>

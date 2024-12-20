@@ -40,6 +40,7 @@ export const labelInOutTxs = (txs: Array<any>, addAccount: string) => {
 export function formatNumber(number: string | number) {
   const result = Number(number);
   if (isNaN(result)) return "-";
+  if (number === 0) return 0;
   if (Math.abs(result) < 1) {
     return result.toLocaleString("en-US", {
       minimumFractionDigits: 5,

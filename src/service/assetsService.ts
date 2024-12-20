@@ -111,16 +111,17 @@ export const getListAsset = async (chain: string) => {
     };
     const res = await api.request(config);
     const assets = res.data.assets as Array<any>;
-    return [...assets, ...NEW_ASSETS];
+    if (chain === 'oraichain') return [...assets, ...NEW_ASSETS];
+    return assets;
   } catch (error) {
     console.log({ error });
     return NEW_ASSETS;
   }
 };
 
-export const getListAssetOnChainAndRegistry = async () => {
+export const getListAssetOnChainAndRegistry = async (endpointAddress: string, chain: string) => {
   try {
-    const cometClient = await Tendermint37Client.connect('https://rpc.orai.io');
+    const cometClient = await Tendermint37Client.connect(endpointAddress);
     const queryClient = QueryClient.withExtensions(
       cometClient as any,
       setupBankExtension
@@ -135,7 +136,7 @@ export const getListAssetOnChainAndRegistry = async () => {
       requestData
     );
     const bankAssets = QueryDenomsMetadataResponse.decode(value);
-    const registryAssets = await getListAsset('oraichain');
+    const registryAssets = await getListAsset(chain);
     const seenBase = new Set();
     return [...registryAssets, ...bankAssets.metadatas].filter((item) => {
       if (!seenBase.has(item.base)) {
@@ -150,10 +151,10 @@ export const getListAssetOnChainAndRegistry = async () => {
   }
 };
 
-export const getListHolderAssets = async (pagination: any, denom: string) => {
+export const getListHolderAssets = async (pagination: any, denom: string, endpointAddress: string) => {
   try {
     const { offset, limit } = pagination;
-    const cometClient = await Tendermint37Client.connect('https://rpc.orai.io');
+    const cometClient = await Tendermint37Client.connect(endpointAddress);
     const queryClient = QueryClient.withExtensions(
       cometClient as any,
       setupBankExtension

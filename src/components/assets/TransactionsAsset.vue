@@ -75,7 +75,7 @@ function handlePagination(page: number) {
 <template>
   <div>
     <div class="mb-3">
-      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalCount) }}</span>
+      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalCount || 0) }}</span>
         transactions</span>
     </div>
     <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
