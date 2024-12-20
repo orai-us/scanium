@@ -117,7 +117,7 @@ function searchAssets() {
       </thead>
       <tbody>
         <tr v-for="(v, index) in assets" :key="index" class="cursor-pointer"
-          @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}`)">
+          @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}?sector=transactions`)">
           <td>
             <div class="flex flex-row items-center gap-3">
               <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"

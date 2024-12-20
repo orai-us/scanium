@@ -1,61 +1,8 @@
 <script lang="ts" setup>
-import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
-import {
-  QueryClient,
-  setupBankExtension,
-} from "@cosmjs/stargate";
-import {
-  QueryDenomsMetadataRequest,
-  QueryDenomsMetadataResponse,
-} from "cosmjs-types/cosmos/bank/v1beta1/query";
-import { onMounted, ref, toRaw, watch, watchEffect } from 'vue';
-import { getInfoToken, getListAsset } from "@/service/assetsService";
 import { formatNumber, shortenDenom } from "@/utils";
 
-const props = defineProps(['denom']);
+const props = defineProps(['asset']);
 
-const assets = ref([] as Array<any>);
-const asset = ref({} as any);
-
-onMounted(async () => {
-  try {
-    const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
-    const queryClient = QueryClient.withExtensions(
-      cometClient as any,
-      setupBankExtension,
-    );
-    const requestData = Uint8Array.from(
-      QueryDenomsMetadataRequest.encode(
-        QueryDenomsMetadataRequest.fromPartial({})
-      ).finish()
-    );
-    const { value } = await queryClient.queryAbci(
-      "/cosmos.bank.v1beta1.Query/DenomsMetadata",
-      requestData
-    );
-    const bankAssets = QueryDenomsMetadataResponse.decode(value);
-    const registryAssets = await getListAsset("oraichain");
-    assets.value = [...bankAssets.metadatas, ...registryAssets];
-  } catch (error) {
-    console.log({ error });
-  }
-});
-watch([() => props.denom, () => assets.value], async () => {
-  const info = assets.value.find((item) => item.base === props.denom);
-  const id = info?.coingecko_id;
-  if (id) {
-    const res = await getInfoToken({ ids: id });
-    if (Array.isArray(res))
-      asset.value = { ...res[0], ...info };
-    else asset.value = info;
-  } else {
-    asset.value = info;
-  }
-});
-
-watchEffect(() => {
-  console.log({ asset: toRaw(asset.value) });
-});
 </script>
 <template>
   <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
@@ -67,7 +14,7 @@ watchEffect(() => {
         <div>
           <span class="text-white text-xl font-bold" v-if="asset.symbol">{{
             shortenDenom(asset.symbol?.toUpperCase())
-          }}</span>
+            }}</span>
           <span v-else>-</span>
         </div>
         <div class="flex flex-row gap-2">

@@ -5,82 +5,91 @@ import {
   setupBankExtension,
 } from "@cosmjs/stargate";
 import {
-  QueryDenomOwnersRequest,
-  QueryDenomOwnersResponse,
+  QueryDenomsMetadataRequest,
+  QueryDenomsMetadataResponse,
 } from "cosmjs-types/cosmos/bank/v1beta1/query";
-import { reactive, ref, watchEffect } from 'vue';
-import Pagination from "@/components/pagination/Pagination.vue";
+import { computed, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { getInfoToken, getListAsset } from "@/service/assetsService";
 import DetailAsset from "@/components/assets/DetailAsset.vue";
+import HolderAsset from "@/components/assets/HolderAsset.vue";
+import TransactionsAsset from "@/components/assets/TransactionsAsset.vue";
+import { RouterLink, useRoute } from "vue-router";
+
+enum SECTOR {
+  TRANSACTIONS = 'transactions',
+  HOLDERS = 'holders'
+}
 
 const props = defineProps(["denom", "chain"]);
-const owners = ref([] as Array<any>);
 
-const pagination = reactive({
-  offset: 0,
-  limit: 10,
-});
-const totalHolder = ref(0 as any);
+const assets = ref([] as Array<any>);
+const asset = ref({} as any);
+const route = useRoute();
+const sector = computed(() => { return route.query.sector; });
 
-watchEffect(async () => {
+onMounted(async () => {
   try {
-    const { offset, limit } = pagination;
     const cometClient = await Tendermint37Client.connect("https://rpc.orai.io");
     const queryClient = QueryClient.withExtensions(
       cometClient as any,
       setupBankExtension,
     );
     const requestData = Uint8Array.from(
-      QueryDenomOwnersRequest.encode(
-        QueryDenomOwnersRequest.fromPartial({ denom: props.denom, pagination: { offset: BigInt(offset), limit: BigInt(limit) } })
+      QueryDenomsMetadataRequest.encode(
+        QueryDenomsMetadataRequest.fromPartial({})
       ).finish()
     );
     const { value } = await queryClient.queryAbci(
-      "/cosmos.bank.v1beta1.Query/DenomOwners",
+      "/cosmos.bank.v1beta1.Query/DenomsMetadata",
       requestData
     );
-    const res = QueryDenomOwnersResponse.decode(value);
-    owners.value = res.denomOwners;
-    totalHolder.value = res.pagination?.total;
+    const bankAssets = QueryDenomsMetadataResponse.decode(value);
+    const registryAssets = await getListAsset("oraichain");
+    assets.value = [...bankAssets.metadatas, ...registryAssets];
   } catch (error) {
     console.log({ error });
   }
 });
+watch([() => props.denom, () => assets.value], async () => {
+  const info = assets.value.find((item) => item.base === props.denom);
+  const id = info?.coingecko_id;
+  if (id) {
+    const res = await getInfoToken({ ids: id });
+    if (Array.isArray(res))
+      asset.value = { ...res[0], ...info };
+    else asset.value = info;
+  } else {
+    asset.value = info;
+  }
+});
 
-function handlePagination(page: number) {
-  pagination.offset = (page - 1) * pagination.limit;
-}
+watchEffect(() => {
+  console.log({ asset: toRaw(asset.value) });
+});
 
 </script>
 <template>
   <div>
-    <DetailAsset :denom="denom" />
+    <DetailAsset :asset="asset" />
     <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
-      <div class="text-white font-bold text-lg">Holder</div>
+      <div class="flex gap-5">
+        <RouterLink :to="`/${chain}/assets/${denom}?sector=${SECTOR.TRANSACTIONS}`"
+          class="font-bold text-lg hover:cursor-pointer"
+          :class="{ 'border-b-2 border-[#CBAEFF] text-white': sector === SECTOR.TRANSACTIONS }">
+          <div>Transactions</div>
+        </RouterLink>
+        <RouterLink :to="`/${chain}/assets/${denom}?sector=${SECTOR.HOLDERS}`"
+          class="font-bold text-lg hover:cursor-pointer"
+          :class="{ 'border-b-2 border-[#CBAEFF] text-white': sector === SECTOR.HOLDERS }">
+          <div>Holders</div>
+        </RouterLink>
+      </div>
       <div class="w-full h-[1px] bg-base-300"></div>
-      <table class="table w-full text-sm" v-if="owners.length > 0">
-        <thead>
-          <tr>
-            <th class="text-white font-bold text-sm">Address</th>
-            <th class="text-white font-bold text-sm">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(owner, index) in owners" :key="index">
-            <td>
-              <RouterLink :to="`/${chain}/account/${owner.address}`" class="text-primary dark:text-link">
-                {{ owner.address }}
-              </RouterLink>
-            </td>
-            <td>
-              <span v-if="owner.balance?.amount / Math.pow(10, 6) >= 0.00001">{{ (owner.balance?.amount / Math.pow(10,
-                6)).toLocaleString("en-US", {}) }}</span>
-              <span v-else>{{ `< 0.00001` }} </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="mt-4 text-center" v-if="totalHolder">
-        <Pagination :totalItems="totalHolder" :limit="pagination.limit" :onPagination="handlePagination" />
+      <div v-show="sector === SECTOR.TRANSACTIONS">
+        <TransactionsAsset :denom="denom" :chain="chain" />
+      </div>
+      <div v-show="sector === SECTOR.HOLDERS">
+        <HolderAsset :denom="denom" :chain="chain" :currentPrice="asset.current_price" />
       </div>
     </div>
   </div>
