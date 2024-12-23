@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { useFormatter, useStakingStore } from '@/stores';
-import { computed, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
-import { LIST_COIN, MAX_TOKEN } from '@/constants';
-import { getCw20Balances, getPriceByIds } from '@/service/assetsService';
+import { LIST_COIN } from '@/constants';
+import { getCw20Balances, getListAsset, getPriceByIds } from '@/service/assetsService';
 import numeral from 'numeral';
 import ChainRegistryClient from '@ping-pub/chain-registry-client';
 import axios from 'axios';
@@ -32,11 +32,11 @@ function changeStatusSupported(supported: boolean) {
   supportedAssets.value = supported;
 }
 
-async function getBalancesCw20() {
-  const responseRegistry = await axios(`https://registry.ping.pub/${props.chain.toLowerCase()}/assetlist.json`);
+async function fetchBalancesCw20() {
+  const assets = await getListAsset(props.chain);
 
-  if (!!responseRegistry?.data) {
-    const assetCw20s = responseRegistry.data.assets?.filter((item: any) => item?.type_asset === "cw20");
+  if (Array.isArray(assets)) {
+    const assetCw20s = assets.filter((item: any) => item?.type_asset === "cw20");
     if (!assetCw20s) return;
     const denoms = [];
     for (const asset of assetCw20s) {
@@ -60,34 +60,19 @@ async function getBalancesCw20() {
 }
 
 onMounted(async () => {
-  getBalancesCw20()
+  fetchBalancesCw20()
 })
 
 watch([() => props.address], () => {
-  getBalancesCw20()
+  fetchBalancesCw20()
 })
-
-function checkFormatTokenMax(formatToken: any) {
-  if (formatToken.denom === MAX_TOKEN.base) {
-    const amount = formatToken.amount / Math.pow(10, MAX_TOKEN.exponent);
-    return {
-      denom: MAX_TOKEN.display,
-      amount,
-      amountDisplay: amount.toString()
-    };
-  }
-  return {
-    ...formatToken,
-    denom: formatToken.denom.substring(0, 10)
-  };
-}
 
 const balancesAssets = computed(() => {
   const balances = [...props.balances, ...balancesChain.value];
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   for (const balance of balances) {
-    const formatToken = checkFormatTokenMax(format.formatToken3(balance));
+    const formatToken = format.formatToken3(balance);
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
@@ -103,7 +88,7 @@ const delegatesAssets = computed(() => {
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   for (let delegation of props.delegations) {
-    const formatToken = checkFormatTokenMax(format.formatToken3(delegation.balance));
+    const formatToken = format.formatToken3(delegation.balance);
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
@@ -120,7 +105,7 @@ const rewardsTotalAssets = computed(() => {
   const resultUnSupported: Array<any> = [];
   if (!!props.rewards?.total) {
     for (let reward of props.rewards?.total) {
-      const formatToken = checkFormatTokenMax(format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18));
+      const formatToken = format.formatToken3(reward, true, '0,0.[0]', 'local', 1e18);
       const denom = formatToken.denom;
       const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
       if (coingeckoSymbols.includes(denom)) {
@@ -146,11 +131,11 @@ const unbondingAssets = computed(() => {
   // );
   const totalUnbonding = Number(props.unbondingTotal);
   if (!!totalUnbonding) {
-    const formatToken = checkFormatTokenMax({
+    const formatToken = {
       amount: totalUnbonding / 1e6,
       denom: stakingStore.params.bondDenom,
       amountDisplay: String(totalUnbonding / 1e6)
-    })
+    }
     const denom = formatToken.denom;
     const id = coingeckoIds[coingeckoSymbols.indexOf(denom)];
     if (coingeckoSymbols.includes(denom)) {
@@ -167,11 +152,12 @@ watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, sup
   const assets = [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value];
   const ids = assets.map(item => item?.id);
 
+  console.log({ ids })
   const result: any = {};
   if (ids?.length > 0) {
     const res = await getPriceByIds({ ids: ids.join(",") });
     for (let item in res) {
-      if (coingeckoIds.indexOf(item) > -1) result[coingeckoSymbols[coingeckoIds.indexOf(item)]] = res[item]?.usd;
+      if (coingeckoIds.indexOf(item) > -1) result[coingeckoSymbols[coingeckoIds.indexOf(item)] as string] = res[item]?.usd;
     }
     priceBySymbol.value = result;
 
