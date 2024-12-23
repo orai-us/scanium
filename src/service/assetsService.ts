@@ -18,6 +18,10 @@ export const getPriceByIds = async (params: ParamsSimplePrice) => {
     params: {
       ...params,
       vs_currencies: 'usd',
+      include_market_cap: true,
+      include_24hr_vol: true,
+      include_24hr_change: true,
+      include_last_updated_at: true,
     },
   };
   const res = await api.request(config);
