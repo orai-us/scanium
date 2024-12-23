@@ -6,7 +6,7 @@ export const NEW_ASSETS = [
   {
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
-    display: 'MAX',
+    display: 'max',
     symbol: 'MAX',
     logo_URIs: {
       svg: 'https://assets.coingecko.com/coins/images/52378/standard/btc.png?1733257730',
