@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
-import { getListAsset } from '@/service/assetsService';
 
 export enum EndpointType {
   rpc,
@@ -139,11 +138,9 @@ function apiConverter(api: any[]) {
   });
 }
 
-export async function fromLocal(lc: LocalConfig): Promise<ChainConfig> {
+export function fromLocal(lc: LocalConfig): ChainConfig {
   const conf = {} as ChainConfig;
-
-  const assetsRegistry = lc.chain_name === 'Oraichain' ? await getListAsset(lc.chain_name) : [];
-  conf.assets = [...lc.assets, ...assetsRegistry].map((x) => ({
+  conf.assets = lc.assets.map((x) => ({
     name: x.base,
     base: x.base,
     display: x.symbol,
@@ -342,8 +339,8 @@ export const useDashboard = defineStore('dashboard', {
         this.networkType === NetworkType.Mainnet
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
-      Object.values<LocalConfig>(source).forEach(async (x: LocalConfig) => {
-        this.chains[x.chain_name] = await fromLocal(x);
+      Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
+        this.chains[x.chain_name] = fromLocal(x);
       });
 
       this.setupDefault();
@@ -355,8 +352,8 @@ export const useDashboard = defineStore('dashboard', {
         network === NetworkType.Mainnet
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
-      Object.values<LocalConfig>(source).forEach(async (x: LocalConfig) => {
-        config[x.chain_name] = await fromLocal(x);
+      Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
+        config[x.chain_name] = fromLocal(x);
       });
       return config;
     },
