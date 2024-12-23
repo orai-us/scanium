@@ -1,4 +1,6 @@
-name: Deploy
+name: Deploy Prod
+
+run-name: Deploy to firebase by ${{ inputs.tag || github.ref_name }}
 
 on:
   push:
@@ -13,18 +15,56 @@ on:
         type: string
         required: true
 
+env:
+  NODE_VERSION: 20
+
 jobs:
-  dispatch:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.ref_name }}
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Install Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.PAT }}
-          repository: oraichain/infra
-          event-type: firebase
-          client-payload: '{"ref": "${{ github.ref }}", "repo": "${{ github.repository }}", "node_version": "18", "project": "oraichain-dapp", "target": "oraichainscan"}'
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Check and Install Yarn
+        run: |
+          if ! yarn --version > /dev/null 2>&1; then
+            echo "Yarn is not installed. Installing Yarn."
+            npm i -g yarn
+          else
+            echo "Yarn is already installed."
+          fi
+      - name: Install dependencies
+        run: yarn install
+      - name: Create env file
+        run: cp .env.example .env
+      - name: Setup Sentry key
+        run: echo SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} > .env.sentry-build-plugin
+      - name: Build source
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=8192"
+          yarn build
+        env:
+          CI: false
+      - name: Import Firebase service account credentials
+        id: import-credentials
+        run: |
+          echo ${{ secrets.ORAICHAIN_DAPP_FIREBASE_DEPLOYER_CREDENTIALS }} | base64 -d > $(pwd)/serviceaccount.json
+          echo "file_path=$(pwd)/serviceaccount.json" >> $GITHUB_OUTPUT
+      - name: Deploy to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.import-credentials.outputs.file_path }}
+        run: yarn firebase -P default deploy --only hosting:oraichainscan
+      - name: Remove credentials file
+        if: success() || failure()
+        run: rm ${{ steps.import-credentials.outputs.file_path }}
