@@ -1,27 +1,26 @@
-export const CHAIN_INDEXS = ['Oraichain'];
+import { convertNewAssetToToken } from "@/utils";
 
-export const MAX_TOKEN = {
-  display: 'MAX',
-  base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuqk9ezgyeugxql3mhqyndrw1huvo5h',
-  id: 'max-2',
-  exponent: 6,
-  denom_units: [
-    {
-      denom: 'MAX',
-      exponent: 6,
-    },
-  ],
-};
+export const CHAIN_INDEXS = ['Oraichain'];
 
 export const NEW_ASSETS = [
   {
+    name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
+    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
     display: 'MAX',
-    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuqk9ezgyeugxql3mhqyndrw1huvo5h',
-    id: 'max-2',
-    exponent: 6,
+    symbol: 'MAX',
+    logo_URIs: {
+      svg: 'https://assets.coingecko.com/coins/images/52378/standard/btc.png?1733257730',
+    },
+    coingecko_id: 'max-2',
+    exponent: '6',
     denom_units: [
       {
-        denom: 'MAX',
+        denom:
+          'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
+        exponent: 0,
+      },
+      {
+        denom: 'max',
         exponent: 6,
       },
     ],
@@ -30,7 +29,7 @@ export const NEW_ASSETS = [
 
 // id: symbol
 export const LIST_COIN = {
-  'max-2': MAX_TOKEN.display,
+  ...convertNewAssetToToken(NEW_ASSETS),
   '01coin': 'zoc',
   '0chain': 'zcn',
   '0dog': '0dog',
