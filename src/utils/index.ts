@@ -19,9 +19,12 @@ export const labelInOutTxs = (txs: Array<any>, addAccount: string) => {
       if (nodes[0]?.type?.includes('ibc')) {
         const tokenTransfers = item.tokenTransfers?.nodes;
         if (Array.isArray(tokenTransfers)) {
-          if (tokenTransfers.find((item: any) => item.from === addAccount))
+          let numberTxOut = 0, numberTxIn = 0;
+          numberTxOut = tokenTransfers.filter((item) => item.from === addAccount).length;
+          numberTxIn = tokenTransfers.filter((item) => item.to === addAccount).length;
+          if (numberTxOut > numberTxIn)
             state = 'OUT';
-          if (tokenTransfers.find((item: any) => item.to === addAccount))
+          else if(numberTxOut < numberTxIn)
             state = 'IN';
         }
       }
