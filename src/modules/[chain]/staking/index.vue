@@ -12,12 +12,13 @@ import { Icon } from '@iconify/vue';
 import type { Key, SigningInfo } from '@/types';
 import { formatSeconds } from '@/libs/utils';
 import type { Validator } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
-import type { Params, ValidatorSigningInfo } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
+import type { Params } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
 import { toBase64 } from '@cosmjs/encoding';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
 import { consensusPubkeyToHexAddress, decodeKey, valconsToBase64 } from '@/libs';
 import { Commit } from '@cosmjs/tendermint-rpc';
 import UptimeBar from '@/components/UptimeBar.vue';
+import axios from 'axios';
 
 enum SORT_TYPE {
   ASC = "asc",
@@ -41,10 +42,23 @@ const tab = ref('active');
 const unbondList = ref([] as Validator[]);
 const slashing = ref({} as Params);
 const keywordSearchValidator = ref("");
+const aprs = ref({} as any);
 const sortDes = reactive({
   field: "voting_power",
   type: SORT_TYPE.DESC
 });
+
+onMounted(async () => {
+  try {
+    const res = await axios.get("https://api.scan.orai.io/v1/validators?limit=100");
+    const data = res.data?.data;
+    data.forEach((element:any) => {
+      aprs.value[element.operator_address] = element.apr * 1.05
+    });
+  } catch (error) {
+    console.log({ error });
+  }
+})
 
 onMounted(() => {
   // staking.fetchUnbondingValdiators().then((res) => {
@@ -627,26 +641,25 @@ const promoteOwallet = computed(()=>{
         <table class="table staking-table w-full">
           <thead>
             <tr>
-              <th scope="col" class="uppercase hover:text-white hover:cursor-pointer">
+              <th scope="col" class="uppercase">
                 {{ $t('staking.validator') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('voting_power')">
+              <th scope="col" class="text-right uppercase">
                 {{ $t('staking.voting_power') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('uptime')">
+              <th scope="col" class="text-right uppercase">
                 Uptime
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('24h_changes')">
+              <th scope="col" class="text-right uppercase">
+                APR
+              </th>
+              <th scope="col" class="text-right uppercase">
                 {{ $t('staking.24h_changes') }}
               </th>
-              <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
-                @click="handleChangeSort('commission')">
+              <th scope="col" class="text-right uppercase">
                 {{ $t('staking.commission') }}
               </th>
-              <th scope="col" class="text-center uppercase" @click="handleChangeSort('voting_power')">
+              <th scope="col" class="text-center uppercase">
                 {{ $t('staking.actions') }}
               </th>
             </tr>
@@ -719,6 +732,11 @@ const promoteOwallet = computed(()=>{
                   </div>
                 </span>
               </td>
+              <!-- 👉 APR  -->
+              <td class="text-right text-xs">
+                <span v-if="aprs[v.operatorAddress]">{{ aprs[v.operatorAddress]?.toLocaleString("en-US",{}) }}%</span>
+                <span v-else>-</span>
+              </td>
               <!-- 👉 24h Changes -->
               <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
                 {{ change24h }}
@@ -787,6 +805,9 @@ const promoteOwallet = computed(()=>{
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('uptime')">
                   Uptime
+                </th>
+                <th scope="col" class="text-right uppercase">
+                  APR
                 </th>
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('24h_changes')">
@@ -876,6 +897,11 @@ const promoteOwallet = computed(()=>{
                     </div>
                   </span>
                 </td>
+                <!-- 👉 APR  -->
+                 <td class="text-right text-xs">
+                  <span v-if="aprs[v.operatorAddress]">{{ aprs[v.operatorAddress]?.toLocaleString("en-US",{}) }}%</span>
+                  <span v-else>-</span>
+                 </td>
                 <!-- 👉 24h Changes -->
                 <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
                   {{ change24Text(v.consensusPubkey) }}
