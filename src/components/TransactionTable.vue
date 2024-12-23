@@ -23,7 +23,8 @@ watchEffect(() => {
           message: formatTitle(message),
           height: item.blockNumber,
           fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
-          timestamp: format.toLocaleDate(new Date(Number(item.timestamp)))
+          timestamp: format.toLocaleDate(new Date(Number(item.timestamp))),
+          state: item.state
         }
       });
     } else {
@@ -43,6 +44,7 @@ watchEffect(() => {
           <th>Message</th>
           <th>Height</th>
           <th>Fee</th>
+          <th>Status</th>
           <th>Time</th>
         </tr>
       </thead>
@@ -75,6 +77,14 @@ watchEffect(() => {
           </td>
           <td class="py-3 !break-normal">
             <span>{{ v.fee || "-" }}</span>
+          </td>
+          <td>
+            <button class="btn btn-xs  border rounded-lg " v-if="v.state"
+            :class="{'!bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)]': v.state ==='IN', 
+                     '!bg-[rgba(255,82,82,0.20)] !text-[#FF5252] border-[rgba(255,82,82,0.20)]': v.state ==='OUT'}">
+             {{ v.state }}
+           </button>
+           <div v-else>-</div>
           </td>
           <td class="!break-normal">{{ v.timestamp || "-" }}</td>
         </tr>
