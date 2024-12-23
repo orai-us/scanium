@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRaw, watch } from 'vue';
-import { getInfoToken, getListAssetOnChainAndRegistry } from "@/service/assetsService";
+import { getInfoToken, getListAssetOnChainAndRegistry, getPriceByIds } from "@/service/assetsService";
 import DetailAsset from "@/components/assets/DetailAsset.vue";
 import HolderAsset from "@/components/assets/HolderAsset.vue";
 import TransactionsAsset from "@/components/assets/TransactionsAsset.vue";
@@ -39,10 +39,17 @@ watch([() => props.denom, () => assets.value], async () => {
   const info = assets.value.find((item) => item.base === props.denom);
   const id = info?.coingecko_id || coingeckoIds[coingeckoSymbols.indexOf(info?.display)];
   if (id) {
-    const res = await getInfoToken({ ids: id });
-    if (Array.isArray(res))
-      asset.value = { ...res[0], ...info };
-    else asset.value = info;
+    // const res = await getInfoToken({ ids: id });
+    const res = await getPriceByIds({ ids: id });
+    const infoToken = {
+      id, 
+      current_price: res[id]?.usd
+    }
+    asset.value = { ...infoToken, ...info };
+    // // console.log({ res, res1 })
+    // if (Array.isArray(infoToken))
+    //   asset.value = { ...infoToken, ...info };
+    // else asset.value = info;
   } else {
     asset.value = info;
   }

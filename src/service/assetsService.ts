@@ -110,7 +110,13 @@ export const getListAsset = async (chain: string) => {
       method: METHODS.GET,
     };
     const res = await api.request(config);
-    const assets = res.data.assets as Array<any>;
+    const assets = res.data.assets
+      .filter(
+        (item: any) =>
+          item.base !== 'cw20:orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5' &&
+          item.base !== 'cw20:orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw'
+      )
+      .map((item: any) => ({ ...item, verify: true }));
     if (chain.toLowerCase() === 'oraichain') return [...assets, ...NEW_ASSETS];
     return assets;
   } catch (error) {

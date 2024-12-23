@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { getInfoToken, getListAssetOnChainAndRegistry } from '@/service/assetsService';
+import { getInfoToken, getListAssetOnChainAndRegistry, getPriceByIds } from '@/service/assetsService';
 import { LIST_COIN } from '@/constants';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
@@ -24,24 +24,50 @@ const pagination = reactive({
 });
 const searchQuery = ref("");
 
+// onMounted(async () => {
+//   try {
+//     const assets = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
+//     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
+//       .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
+//     const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
+//     assetsAll.value = [...assetsSupported, ...assetsUnSupported];
+//     assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
+//     const ids = assetsSupported.map((item: any) => item?.id);
+//     console.log({ ids })
+//     if (ids?.length > 0) {
+//       try {
+//         const res = await getInfoToken({ ids: ids.join(",") });
+//         const prices: any = {};
+//         for (let item of res) {
+//           prices[item.id] = item;
+//         }
+//         priceTokens.value = prices;
+//       } catch (error) {
+//         console.log({ error });
+//       }
+//     }
+//   } catch (error) {
+//     console.log({ error });
+//   }
+
+// });
+
 onMounted(async () => {
   try {
     const assets = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
       .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
+
     const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
     assetsAll.value = [...assetsSupported, ...assetsUnSupported];
-    assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
+    assetsSearch.value = [...assetsSupported, ...assetsUnSupported].filter(item => item.symbol);
+    
     const ids = assetsSupported.map((item: any) => item?.id);
-    console.log({ ids })
+
     if (ids?.length > 0) {
       try {
-        const res = await getInfoToken({ ids: ids.join(",") });
-        const prices: any = {};
-        for (let item of res) {
-          prices[item.id] = item;
-        }
-        priceTokens.value = prices;
+        const res = await getPriceByIds({ ids: ids.join(",") });
+        priceTokens.value = res;
       } catch (error) {
         console.log({ error });
       }
@@ -49,7 +75,6 @@ onMounted(async () => {
   } catch (error) {
     console.log({ error });
   }
-
 });
 
 const totalAssets = computed(() => { return assetsSearch.value.length; });
@@ -85,10 +110,11 @@ watch(searchQuery,()=>{
       <thead>
         <tr>
           <th class="text-white font-bold text-sm">Name</th>
+          <th class="text-white font-bold text-sm text-right"></th>
           <th class="text-white font-bold text-sm text-right">Denom</th>
           <th class="text-white font-bold text-sm text-right">Price</th>
-          <th class="text-white font-bold text-sm text-right">Total Supply</th>
-          <th class="text-white font-bold text-sm text-right">Circulating Supply</th>
+          <!-- <th class="text-white font-bold text-sm text-right">Total Supply</th> -->
+          <!-- <th class="text-white font-bold text-sm text-right">Circulating Supply</th> -->
         </tr>
       </thead>
       <tbody>
@@ -104,15 +130,21 @@ watch(searchQuery,()=>{
             </div>
           </td>
           <td class="text-right">
+            <div v-if="v.verify">
+              <div class="text-xs flex items-center justify-center !bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)] p-2 rounded-lg w-fit">
+                Verified</div>
+            </div>
+          </td>
+          <td class="text-right w-fit">
             <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base" />
           </td>
           <td class="text-right">
-            <span v-if="priceTokens[v.id]?.current_price" class="text-white">
-              $ {{ formatNumber(priceTokens[v.id].current_price) }}
+            <span v-if="priceTokens[v.id]?.usd" class="text-white">
+              $ {{ formatNumber(priceTokens[v.id].usd) }}
             </span>
             <span v-else>-</span>
           </td>
-          <td class="text-right">
+          <!-- <td class="text-right">
             <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
               <div>{{ formatNumber(priceTokens[v.id].total_supply) }}</div>
               <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
@@ -121,8 +153,8 @@ watch(searchQuery,()=>{
               <span v-else>-</span>
             </div>
             <span v-else>-</span>
-          </td>
-          <td class="text-right">
+          </td> -->
+          <!-- <td class="text-right">
             <div v-if="priceTokens[v.id]?.circulating_supply" class="text-white">
               <div>{{ formatNumber(priceTokens[v.id].circulating_supply) }}
               </div>
@@ -132,7 +164,7 @@ watch(searchQuery,()=>{
               <span v-else>-</span>
             </div>
             <span v-else>-</span>
-          </td>
+          </td> -->
         </tr>
       </tbody>
     </table>
