@@ -6,6 +6,7 @@ import HolderAsset from "@/components/assets/HolderAsset.vue";
 import TransactionsAsset from "@/components/assets/TransactionsAsset.vue";
 import { RouterLink, useRoute } from "vue-router";
 import { LIST_COIN } from '@/constants';
+import { useBlockchain } from '@/stores';
 
 enum SECTOR {
   TRANSACTIONS = 'transactions',
@@ -14,6 +15,8 @@ enum SECTOR {
 
 const props = defineProps(["denom", "chain"]);
 
+const chainStore = useBlockchain();
+const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const assets = ref([] as Array<any>);
 const asset = ref({} as any);
 const route = useRoute();
@@ -27,7 +30,7 @@ const coingeckoIds = Object.keys(LIST_COIN);
 
 onMounted(async () => {
   try {
-    assets.value = await getListAssetOnChainAndRegistry();
+    assets.value = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
   } catch (error) {
     console.log({ error });
   }

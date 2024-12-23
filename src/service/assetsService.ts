@@ -111,7 +111,7 @@ export const getListAsset = async (chain: string) => {
     };
     const res = await api.request(config);
     const assets = res.data.assets as Array<any>;
-    if (chain === 'oraichain') return [...assets, ...NEW_ASSETS];
+    if (chain.toLowerCase() === 'oraichain') return [...assets, ...NEW_ASSETS];
     return assets;
   } catch (error) {
     console.log({ error });
@@ -172,7 +172,6 @@ export const getListHolderAssets = async (pagination: any, denom: string, endpoi
       requestData
     );
     const res = QueryDenomOwnersResponse.decode(value);
-    console.log({ res });
     return res;
   } catch (error) {
     console.log({ error });

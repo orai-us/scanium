@@ -35,39 +35,39 @@ const props = defineProps(['asset']);
       </div>
     </div>
     <div class="w-full h-[1px] bg-base-300"></div>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-5">
       <div class="flex flex-row">
         <div class="w-[200px]">Total Supply</div>
-        <span class="text-white font-semibold">{{ formatNumber(asset.total_supply) }} {{
+        <span class="text-white">{{ formatNumber(asset.total_supply) }} {{
           asset.symbol?.toUpperCase() }}</span>
       </div>
       <div class="flex flex-row">
         <div class="w-[200px]">Fully distributed MC</div>
-        <span class="text-white font-semibold">$ {{ formatNumber(asset.total_supply * asset.current_price)
+        <span class="text-white">$ {{ formatNumber(asset.total_supply * asset.current_price)
           }}</span>
       </div>
       <div class="flex flex-row">
         <div class="w-[200px]">Circulating Supply</div>
-        <span class="text-white font-semibold">{{ formatNumber(asset.circulating_supply) }} {{
+        <span class="text-white">{{ formatNumber(asset.circulating_supply) }} {{
           asset.symbol?.toUpperCase() }}</span>
       </div>
       <div class="flex flex-row">
         <div class="w-[200px]">Market cap</div>
-        <span class="text-white font-semibold">$ {{ formatNumber(asset.circulating_supply * asset.current_price)
+        <span class="text-white">$ {{ formatNumber(asset.circulating_supply * asset.current_price)
           }}</span>
       </div>
       <div class="flex flex-row">
         <div class="w-[200px]">Decimals</div>
-        <span class="text-white font-semibold">{{ asset.denom_units?.slice(-1)[0].exponent }}</span>
+        <span class="text-white">{{ asset.denom_units?.slice(-1)[0].exponent }}</span>
       </div>
       <div class="flex flex-row">
         <div class="w-[200px]">Denom</div>
-        <span class="text-white font-semibold">{{ asset.denom_units?.slice(-1)[0].denom }}</span>
+        <span class="text-white">{{ asset.denom_units?.slice(-1)[0].denom }}</span>
       </div>
 
       <div class="flex flex-row">
         <div class="w-[200px]">Description</div>
-        <span class="text-white font-semibold">{{ asset.description }}</span>
+        <span class="text-white">{{ asset.description }}</span>
       </div>
     </div>
   </div>

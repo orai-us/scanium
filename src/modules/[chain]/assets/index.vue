@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { getInfoToken, getListAssetOnChainAndRegistry } from '@/service/assetsService';
 import { LIST_COIN } from '@/constants';
 import { formatNumber, shortenDenom } from '@/utils';
@@ -62,12 +62,12 @@ const assets = computed(() => {
   return assetsSearch.value.slice(pagination.offset, pagination.offset + pagination.limit);
 });
 
-function searchAssets() {
+watch(searchQuery,()=>{
   handlePagination(1);
   const keyword = searchQuery.value.toLowerCase();
   if (keyword.length === 0) assetsSearch.value = assetsAll.value;
   assetsSearch.value = assetsAll.value.filter((item) => item.symbol?.toLowerCase().includes(keyword) || item.base?.toLowerCase().includes(keyword));
-}
+})
 
 </script>
 <template>
@@ -78,7 +78,7 @@ function searchAssets() {
       <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ totalAssets }}</span> Assets</span>
       <input
         class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
-        v-model="searchQuery" placeholder="Search by Name, Denom" v-on:keyup.enter="searchAssets" />
+        v-model="searchQuery" placeholder="Search by Name, Denom" />
     </div>
 
     <table class="table w-full text-sm" v-if="assets.length > 0">
@@ -114,20 +114,22 @@ function searchAssets() {
           </td>
           <td class="text-right">
             <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
-              <div v-if="priceTokens[v.id]?.current_price">{{ formatNumber(priceTokens[v.id].total_supply) }}</div>
-              <div v-else>-</div>
-              <span>$ {{ formatNumber(priceTokens[v.id].total_supply *
+              <div>{{ formatNumber(priceTokens[v.id].total_supply) }}</div>
+              <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
+                formatNumber(priceTokens[v.id].total_supply *
                 priceTokens[v.id].current_price) }}</span>
+              <span v-else>-</span>
             </div>
             <span v-else>-</span>
           </td>
           <td class="text-right">
-            <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
-              <div v-if="priceTokens[v.id]?.current_price">{{ formatNumber(priceTokens[v.id].circulating_supply) }}
+            <div v-if="priceTokens[v.id]?.circulating_supply" class="text-white">
+              <div>{{ formatNumber(priceTokens[v.id].circulating_supply) }}
               </div>
-              <div v-else>-</div>
-              <span>$ {{ formatNumber(priceTokens[v.id].circulating_supply *
-                priceTokens[v.id].current_price) }}</span>
+              <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
+                formatNumber(priceTokens[v.id].circulating_supply *
+                  priceTokens[v.id].current_price) }}</span>
+              <span v-else>-</span>
             </div>
             <span v-else>-</span>
           </td>
