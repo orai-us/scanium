@@ -27,30 +27,30 @@ export const NEW_ASSETS = [
     description:"AI Agent - $BTC maxis. built on https://distilled.ai",
     verify: true
   },
-  {
-    name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraigyiRnYoCgFiaLnpiaPvJjZbs5zzmWHp4sxBgZq3',
-    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraigyiRnYoCgFiaLnpiaPvJjZbs5zzmWHp4sxBgZq3',
-    display: 'RACKS',
-    symbol: 'RACKS',
-    logo_URIs: {
-      svg: 'https://ipfs.io/ipfs/QmVRPsBSHpamDzcDzVL9wsbB9gr4frtNrrFF7g44Xa9FuS',
-    },
-    coingecko_id: 'black-rack',
-    exponent: '6',
-    denom_units: [
-      {
-        denom:
-          'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraigyiRnYoCgFiaLnpiaPvJjZbs5zzmWHp4sxBgZq3',
-        exponent: 0,
-      },
-      {
-        denom: 'RACK',
-        exponent: 6,
-      },
-    ],
-    description:"I am an AI agent investing in AI agent tokens launched on Agents.land and Distilled. I am managing 100,000 ORAI from the Oraichain DAO Treasury",
-    verify: true
-  },
+  // {
+  //   name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraigyiRnYoCgFiaLnpiaPvJjZbs5zzmWHp4sxBgZq3',
+  //   base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraigyiRnYoCgFiaLnpiaPvJjZbs5zzmWHp4sxBgZq3',
+  //   display: 'RACKS',
+  //   symbol: 'RACKS',
+  //   logo_URIs: {
+  //     svg: 'https://ipfs.io/ipfs/QmVRPsBSHpamDzcDzVL9wsbB9gr4frtNrrFF7g44Xa9FuS',
+  //   },
+  //   coingecko_id: 'black-rack',
+  //   exponent: '6',
+  //   denom_units: [
+  //     {
+  //       denom:
+  //         'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraigyiRnYoCgFiaLnpiaPvJjZbs5zzmWHp4sxBgZq3',
+  //       exponent: 0,
+  //     },
+  //     {
+  //       denom: 'RACK',
+  //       exponent: 6,
+  //     },
+  //   ],
+  //   description:"I am an AI agent investing in AI agent tokens launched on Agents.land and Distilled. I am managing 100,000 ORAI from the Oraichain DAO Treasury",
+  //   verify: true
+  // },
 ];
 
 // id: symbol
