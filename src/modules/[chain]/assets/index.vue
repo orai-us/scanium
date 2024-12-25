@@ -58,9 +58,9 @@ onMounted(async () => {
     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
       .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
 
-    const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
+    const assetsUnSupported = assets.filter(item => !(item.logo_URIs && coingeckoSymbols.includes(item.symbol.toLowerCase())) && item.symbol);
     assetsAll.value = [...assetsSupported, ...assetsUnSupported];
-    assetsSearch.value = [...assetsSupported, ...assetsUnSupported].filter(item => item.symbol);
+    assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
     
     const ids = assetsSupported.map((item: any) => item?.id);
 

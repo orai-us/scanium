@@ -40,12 +40,13 @@ const query = gql`
     `;
 
 const variables = computed(() => {
+  const denom = props.denom?.includes("cw20:") ? props.denom.split("cw20:")[1] : props.denom;
   return {
     filter: {
       tokenTransfers: {
         some: {
           denom: {
-            equalTo: props.denom
+            equalTo: denom
           }
         }
       }

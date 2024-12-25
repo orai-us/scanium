@@ -56,6 +56,7 @@ export const convertNewAssetToToken = (
 
 export function formatNumber(number: string | number) {
   const result = Number(number);
+  if (result === 0) return 0;
   if (isNaN(result)) return "-";
   if (Math.abs(result) < 1) {
     return result.toLocaleString("en-US", {
