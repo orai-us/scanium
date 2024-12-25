@@ -17,6 +17,7 @@ import {
   SetGasLessContractsProposal,
   UnsetGasLessContractsProposal,
 } from '@/codegen/cosmwasm/wasm/v1/proposal';
+import ObjectMessageTxElement from './ObjectMessageTxElement.vue';
 
 const ExtendedRegistry = Object.fromEntries(
   [SetGasLessContractsProposal, UnsetGasLessContractsProposal].map((msg) => [
@@ -44,6 +45,8 @@ function selectObject(v: Object, direct?: string) {
       return NumberElement;
     case v instanceof Uint8Array:
       return UInt8Array;
+    case direct === 'messageTx':
+      return ObjectMessageTxElement;
     case Array.isArray(v):
       return ArrayElement;
     case v &&
