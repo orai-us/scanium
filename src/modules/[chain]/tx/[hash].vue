@@ -26,11 +26,14 @@ const tab = ref('msg');
 const messageOpens = ref([true] as Array<boolean>);
 const logOpens = ref([true] as Array<boolean>);
 
-if (props.hash) {
-  blockchain.rpc.getTx(props.hash).then((x) => {
-    tx.value = x;
-  });
-}
+watchEffect(() => {
+  if (props.hash) {
+    blockchain.rpc.getTx(props.hash).then((x) => {
+      tx.value = x;
+    });
+  }
+})
+
 const messages = computed(() => {
   return tx.value?.tx?.body?.messages.map((msg) => {
     const decodedValue = decodeProto(msg);
