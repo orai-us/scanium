@@ -75,13 +75,13 @@ function selected(route: any, nav: NavLink) {
 }
 function confirm() {
   errorMessage.value = '';
-  const key = searchQuery.value;
+  const key = searchQuery.value.toLowerCase();
   if (!key) {
     errorMessage.value = 'Please enter a value!';
     return;
   }
   const height = /^\d+$/;
-  const txhash = /^[A-Z\d]{64}$/;
+  const txhash = /^[a-z\d]{64}$/;
   const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
   const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
 
