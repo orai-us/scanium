@@ -36,17 +36,11 @@ const tipMsg = computed(() => {
 });
 
 watchEffect(() => {
-  const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
-  const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
   const key = props.contract;
-  if (addr.test(key)) {
-    urlContract.value = `/${props.chain}/account/${key}`;
-  } else if (contract.test(key)) {
-    wasmStore.wasmClient.getWasmContractInfo(key).then((x) => {
-      urlContract.value = `/${props.chain}/cosmwasm/${Number(x?.codeId)}/transactions/?contract=${key}`;
-      labelContracts.value = x?.label;
-    });
-  }
+  wasmStore.wasmClient.getWasmContractInfo(key).then((x) => {
+    urlContract.value = `/${props.chain}/cosmwasm/${Number(x?.codeId)}/transactions/?contract=${key}`;
+    labelContracts.value = x?.label;
+  });
 });
 
 </script>
@@ -59,7 +53,7 @@ watchEffect(() => {
       <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="contract"
         @click="copyWebsite(contract || '')" />
       <div>
-        <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
+        <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded-lg text-success"
           v-if="labelContracts">
           <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
           <button>{{ labelContracts }}</button>
