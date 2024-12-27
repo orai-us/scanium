@@ -7,7 +7,6 @@ import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
 import { useFormatter } from '@/stores';
-import { toBase64 } from '@cosmjs/encoding';
 
 const props = defineProps(['chain', 'height']);
 const format = useFormatter();
@@ -103,15 +102,16 @@ const { result: resultBlock } = useQuery(queryBlock, blockVariables);
 
 watchEffect(() => {
   if (resultBlock.value) {
+    console.log({ data: toRaw(resultBlock.value) })
     const blockDetail = resultBlock.value.blocks.results[0];
     blockInformation.value = {
-      'Time': format.toLocaleDate(new Date(Number(blockDetail.time))),
-      'Chain': blockDetail.chainId,
-      'Block Hash': blockDetail.id,
-      'Round': blockDetail.round,
-      'TX Counts': blockDetail.txCount,
-      'Proposer': blockDetail.proposerAddress,
-      'Gas Used / Wanted': `${aggregates.value.sum?.gasUsed}/${aggregates.value.sum?.gasWanted}`
+      'Time': format.toLocaleDate(new Date(Number(blockDetail?.time))),
+      'Chain': blockDetail?.chainId,
+      'Block Hash': blockDetail?.id,
+      'Round': blockDetail?.round,
+      'TX Counts': blockDetail?.txCount,
+      'Proposer': blockDetail?.proposerAddress,
+      'Gas Used / Wanted': `${aggregates.value?.sum?.gasUsed}/${aggregates.value?.sum?.gasWanted}`
     };
   }
 });
