@@ -27,6 +27,8 @@ const ExtendedRegistry = Object.fromEntries(
 );
 
 export function select(v: any, direct?: string) {
+  if(direct === 'messageTx')
+    return ObjectMessageTxElement;
   const type = typeof v;
   switch (type) {
     case 'object':
@@ -45,8 +47,6 @@ function selectObject(v: Object, direct?: string) {
       return NumberElement;
     case v instanceof Uint8Array:
       return UInt8Array;
-    case direct === 'messageTx':
-      return ObjectMessageTxElement;
     case Array.isArray(v):
       return ArrayElement;
     case v &&
