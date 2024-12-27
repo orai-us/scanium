@@ -8,10 +8,10 @@ const props = defineProps(["height", "chain"]);
     <h2 class="card-title flex flex-row justify-between text-white">
       <p class="">Block #{{ height }}</p>
       <div class="flex" v-if="props.height">
-        <RouterLink :to="`/${chain}/block/${height - 1}`" class="btn btn-primary btn-sm p-1 text-2xl mr-2">
+        <RouterLink :to="`/${chain}/block/${Number(height) - 1}`" class="btn btn-primary btn-sm p-1 text-2xl mr-2">
           <Icon icon="mdi-arrow-left" class="w-full h-full" />
         </RouterLink>
-        <RouterLink :to="`/${chain}/block/${height + 1}`" class="btn btn-primary btn-sm p-1 text-2xl">
+        <RouterLink :to="`/${chain}/block/${Number(height) + 1}`" class="btn btn-primary btn-sm p-1 text-2xl">
           <Icon icon="mdi-arrow-right" class="w-full h-full" />
         </RouterLink>
       </div>

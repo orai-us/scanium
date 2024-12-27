@@ -104,14 +104,13 @@ const { result: resultBlock } = useQuery(queryBlock, blockVariables);
 watchEffect(() => {
   if (resultBlock.value) {
     const blockDetail = resultBlock.value.blocks.results[0];
-    console.log({ resultBlock: toRaw(blockDetail) });
     blockInformation.value = {
       'Time': format.toLocaleDate(new Date(Number(blockDetail.time))),
       'Chain': blockDetail.chainId,
-      'Block Hash': toBase64(blockDetail.id),
+      'Block Hash': blockDetail.id,
       'Round': blockDetail.round,
       'TX Counts': blockDetail.txCount,
-      'Proposer': format.validator(blockDetail.proposerAddress && toBase64(blockDetail.proposerAddress)),
+      'Proposer': blockDetail.proposerAddress,
       'Gas Used / Wanted': `${aggregates.value.sum?.gasUsed}/${aggregates.value.sum?.gasWanted}`
     };
   }
