@@ -24,8 +24,8 @@ export const NEW_ASSETS = [
         exponent: 6,
       },
     ],
-    description: 'AI Agent - $BTC maxis. built on https://distilled.ai',
-    verify: true,
+    description:"AI Agent - $BTC maxis. built on https://distilled.ai",
+    verify: true
   },
   {
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/D7yP4ycfsRWUGYionGpi64sLF2ddZ2JXxuRAti2M7uck',
@@ -48,8 +48,7 @@ export const NEW_ASSETS = [
         exponent: 6,
       },
     ],
-    description:
-      'BlackRack is a hedge fund operated by an AI agent, managing 100,000 ORAI from the Oraichain DAO Treasury as its initial AUM (assets under management).',
+    description: 'BlackRack is a hedge fund operated by an AI agent, managing 100,000 ORAI from the Oraichain DAO Treasury as its initial AUM (assets under management).',
     verify: true,
   },
 ];
