@@ -37,10 +37,6 @@ watchEffect(() => {
   fetchName();
 });
 
-
-watchEffect(() => {
-  console.log({ tokens: toRaw(tokens.value) });
-});
 </script>
 <template>
   <div v-for="(token, key) in tokens" :key="key">

@@ -30,7 +30,6 @@ function allElementsSameType(arr: Array<any>) {
   if (arr.length === 0) return true;
   const stringStructure = Object.keys(arr[0]).toString();  
   return arr.every(element => { 
-    console.log({ key: Object.keys(element).toString() }) 
     return Object.keys(element).toString() === stringStructure; 
   });
 }
@@ -49,10 +48,6 @@ const isRenderJsonArray = computed(() => {
     }
   }
   return false;
-})
-
-watchEffect(()=>{
-  console.log({ value: toRaw(props.value) });
 })
 
 </script>

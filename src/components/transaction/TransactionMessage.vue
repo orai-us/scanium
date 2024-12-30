@@ -81,7 +81,7 @@ watchEffect(() => {
             <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="value.sender"
               @click="copyWebsite(value.sender || '')" />
             <div v-for="{ name, provider } in labelSenders">
-              <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
+              <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success"
                 :data-tip="provider" :title="provider">
                 <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
                 <button>{{ name }}</button>
