@@ -2,7 +2,7 @@
 import { wrapBinary } from '@/libs/utils';
 import { JsonViewer } from 'vue3-json-viewer';
 import { useBaseStore } from '@/stores';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, toRaw, watchEffect } from 'vue';
 import ArrayElement from './ArrayElement.vue';
 import TextElement from './TextElement.vue';
 import DynamicComponent from './DynamicComponent.vue';
@@ -28,10 +28,11 @@ function countNestedObjects(obj: any) {
 
 function allElementsSameType(arr: Array<any>) {
   if (arr.length === 0) return true;
-
-  const firstType = Object.prototype.toString.call(arr[0]);
-
-  return arr.every(element => Object.prototype.toString.call(element) === firstType);
+  const stringStructure = Object.keys(arr[0]).toString();  
+  return arr.every(element => { 
+    console.log({ key: Object.keys(element).toString() }) 
+    return Object.keys(element).toString() === stringStructure; 
+  });
 }
 
 watchEffect(() => {
@@ -50,31 +51,35 @@ const isRenderJsonArray = computed(() => {
   return false;
 })
 
+watchEffect(()=>{
+  console.log({ value: toRaw(props.value) });
+})
+
 </script>
 <template>
-  <div class="overflow-auto rounded-lg max-w-full border border-gray-800" v-if="Array.isArray(value)">
-    <div v-if="isRenderJsonArray && allElementsSameType(value)">
-      <JsonViewer :value="wrapBinary(value)" :theme="baseStore.theme" style="background: transparent; border: none"
-        copyable sort expand-depth="5" boxed />
+  <div>
+    <div v-if="Array.isArray(value)" class="overflow-auto rounded-lg max-w-full border border-gray-800">
+      <div v-if="allElementsSameType(value) && !isRenderJsonArray">
+        <DynamicComponent :value="value" />
+      </div>
+      <div v-else>
+        <JsonViewer :value="wrapBinary(value)" :theme="baseStore.theme" style="background: transparent; border: none"
+          copyable sort expand-depth="5" boxed />
+      </div>
+    </div>
+    <div v-else-if="typeof value === 'string' || typeof value === 'boolean'">
+      <TextElement :value="value" />
     </div>
     <div v-else>
-      <DynamicComponent :value="value" />
-    </div>
-
-  </div>
-  <div v-else-if="typeof value ==='string' || typeof value ==='boolean'">
-    <TextElement :value="value" />
-  </div>
-  <div class="overflow-auto rounded-lg w-full border border-gray-800" v-else>
-    <div v-if="countNest > 1">
-      <JsonViewer :value="wrapBinary(value)" :theme="baseStore.theme" style="background: transparent; border: none"
-        copyable sort expand-depth="5" boxed />
-    </div>
-    <div v-else>
-      <ArrayElement :value="[value]" />
+      <div v-if="countNest > 1" class="overflow-auto rounded-lg w-full border border-gray-800">
+        <JsonViewer :value="wrapBinary(value)" :theme="baseStore.theme" style="background: transparent; border: none"
+          copyable sort expand-depth="5" boxed />
+      </div>
+      <div v-else>
+        <ArrayElement :value="[value]" />
+      </div>
     </div>
   </div>
-
 </template>
 <style>
 .jv-container .jv-code.boxed {

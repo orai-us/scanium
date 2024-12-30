@@ -13,19 +13,16 @@ let exponent = ref(0);
 watchEffect(() => {
   async function fetchName() {
     const denom = props.value["denom"];
-    if (denom?.includes("/")) {
-      const assets = await getListAsset(route.params?.chain?.toString());
-      const asset = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
-      if (asset) {
-        const name = asset.display;
-        const denomUnits = asset.denom_units;
-        if (Array.isArray(denomUnits)) {
-          exponent.value = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
-        }
-        nameToken.value = name;
+    const assets = await getListAsset(route.params?.chain?.toString());
+    const asset = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
+    console.log({ asset });
+    if (asset) {
+      const name = asset.display;
+      const denomUnits = asset.denom_units;
+      if (Array.isArray(denomUnits)) {
+        exponent.value = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
       }
-    } else {
-      nameToken.value = denom;
+      nameToken.value = name;
     }
   }
   fetchName();
