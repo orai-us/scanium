@@ -15,7 +15,6 @@ watchEffect(() => {
     const denom = props.value["denom"];
     const assets = await getListAsset(route.params?.chain?.toString());
     const asset = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
-    console.log({ asset });
     if (asset) {
       const name = asset.display;
       const denomUnits = asset.denom_units;
