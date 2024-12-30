@@ -267,7 +267,7 @@ const changeLogOpen = (index: number) => {
 
 <style>
 .jv-container .jv-code.boxed {
-  max-height: fit-content;
+  max-height: fit-content !important;
   overflow-y: auto;
 }
 </style>

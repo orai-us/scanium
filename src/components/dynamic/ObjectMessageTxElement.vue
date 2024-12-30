@@ -78,7 +78,7 @@ const isRenderJsonArray = computed(() => {
 </template>
 <style>
 .jv-container .jv-code.boxed {
-  max-height: fit-content;
+  max-height: fit-content !important;
   overflow-y: auto;
   width: 1200px;
 }
