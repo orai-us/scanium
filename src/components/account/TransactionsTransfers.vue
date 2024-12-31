@@ -119,7 +119,7 @@ function handlePagination(page: number) {
             <td class="py-3">
               <span>{{ v.token }}</span>
             </td>
-            <td class="!break-normal">{{ v.timestamp || "-" }}</td>
+            <td class="!break-normal">{{ format.toDay(v.timestamp, 'from') || "-" }}</td>
           </tr>
         </tbody>
       </table>

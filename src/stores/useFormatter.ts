@@ -349,8 +349,8 @@ export const useFormatter = defineStore('formatter', {
           return {
             amount: 0,
             denom: `${denom.toLowerCase()}`,
-            amountDisplay: "0"
-          }
+            amountDisplay: '0',
+          };
         }
         if (amount < 0.01) {
           fmt = '0.[000000]';
@@ -481,6 +481,9 @@ export const useFormatter = defineStore('formatter', {
         return dayjs(timeValue).toNow();
       }
       return dayjs(timeValue).format('YYYY-MM-DD HH:mm:ss');
+    },
+    timestampFrom(time?: string | number | Date | Timestamp) {
+      return `${this.toDay(time, "from")} (${this.toLocaleDate(time)})`;
     },
     messages(msgs: { '@type'?: string; typeUrl?: string }[]) {
       if (msgs) {

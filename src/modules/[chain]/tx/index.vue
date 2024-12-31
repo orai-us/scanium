@@ -175,14 +175,10 @@ watch(transactions, (newTxs, oldTxs) => {
             </td>
             <td class="!break-normal">
               <span v-if="!!detailTxs[item.hash]?.txResponse?.timestamp">
-                {{ format.toLocaleDate(detailTxs[item.hash]?.txResponse?.timestamp) }} ({{
-                format.toDay(detailTxs[item.hash]?.txResponse?.timestamp, 'from')
-                }})
+                {{ format.toDay(detailTxs[item.hash]?.txResponse?.timestamp, 'from') }}
               </span>
               <span v-else-if="!!item.timestamp">
-                {{ format.toLocaleDate(Number(item.timestamp)) }} ({{
-                format.toDay(Number(item.timestamp), 'from')
-                }})
+                {{ format.toDay(Number(item.timestamp), 'from') }}
               </span>
               <span v-else>-</span>
             </td>
