@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, toRaw, watch } from 'vue';
-import { getInfoToken, getListAssetOnChainAndRegistry, getPriceByIds } from "@/service/assetsService";
+import { computed, onMounted, ref, watch } from 'vue';
+import { getListAssetOnChainAndRegistry, getPriceByIds } from "@/service/assetsService";
 import DetailAsset from "@/components/assets/DetailAsset.vue";
-import HolderAsset from "@/components/assets/HolderAsset.vue";
+import HolderAssetNativeToken from "@/components/assets/HolderAssetNativeToken.vue";
 import TransactionsAsset from "@/components/assets/TransactionsAsset.vue";
 import { RouterLink, useRoute } from "vue-router";
 import { LIST_COIN } from '@/constants';
 import { useBlockchain } from '@/stores';
+import HolderAssetCw20 from '@/components/assets/HolderAssetCw20.vue';
 
 enum SECTOR {
   TRANSACTIONS = 'transactions',
@@ -42,9 +43,9 @@ watch([() => props.denom, () => assets.value], async () => {
     // const res = await getInfoToken({ ids: id });
     const res = await getPriceByIds({ ids: id });
     const infoToken = {
-      id, 
+      id,
       current_price: res[id]?.usd
-    }
+    };
     asset.value = { ...infoToken, ...info };
     // // console.log({ res, res1 })
     // if (Array.isArray(infoToken))
@@ -77,7 +78,12 @@ watch([() => props.denom, () => assets.value], async () => {
         <TransactionsAsset :denom="denom" :chain="chain" />
       </div>
       <div v-show="sector === SECTOR.HOLDERS">
-        <HolderAsset :denom="denom" :chain="chain" :currentPrice="asset.current_price" />
+        <div v-if="denom.includes('cw20:')">
+          <HolderAssetCw20 :denom="denom" :chain="chain" :currentPrice="asset.current_price" />
+        </div>
+        <div v-else>
+          <HolderAssetNativeToken :denom="denom" :chain="chain" :currentPrice="asset.current_price" />
+        </div>
       </div>
     </div>
   </div>

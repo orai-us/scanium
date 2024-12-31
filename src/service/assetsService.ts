@@ -15,8 +15,17 @@ const baseLcdOraiBank = 'https://lcd.orai.io/cosmos/bank';
 const baseCosmwasm = 'https://lcd.orai.io/cosmwasm/wasm';
 const multiCallContractAddress =
   'orai1q7x644gmf7h8u8y6y8t9z9nnwl8djkmspypr6mxavsk9ual7dj0sxpmgwd';
+const baseURLScanium = 'https://api-services.scanium.io';
+const urlBalancesCw20 = 'v1/balance';
 export interface ParamsSimplePrice {
   ids: string;
+}
+
+export interface ParamsHolderAssetsCw20 {
+  page: number;
+  limit: number;
+  cw20Address: string;
+  address: string
 }
 const simplePrice = '/simple/price';
 const coinsMarket = '/coins/markets';
@@ -157,7 +166,7 @@ export const getListAssetOnChainAndRegistry = async (endpointAddress: string, ch
   }
 };
 
-export const getListHolderAssets = async (pagination: any, denom: string, endpointAddress: string) => {
+export const getHolderAssetsNativeToken = async (pagination: any, denom: string, endpointAddress: string) => {
   try {
     const { offset, limit } = pagination;
     const cometClient = await Tendermint37Client.connect(endpointAddress);
@@ -183,4 +192,19 @@ export const getListHolderAssets = async (pagination: any, denom: string, endpoi
     console.log({ error });
     return { denomOwners: [], pagination: { total: 0 } };
   }
+};
+
+export const getHolderAssetsCw20 = async (params: ParamsHolderAssetsCw20) => {
+  const config = {
+    baseURL: baseURLScanium,
+    url: `${urlBalancesCw20}/${params.cw20Address}`,
+    method: METHODS.GET,
+    params: {
+      page: params.page,
+      limit: params.limit,
+      address: params.address,
+    },
+  };
+  const res = await api.request(config);
+  return res?.data;
 };
