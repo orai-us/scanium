@@ -25,6 +25,7 @@ export interface ParamsHolderAssetsCw20 {
   page: number;
   limit: number;
   cw20Address: string;
+  address: string
 }
 const simplePrice = '/simple/price';
 const coinsMarket = '/coins/markets';
@@ -201,6 +202,7 @@ export const getHolderAssetsCw20 = async (params: ParamsHolderAssetsCw20) => {
     params: {
       page: params.page,
       limit: params.limit,
+      address: params.address,
     },
   };
   const res = await api.request(config);
