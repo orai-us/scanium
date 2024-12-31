@@ -9,7 +9,7 @@ const vueRouters = useRouter();
 const wasmStore = useWasmStore();
 const labelContracts = ref(null as any);
 const urlContract = ref("");
-let showCopyToast = ref(0);
+let showCopyToast = ref(null as any);
 
 const copyWebsite = async (url: string) => {
   if (!url) {
@@ -17,20 +17,20 @@ const copyWebsite = async (url: string) => {
   }
   try {
     await navigator.clipboard.writeText(url);
-    showCopyToast.value = 1;
+    showCopyToast.value = true;
     setTimeout(() => {
-      showCopyToast.value = 0;
+      showCopyToast.value = null;
     }, 1000);
   } catch (err) {
-    showCopyToast.value = 2;
+    showCopyToast.value = false;
     setTimeout(() => {
-      showCopyToast.value = 0;
+      showCopyToast.value = null;
     }, 1000);
   }
 };
 
 const tipMsg = computed(() => {
-  return showCopyToast.value === 2
+  return showCopyToast.value === false
     ? { class: 'error', msg: 'Copy Error!' }
     : { class: 'success', msg: 'Copy Success!' };
 });
@@ -61,14 +61,14 @@ watchEffect(() => {
       </div>
     </div>
 
-    <div class="toast" v-show="showCopyToast === 1">
+    <div class="toast" v-show="showCopyToast === true">
       <div class="alert alert-success">
         <div class="text-xs md:!text-sm">
           <span>{{ tipMsg.msg }}</span>
         </div>
       </div>
     </div>
-    <div class="toast" v-show="showCopyToast === 2">
+    <div class="toast" v-show="showCopyToast === false">
       <div class="alert alert-error">
         <div class="text-xs md:!text-sm">
           <span>{{ tipMsg.msg }}</span>
