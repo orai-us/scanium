@@ -64,7 +64,6 @@ watchEffect(() => {
   });
 });
 
-
 </script>
 <template>
   <div>

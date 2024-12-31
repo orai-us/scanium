@@ -90,7 +90,6 @@ export function displayPoolName(poolKey: any) {
   if (typeof poolKey === 'string') {
     tmpPoolKey = parsePoolKey(poolKey);
   }
-  console.log({displayPoolName: tmpPoolKey})
   return `${tokenMap[tmpPoolKey.token_x].coinDenom}-${
     tokenMap[tmpPoolKey.token_y].coinDenom
   } ${toDecimal(tmpPoolKey.fee_tier.fee, 10)}%`;
@@ -110,7 +109,6 @@ export function displayTickPrice(tick: number, poolKey: any) {
   if(typeof poolKey === "string"){
     tmpPoolKey = parsePoolKey(poolKey);
   }
-  console.log({ tmpPoolKey });
   const tokenX = tokenMap[tmpPoolKey.token_x];
   const tokenY = tokenMap[tmpPoolKey.token_y];
 
