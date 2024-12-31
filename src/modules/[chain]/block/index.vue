@@ -132,7 +132,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
                   </span>
                 </td>
                 <td class="truncate text-right">
-                  <span class="rounded text-xs whitespace-nowrap font-normal text-[#83838A] text-right">
+                  <span class="rounded text-xs whitespace-nowrap font-normal text-white text-right">
                     {{
                       format.toDay(item.block?.header?.time.toString(), 'from')
                     }}

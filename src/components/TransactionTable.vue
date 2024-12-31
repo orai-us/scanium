@@ -23,7 +23,7 @@ watchEffect(() => {
           message: formatTitle(message),
           height: item.blockNumber,
           fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
-          timestamp: format.toLocaleDate(new Date(Number(item.timestamp))),
+          timestamp: format.toDay(new Date(Number(item.timestamp)), 'from'),
           state: item.state
         }
       });

@@ -134,9 +134,7 @@ const changeLogOpen = (index: number) => {
             <tr>
               <td>{{ $t('account.time') }}</td>
               <td>
-                {{ format.toLocaleDate(tx.txResponse.timestamp) }} ({{
-                  format.toDay(tx.txResponse.timestamp, 'from')
-                }})
+                {{ format.timestampFrom(tx.txResponse.timestamp) }}
               </td>
             </tr>
             <tr>
