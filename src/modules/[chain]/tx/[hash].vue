@@ -242,7 +242,7 @@ const changeLogOpen = (index: number) => {
         </div>
       </div>
 
-      <div v-show="tab === 'json'">
+      <div v-if="tab === 'json'">
         <div
           v-if="tx?.txResponse"
           class="bg-base-100 px-4 pt-3 pb-4 rounded shadow"
@@ -265,7 +265,7 @@ const changeLogOpen = (index: number) => {
 
 <style>
 .jv-container .jv-code.boxed {
-  max-height: fit-content;
+  max-height: fit-content !important;
   overflow-y: auto;
 }
 </style>

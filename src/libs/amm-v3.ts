@@ -18,6 +18,7 @@ export enum DENOM {
   PEPE = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/extPEPE',
   DOGE = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/DogeBNB',
   WSOL = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraib0x4VH72cCsNwZwLtHtBnXuCxHWf4mB',
+  orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml = 'orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml' //tx af3e3ee18e40502117a164a87491ca1ced224505e2f0a32b7d3982b7b0d0e5f7
   // IBC_INJ = 'ibc/49D820DFDE9F885D7081725A58202ABA2F465CAEE4AFBC683DFB79A8E013E83E',
   // BEP20 KWT= 'ibc/4F7464EEE736CCFB6B444EB72DE60B3B43C0DD509FFA2B87E05D584467AAE8C8';
   // KWT= 'orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5';
@@ -48,6 +49,7 @@ export const tokenMap = {
   [DENOM.PEPE as string]: { coinDenom: 'PEPE', coinDecimals: 6 },
   [DENOM.DOGE as string]: { coinDenom: 'PEPE', coinDecimals: 8 },
   [DENOM.WSOL as string]: { coinDenom: 'TON', coinDecimals: 9 },
+  [DENOM.orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml as string]: { coinDenom: 'orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml', coinDecimals: 6 },
 };
 
 export const contractAddress = 'orai10s0c75gw5y5eftms5ncfknw6lzmx0dyhedn75uz793m8zwz4g8zq4d9x9a';
@@ -101,9 +103,12 @@ export function tickToDecimalPrice(
   return 1.0001 ** tick * 10 ** (decimalX - decimalY);
 }
 
-export function displayTickPrice(tick: number, poolKey: string) {
+export function displayTickPrice(tick: number, poolKey: any) {
   if (tick === undefined) return '';
-  const tmpPoolKey = parsePoolKey(poolKey);
+  let tmpPoolKey = poolKey; //tx: 690bd1d70861fc1856476975718bcf466a13c299b6ca87bae34e5cfa08616dd6
+  if(typeof poolKey === "string"){
+    tmpPoolKey = parsePoolKey(poolKey);
+  }
   const tokenX = tokenMap[tmpPoolKey.token_x];
   const tokenY = tokenMap[tmpPoolKey.token_y];
 
