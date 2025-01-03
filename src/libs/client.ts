@@ -733,8 +733,13 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   }
   async getAuthAccount(address: string) {
     // return this.request(this.registry.auth_account_address, { address });
-    const res = await this.queryClient.auth.account(address);
-    return res;
+    try {
+      const res = await this.queryClient.auth.account(address);
+      return res;
+    } catch (error) {
+      console.log({ error });
+      return { value: null };
+    }
   }
   // Bank Module
   async getBankParams() {
@@ -1433,7 +1438,7 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
           block = await this.tmClient.block(tmRes.height);
         } catch (error) {
           console.log({ error });
-          block = { block: { header: { time: '' } } }
+          block = { block: { header: { time: '' } } };
         }
         return {
           tx,
