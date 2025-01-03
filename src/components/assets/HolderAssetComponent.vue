@@ -28,7 +28,7 @@ const handleSearch = (event: any) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(owner, index) in owners" :key="index">
+          <tr v-for="(owner, index) in owners" :key="owner.address">
             <td>
               <RouterLink :to="`/${chain}/account/${owner.address}`" class="text-primary dark:text-link">
                 {{ owner.address }}
