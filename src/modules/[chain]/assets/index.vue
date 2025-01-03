@@ -120,7 +120,7 @@ watch(searchQuery,()=>{
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(v, index) in assets" :key="index" class="cursor-pointer"
+        <tr v-for="(v, index) in assets" :key="v.base" class="cursor-pointer"
           @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}`)">
           <td>
             <div class="flex flex-row items-center gap-3">

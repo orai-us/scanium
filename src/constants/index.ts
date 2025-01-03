@@ -35,7 +35,7 @@ export const NEW_ASSETS = [
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmVRPsBSHpamDzcDzVL9wsbB9gr4frtNrrFF7g44Xa9FuS',
     },
-    coingecko_id: 'black-rack',
+    coingecko_id: 'blackrack',
     exponent: '6',
     denom_units: [
       {
