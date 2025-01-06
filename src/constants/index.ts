@@ -51,6 +51,30 @@ export const NEW_ASSETS = [
     description: 'BlackRack is a hedge fund operated by an AI agent, managing 100,000 ORAI from the Oraichain DAO Treasury as its initial AUM (assets under management).',
     verify: true,
   },
+  {
+    name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
+    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
+    display: 'gnrt', // Not used to display on assets and messages
+    symbol: 'GNRT',
+    logo_URIs: {
+      svg: 'https://ipfs.io/ipfs/QmNu1YU842i2imMX9bTV5kFK8ndUpUwxHD9ipRRXoBakD6',
+    },
+    coingecko_id: 'GNRT',
+    exponent: '6',
+    denom_units: [
+      {
+        denom:
+          'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
+        exponent: 0,
+      },
+      {
+        denom: 'gnrt',
+        exponent: 6,
+      },
+    ],
+    description: '$GNRT is an AI Agent built to revolutionize degen culture, providing the safest and fairest token launch mechanism available via agents.land . Community members can request token creation via X and the AI Agent will launch the most hype ideas spontaneously and without human intervention.',
+    verify: true,
+  },
 ];
 
 // id: symbol

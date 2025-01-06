@@ -81,7 +81,9 @@ const copyWebsite = async (url: string) => {
       </div> -->
       <div class="flex flex-row">
         <div class="w-[200px]">Description</div>
-        <span class="text-white">{{ asset.description }}</span>
+        <div class="w-[80%]">
+          <span class="text-white">{{ asset.description }}</span>
+        </div>
       </div>
       <div class="flex flex-row">
         <div class="w-[200px]">Denom</div>

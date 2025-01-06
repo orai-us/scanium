@@ -54,6 +54,13 @@
       "exponent": "6",
       "coingecko_id": "black-rack",
       "logo": "https://ipfs.io/ipfs/QmVRPsBSHpamDzcDzVL9wsbB9gr4frtNrrFF7g44Xa9FuS"
+    },
+    {
+      "base": "factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9",
+      "symbol": "GNRT",
+      "exponent": "6",
+      "coingecko_id": "gnrt",
+      "logo": "https://ipfs.io/ipfs/QmNu1YU842i2imMX9bTV5kFK8ndUpUwxHD9ipRRXoBakD6"
     }
   ]
 }
