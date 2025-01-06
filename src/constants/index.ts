@@ -68,7 +68,7 @@ export const NEW_ASSETS = [
         exponent: 0,
       },
       {
-        denom: 'gnrt',
+        denom: 'GNRT',
         exponent: 6,
       },
     ],
