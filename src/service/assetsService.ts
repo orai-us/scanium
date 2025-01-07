@@ -134,6 +134,37 @@ export const getListAsset = async (chain: string) => {
   }
 };
 
+export const normalizeAssets = async (chain: string) => {
+  try {
+    const config = {
+      baseURL: 'https://registry.ping.pub',
+      url: `${chain.toLowerCase()}/assetlist.json`,
+      method: METHODS.GET,
+    };
+    const res = await api.request(config);
+    let assets = res.data.assets
+    if (chain.toLowerCase() === 'oraichain') assets = [...assets, ...NEW_ASSETS];
+    const result = assets.map((asset: any) => {
+      const denomUnits = asset.denom_units;
+      const logoURIs = asset.logo_URIs;
+      return {
+        name: asset.base,
+        base: asset.base,
+        display: assets.symbol,
+        symbol: asset.symbol,
+        logo_URIs: logoURIs,
+        exponent: denomUnits?.slice(-1)[0].exponent || 6,
+        coingecko_id: asset.coingecko_id,
+        denom_units: denomUnits,
+      };
+    });
+    return result;
+  } catch (error) {
+    console.log({ error });
+    return NEW_ASSETS;
+  }
+};
+
 export const getListAssetOnChainAndRegistry = async (endpointAddress: string, chain: string) => {
   try {
     const cometClient = await Tendermint37Client.connect(endpointAddress);
