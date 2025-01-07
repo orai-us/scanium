@@ -44,6 +44,22 @@ const onClickHandler = (page: number) => {
 .active-page:hover {
   background-color: #c2dee412;
 }
+
+@media (max-width: 768px) {
+  .pagination-container {
+    display: flex;
+    column-gap: 4px;
+  }
+  .paginate-buttons {
+    height: 30px;
+    width: 30px;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: rgb(20, 17, 17);
+    border: 1px solid rgb(84, 83, 83);
+    color: rgb(167, 165, 165);
+  }
+}
 </style>
 
 <script lang="ts">
