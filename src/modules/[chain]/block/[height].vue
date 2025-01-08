@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, toRaw, watch } from 'vue';
 import { Icon } from '@iconify/vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useBaseStore, useFormatter } from '@/stores';
@@ -9,36 +9,30 @@ import { toBase64 } from '@cosmjs/encoding';
 import TransactionBlockIndexs from '@/components/blocks/TransactionBlockIndexs.vue';
 import TransactionBlockRpc from '@/components/blocks/TransactionBlockRpc.vue';
 import { CHAIN_INDEXS } from '@/constants';
+import BlogService from '@/service/blogService';
 
 const props = defineProps(['height', 'chain']);
 
 const store = useBaseStore();
 const format = useFormatter();
-const current = ref({} as BlockResponse);
+// const current = ref({} as BlockResponse);
+const current = ref({} as any);
+const sumAggregates = ref(null as any);
 const target = ref(Number(props.height || 0));
 const blockInformation = ref();
 const height = computed(() => {
   return Number(current.value.block?.header?.height || props.height || 0);
 });
 
-const commit = computed(() => {
-  const lastCommit = current.value.block?.lastCommit;
-  if (lastCommit) {
-    Object.assign(lastCommit, {
-      signatures: lastCommit.signatures.filter((c) => c.signature),
-    });
-  }
-  return lastCommit;
-});
-
 const isFutureBlock = computed({
-  get: () => {
+  get: async () => {
     const latest = store.latest?.block?.header.height;
     const isFuture = latest ? target.value > Number(latest) : true;
-    if (!isFuture && !current.value.blockId)
-      store.fetchBlock(target.value).then((x) => {
-        current.value = x;
-      });
+    if (!isFuture && !current.value.blockId) {
+      current.value = await BlogService.getBlockDetail(props.chain, target.value)
+      sumAggregates.value = await BlogService.getAggregates(props.chain, target.value);
+    }
+
     return isFuture;
   },
   set: (val) => {
@@ -63,24 +57,47 @@ const estimateDate = computed(() => {
 
 watch((current), () => {
   const block = current.value?.block;
-  const blockId = current.value?.blockId;
-  const headerBlock = block?.header;
-  const lastCommit = block?.lastCommit;
-  const time = headerBlock?.time;
-  const chainId = headerBlock?.chainId;
-  const blockHash = toBase64(blockId?.hash);
-  const round = lastCommit?.round;
-  const txCount = block?.txs?.length;
-  const proposerAddress = headerBlock?.proposerAddress;
-  const proposer = format.validator(proposerAddress && toBase64(proposerAddress))
-  blockInformation.value = {
-    'Time': format.toLocaleDate(time.toString()),
-    'Chain': chainId,
-    'Block Hash': blockHash,
-    'Round': round,
-    'TX Counts': txCount,
-    'Proposer': proposer
+  if (block) {
+    const blockId = current.value?.blockId;
+    const headerBlock = block?.header;
+    const lastCommit = block?.lastCommit;
+    const time = headerBlock?.time;
+    const chainId = headerBlock?.chainId;
+    const blockHash = toBase64(blockId?.hash);
+    const round = lastCommit?.round;
+    const txCount = block?.txs?.length;
+    const proposerAddress = headerBlock?.proposerAddress;
+    const proposer = format.validator(proposerAddress && toBase64(proposerAddress));
+    blockInformation.value = {
+      'Time': format.toLocaleDate(time.toString()) || "-",
+      'Chain': chainId || "-",
+      'Block Hash': blockHash || "-",
+      'Round': round || "-",
+      'TX Counts': txCount || "-",
+      'Proposer': proposer || "-",
+    };
+  } else {
+    const block = current.value;
+    blockInformation.value = {
+      'Time': format.toLocaleDate(block.time.toString()) || "-",
+      'Chain': block.chainId || "-",
+      'Block Hash': block.id || "-",
+      'Round': block.round || "-",
+      'TX Counts': block.txCount || "-",
+      'Proposer': block?.proposerAddress || "-",
+    };
   }
+})
+
+watch((sumAggregates), () => {
+  const blockInfo = blockInformation.value;
+  if (sumAggregates) {
+    blockInformation.value = { ...blockInfo, 'Gas Used / Wanted': `${sumAggregates.value?.gasUsed}/${sumAggregates.value?.gasWanted}` };
+  }
+  else {
+    blockInformation.value = { ...blockInfo, 'Gas Used / Wanted': "-" };
+  }
+  console.log({ blockInformation: toRaw(blockInformation.value) });
 })
 
 const edit = ref(false);
@@ -92,9 +109,8 @@ function updateTarget() {
 
 onBeforeRouteUpdate(async (to, from, next) => {
   if (from.path !== to.path) {
-    store.fetchBlock(String(to.params.height)).then((x) => {
-      current.value = x;
-    });
+    current.value = await BlogService.getBlockDetail(props.chain, target.value)
+    sumAggregates.value = await BlogService.getAggregates(props.chain, target.value);
     next();
   }
 });
