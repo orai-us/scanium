@@ -30,8 +30,8 @@ export const NEW_ASSETS = [
   {
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/D7yP4ycfsRWUGYionGpi64sLF2ddZ2JXxuRAti2M7uck',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/D7yP4ycfsRWUGYionGpi64sLF2ddZ2JXxuRAti2M7uck',
-    display: 'racks', // Not used to display on assets and messages
-    symbol: 'RACKS',
+    display: 'rack', // Not used to display on assets and messages
+    symbol: 'RACK',
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmVRPsBSHpamDzcDzVL9wsbB9gr4frtNrrFF7g44Xa9FuS',
     },
