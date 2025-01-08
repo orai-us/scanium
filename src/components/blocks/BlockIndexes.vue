@@ -102,7 +102,6 @@ const { result: resultBlock } = useQuery(queryBlock, blockVariables);
 
 watchEffect(() => {
   if (resultBlock.value) {
-    console.log({ data: toRaw(resultBlock.value) })
     const blockDetail = resultBlock.value.blocks.results[0];
     blockInformation.value = {
       'Time': format.toLocaleDate(new Date(Number(blockDetail?.time))),
