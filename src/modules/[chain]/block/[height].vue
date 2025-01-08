@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, toRaw, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { Icon } from '@iconify/vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useBaseStore, useFormatter } from '@/stores';
@@ -25,20 +25,20 @@ const height = computed(() => {
 });
 
 const isFutureBlock = computed({
-  get: async () => {
+  get: () => {
     const latest = store.latest?.block?.header.height;
     const isFuture = latest ? target.value > Number(latest) : true;
-    if (!isFuture && !current.value.blockId) {
-      current.value = await BlogService.getBlockDetail(props.chain, target.value)
-      sumAggregates.value = await BlogService.getAggregates(props.chain, target.value);
-    }
-
     return isFuture;
   },
   set: (val) => {
     console.log(val);
   },
 });
+
+watchEffect(async () => {
+  current.value = await BlogService.getBlockDetail(props.chain, props.height);
+  sumAggregates.value = await BlogService.getAggregates(props.chain, props.height);
+})
 
 const remainingBlocks = computed(() => {
   const latest = store.latest?.block?.header.height;
@@ -69,35 +69,32 @@ watch((current), () => {
     const proposerAddress = headerBlock?.proposerAddress;
     const proposer = format.validator(proposerAddress && toBase64(proposerAddress));
     blockInformation.value = {
-      'Time': format.toLocaleDate(time.toString()) || "-",
-      'Chain': chainId || "-",
-      'Block Hash': blockHash || "-",
-      'Round': round || "-",
-      'TX Counts': txCount || "-",
-      'Proposer': proposer || "-",
+      'Time': format.toLocaleDate(time.toString()),
+      'Chain': chainId,
+      'Block Hash': blockHash,
+      'Round': round,
+      'TX Counts': txCount,
+      'Proposer': proposer,
+      'Gas Used / Wanted': "-" 
     };
   } else {
     const block = current.value;
     blockInformation.value = {
-      'Time': format.toLocaleDate(block.time.toString()) || "-",
-      'Chain': block.chainId || "-",
-      'Block Hash': block.id || "-",
-      'Round': block.round || "-",
-      'TX Counts': block.txCount || "-",
-      'Proposer': block?.proposerAddress || "-",
+      'Time': format.toLocaleDate(parseInt(block.time)),
+      'Chain': block.chainId,
+      'Block Hash': block.id,
+      'Round': block.round,
+      'TX Counts': block.txCount,
+      'Proposer': block?.proposerAddress,
+      'Gas Used / Wanted': "-" 
     };
   }
 })
 
 watch((sumAggregates), () => {
   const blockInfo = blockInformation.value;
-  if (sumAggregates) {
-    blockInformation.value = { ...blockInfo, 'Gas Used / Wanted': `${sumAggregates.value?.gasUsed}/${sumAggregates.value?.gasWanted}` };
-  }
-  else {
-    blockInformation.value = { ...blockInfo, 'Gas Used / Wanted': "-" };
-  }
-  console.log({ blockInformation: toRaw(blockInformation.value) });
+  if (sumAggregates.value)
+    blockInformation.value = { ...blockInfo, 'Gas Used / Wanted': `${sumAggregates.value.gasUsed}/${sumAggregates.value.gasWanted}` };
 })
 
 const edit = ref(false);
@@ -107,13 +104,14 @@ function updateTarget() {
   console.log(target.value);
 }
 
-onBeforeRouteUpdate(async (to, from, next) => {
-  if (from.path !== to.path) {
-    current.value = await BlogService.getBlockDetail(props.chain, target.value)
-    sumAggregates.value = await BlogService.getAggregates(props.chain, target.value);
-    next();
-  }
-});
+// onBeforeRouteUpdate(async (to, from, next) => {
+//   if (from.path !== to.path) {
+//     debugger
+//     current.value = await BlogService.getBlockDetail(props.chain, target.value)
+//     sumAggregates.value = await BlogService.getAggregates(props.chain, target.value);
+//     next();
+//   }
+// });
 </script>
 <template>
   <div>
@@ -177,7 +175,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
     <div v-else>
       <div class="box-content">
         <h2 class="card-title flex flex-row justify-between text-white">
-          <p class="">Block #{{ current.block?.header?.height }}</p>
+          <p class="">Block #{{ height }}</p>
           <div class="flex" v-if="props.height">
             <RouterLink :to="`/${store.blockchain.chainName}/block/${height - 1}`"
               class="btn btn-primary btn-sm p-1 text-2xl mr-2">

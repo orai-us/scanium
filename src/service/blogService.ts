@@ -71,7 +71,6 @@ class BlogService {
 
       const { data } = await this.apolloClient.query({ query, variables });
       const result = data?.transactions?.aggregates?.sum;
-      console.log({ result });
       return result;
     }
     return null;
