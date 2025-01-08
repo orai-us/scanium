@@ -214,7 +214,6 @@ export function assetFromDirectory(source: any, chainName: string): Asset[] {
   }));
   if (chainName === 'Oraichain') {
     assets = [...assets, ...NEW_ASSETS];
-    console.log({ assets });
   }
   return assets;
 }
