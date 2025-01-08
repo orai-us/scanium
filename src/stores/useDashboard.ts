@@ -151,21 +151,23 @@ export function fromLocal(lc: LocalConfig, chainName: string): ChainConfig {
     exponent: x.exponent,
     denom_units: [
       { denom: x.base, exponent: 0 },
-      { denom: x.symbol.toLowerCase(), exponent: Number(x.exponent) },
+      { denom: x.symbol, exponent: Number(x.exponent) },
     ],
   }));
   if (chainName.toLowerCase() === 'oraichain') {
-    const newAssets = NEW_ASSETS.map((item) => ({
-      name: item.base,
-      base: item.base,
-      display: item.symbol,
-      symbol: item.symbol,
-      logo_URIs: item.logo_URIs,
-      coingecko_id: item.coingecko_id,
-      exponent: item.exponent,
-      denom_units: item.denom_units,
-    }));
-    assets = [...assets, ...newAssets];
+    for (let item of NEW_ASSETS) {
+      const asset = {
+        name: item.base,
+        base: item.base,
+        display: item.symbol,
+        symbol: item.symbol,
+        logo_URIs: item.logo_URIs,
+        coingecko_id: item.coingecko_id,
+        exponent: item.exponent,
+        denom_units: item.denom_units,
+      };
+      assets.push(asset);
+    }
   }
   conf.assets = assets;
   conf.cosmwasmEnabled = lc.cosmwasm_enabled ?? false;
@@ -350,18 +352,22 @@ export const useDashboard = defineStore('dashboard', {
       });
     },
     async loadingAssetsFromRegistry() {
-      get(this.source).then((res) => {
-        res.chains.forEach((x: DirectoryChain) => {
-          let chainName = x?.chain_name;
-          if (chainName === 'oraichain') chainName = 'Oraichain';
-          if (this.chains[chainName]) {
-            this.chains[chainName].assets = [
-              ...this.chains[chainName].assets,
-              ...assetFromDirectory(x),
-            ];
-          }
+      if (this.status === LoadingStatus.Empty) {
+        this.status = LoadingStatus.Loading;
+        get(this.source).then((res) => {
+          res.chains.forEach((x: DirectoryChain) => {
+            let chainName = x?.chain_name;
+            if (chainName === 'oraichain') chainName = 'Oraichain';
+            if (this.chains[chainName]) {
+              this.chains[chainName].assets = [
+                ...this.chains[chainName].assets,
+                ...assetFromDirectory(x),
+              ];
+            }
+          });
+          this.status = LoadingStatus.Loaded;
         });
-      });
+      }
     },
     async loadingFromLocal() {
       if (window.location.hostname.search('testnet') > -1) {
@@ -376,7 +382,7 @@ export const useDashboard = defineStore('dashboard', {
       });
 
       this.setupDefault();
-      this.status = LoadingStatus.Loaded;
+      // this.status = LoadingStatus.Loaded;
     },
     async loadLocalConfig(network: NetworkType) {
       const config: Record<string, ChainConfig> = {};
