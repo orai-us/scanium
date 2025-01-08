@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
-import { toRaw } from 'vue';
 import { NEW_ASSETS } from '@/constants';
 
 export enum EndpointType {
@@ -140,9 +139,9 @@ function apiConverter(api: any[]) {
   });
 }
 
-export function fromLocal(lc: LocalConfig): ChainConfig {
+export function fromLocal(lc: LocalConfig, chainName: string): ChainConfig {
   const conf = {} as ChainConfig;
-  conf.assets = lc.assets.map((x) => ({
+  let assets = lc.assets.map((x) => ({
     name: x.base,
     base: x.base,
     display: x.symbol,
@@ -155,6 +154,20 @@ export function fromLocal(lc: LocalConfig): ChainConfig {
       { denom: x.symbol.toLowerCase(), exponent: Number(x.exponent) },
     ],
   }));
+  if (chainName.toLowerCase() === 'oraichain') {
+    const newAssets = NEW_ASSETS.map((item) => ({
+      name: item.base,
+      base: item.base,
+      display: item.symbol,
+      symbol: item.symbol,
+      logo_URIs: item.logo_URIs,
+      coingecko_id: item.coingecko_id,
+      exponent: item.exponent,
+      denom_units: item.denom_units,
+    }));
+    assets = [...assets, ...newAssets];
+  }
+  conf.assets = assets;
   conf.cosmwasmEnabled = lc.cosmwasm_enabled ?? false;
   conf.versions = {
     cosmosSdk: lc.sdk_version,
@@ -201,7 +214,7 @@ export function fromLocal(lc: LocalConfig): ChainConfig {
 //   return conf;
 // }
 
-export function assetFromDirectory(source: any, chainName: string): Asset[] {
+export function assetFromDirectory(source: any): Asset[] {
   let assets = source?.assets.map((x: any) => ({
     name: x.denom,
     base: x.denom,
@@ -212,9 +225,6 @@ export function assetFromDirectory(source: any, chainName: string): Asset[] {
     exponent: x.decimals,
     denom_units: x.denom_units,
   }));
-  if (chainName === 'Oraichain') {
-    assets = [...assets, ...NEW_ASSETS];
-  }
   return assets;
 }
 
@@ -345,7 +355,10 @@ export const useDashboard = defineStore('dashboard', {
           let chainName = x?.chain_name;
           if (chainName === 'oraichain') chainName = 'Oraichain';
           if (this.chains[chainName]) {
-            this.chains[chainName].assets = assetFromDirectory(x, chainName);
+            this.chains[chainName].assets = [
+              ...this.chains[chainName].assets,
+              ...assetFromDirectory(x),
+            ];
           }
         });
       });
@@ -359,7 +372,7 @@ export const useDashboard = defineStore('dashboard', {
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
       Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
-        this.chains[x.chain_name] = fromLocal(x);
+        this.chains[x.chain_name] = fromLocal(x, x.chain_name);
       });
 
       this.setupDefault();
@@ -372,7 +385,7 @@ export const useDashboard = defineStore('dashboard', {
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
       Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
-        config[x.chain_name] = fromLocal(x);
+        config[x.chain_name] = fromLocal(x, x.chain_name);
       });
       return config;
     },
