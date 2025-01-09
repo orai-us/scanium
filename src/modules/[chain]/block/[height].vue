@@ -9,7 +9,7 @@ import { toBase64 } from '@cosmjs/encoding';
 import TransactionBlockIndexs from '@/components/blocks/TransactionBlockIndexs.vue';
 import TransactionBlockRpc from '@/components/blocks/TransactionBlockRpc.vue';
 import { CHAIN_INDEXS } from '@/constants';
-import BlogService from '@/service/blogService';
+import BlocksService from '@/service/blocksService';
 
 const props = defineProps(['height', 'chain']);
 
@@ -36,7 +36,7 @@ const isFutureBlock = computed({
 });
 
 watchEffect(async () => {
-  const blockDetail = await BlogService.getBlockDetail(props.chain, props.height);
+  const blockDetail = await BlocksService.getBlockDetail(props.chain, props.height);
   current.value = blockDetail.blocks;  
   sumAggregates.value = blockDetail.sumAggregates;
 })

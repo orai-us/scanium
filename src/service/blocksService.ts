@@ -8,7 +8,7 @@ import {
   InMemoryCache,
 } from '@apollo/client/core';
 
-class BlogService {
+class BlocksService {
   store = useBaseStore();
   cache = new InMemoryCache();
   httpLink = createHttpLink({
@@ -69,4 +69,4 @@ class BlogService {
   };
 }
 
-export default new BlogService();
+export default new BlocksService();
