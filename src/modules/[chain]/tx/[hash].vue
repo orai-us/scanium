@@ -165,7 +165,7 @@ const changeLogOpen = (index: number) => {
     </div>
     <div class="border-t border-b border-base-200">
       <div
-        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
+        class="tabs tabs-boxed customTabV2 bg-transparent xl:mb-4 mb-0 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
       >
         <a
           class="tab text-gray-400 capitalize !pb-3"
@@ -190,7 +190,7 @@ const changeLogOpen = (index: number) => {
       <div v-if="tab === 'msg'">
         <div
           v-if="tx?.txResponse"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4"
+          class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 p-1 rounded mb-4"
         >
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
@@ -201,14 +201,14 @@ const changeLogOpen = (index: number) => {
               'collapse-close': !messageOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
-              <div class="flex justify-between p-5 collapse-title"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title xl:max-w-full max-w-96"
                 :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
-                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
+                <h5 class="xl:text-lg text-sm font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
               <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
                 <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
               </div>
-              <div class="collapse-content" v-else>
+              <div class="collapse-content xl:max-w-full max-w-96" v-else>
                 <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
                   :chain="chain" />
               </div>
@@ -229,7 +229,7 @@ const changeLogOpen = (index: number) => {
               'collapse-close': !logOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
-              <div class="flex justify-between p-5 collapse-title"
+              <div class="flex justify-between p-5 collapse-title max-w-screen"
                 :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
                 <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>

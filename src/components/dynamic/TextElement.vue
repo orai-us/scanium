@@ -89,7 +89,7 @@ const copyWebsite = async (url: string) => {
     class="md-editor-recover"
   ></MdEditor>
   <span v-else-if="isAddress()" class="flex items-center">
-    <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link">{{
+    <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link xl:text-sm text-[12px]">{{
       text
     }}</RouterLink>
     <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="text" @click="copyWebsite(text || '')" />
