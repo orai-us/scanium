@@ -36,8 +36,9 @@ const isFutureBlock = computed({
 });
 
 watchEffect(async () => {
-  current.value = await BlogService.getBlockDetail(props.chain, props.height);
-  sumAggregates.value = await BlogService.getAggregates(props.chain, props.height);
+  const blockDetail = await BlogService.getBlockDetail(props.chain, props.height);
+  current.value = blockDetail.blocks;  
+  sumAggregates.value = blockDetail.sumAggregates;
 })
 
 const remainingBlocks = computed(() => {

@@ -30,8 +30,8 @@ watchEffect(() => {
     } else {
       txs.value = props.transactions
     }
-  }else{
-    txs.value = []
+  } else {
+    txs.value = [];
   }
 })
 </script>

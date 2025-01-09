@@ -19,11 +19,11 @@ class BlogService {
     link: this.httpLink,
   });
 
-  getBlockDetail = async (chainName: string, height?: number | string) => {
+  getBlockDetail = async (chainName: string, height?: number | string): Promise<{blocks?: any, sumAggregates?: any}> => {
     if (CHAIN_INDEXS.includes(chainName)) {
       const query = gql`
-        query GetBlockDetail($filter: BlockFilter!, $first: Int!) {
-          blocks(filter: $filter, first: $first) {
+        query GetBlockDetail($filterBlock: BlockFilter!, $first: Int!, $filterTx: TransactionFilter! ) {
+          blocks(filter: $filterBlock, first: $first) {
             results: nodes {
               id
               chainId
@@ -34,28 +34,7 @@ class BlogService {
               nodeId
             }
           }
-        }
-      `;
-
-      const variables = {
-        filter: { height: { equalTo: height } },
-        first: 1,
-      };
-
-      const { data } = await this.apolloClient.query({ query, variables });
-      const result = data.blocks?.results[0];
-      if (result) return result;
-      else return await this.store.fetchBlock(height);
-    } else {
-      return await this.store.fetchBlock(height);
-    }
-  };
-
-  getAggregates = async (chainName: string, height?: number | string) => {
-    if (CHAIN_INDEXS.includes(chainName)) {
-      const query = gql`
-        query GetTransactions($filter: TransactionFilter!) {
-          transactions(filter: $filter) {
+          transactions(filter: $filterTx) {
             aggregates {
               sum {
                 gasUsed
@@ -65,15 +44,28 @@ class BlogService {
           }
         }
       `;
+
       const variables = {
-        filter: { blockNumber: { equalTo: height } },
+        filterBlock: { height: { equalTo: height } },
+        first: 1,
+        filterTx: { blockNumber: { equalTo: height } },
       };
 
       const { data } = await this.apolloClient.query({ query, variables });
-      const result = data?.transactions?.aggregates?.sum;
-      return result;
+      const blocks = data.blocks?.results[0];
+      const sumAggregates = data.transactions?.aggregates?.sum;
+      if (blocks) return {
+        blocks, 
+        sumAggregates
+      }
+      else return {
+        blocks: await this.store.fetchBlock(height),
+      }
+    } else {
+      return {
+        blocks: await this.store.fetchBlock(height),
+      }
     }
-    return null;
   };
 }
 
