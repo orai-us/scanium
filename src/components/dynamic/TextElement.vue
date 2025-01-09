@@ -104,8 +104,8 @@ const copyWebsite = async (url: string) => {
       </span>
     </div>
   </span>
-  <span v-else class="flex"
-    ><span class="break-words max-w-5xl">{{ text }}</span>
+  <div v-else class="flex">
+    <span class="break-words max-w-full xl:text-sm text-[12px]">{{ text }}</span>
     <span
       v-if="isConvertable"
       @click="toHexOutput = !toHexOutput"
@@ -126,7 +126,7 @@ const copyWebsite = async (url: string) => {
         />
       </svg>
     </span>
-  </span>
+  </div>
   <div class="toast" v-show="resultCopy === true">
     <div class="alert alert-success">
       <div class="text-xs md:!text-sm">
