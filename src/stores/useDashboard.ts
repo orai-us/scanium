@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
-import { normalizeAssets } from '@/service/assetsService';
+import { NEW_ASSETS } from '@/constants';
 
 export enum EndpointType {
   rpc,
@@ -139,22 +139,37 @@ function apiConverter(api: any[]) {
   });
 }
 
-export async function fromLocal(lc: LocalConfig): Promise<ChainConfig> {
+export function fromLocal(lc: LocalConfig, chainName: string): ChainConfig {
   const conf = {} as ChainConfig;
-  // conf.assets = lc.assets.map((x) => ({
-  //   name: x.base,
-  //   base: x.base,
-  //   display: x.symbol,
-  //   symbol: x.symbol,
-  //   logo_URIs: { svg: x.logo },
-  //   coingecko_id: x.coingecko_id,
-  //   exponent: x.exponent,
-  //   denom_units: [
-  //     { denom: x.base, exponent: 0 },
-  //     { denom: x.symbol.toLowerCase(), exponent: Number(x.exponent) },
-  //   ],
-  // }));
-  conf.assets = await normalizeAssets(lc.chain_name);
+  let assets = lc.assets.map((x) => ({
+    name: x.base,
+    base: x.base,
+    display: x.symbol,
+    symbol: x.symbol,
+    logo_URIs: { svg: x.logo },
+    coingecko_id: x.coingecko_id,
+    exponent: x.exponent,
+    denom_units: [
+      { denom: x.base, exponent: 0 },
+      { denom: x.symbol, exponent: Number(x.exponent) },
+    ],
+  }));
+  if (chainName.toLowerCase() === 'oraichain') {
+    for (let item of NEW_ASSETS) {
+      const asset = {
+        name: item.base,
+        base: item.base,
+        display: item.symbol,
+        symbol: item.symbol,
+        logo_URIs: item.logo_URIs,
+        coingecko_id: item.coingecko_id,
+        exponent: item.exponent,
+        denom_units: item.denom_units,
+      };
+      assets.push(asset);
+    }
+  }
+  conf.assets = assets;
   conf.cosmwasmEnabled = lc.cosmwasm_enabled ?? false;
   conf.versions = {
     cosmosSdk: lc.sdk_version,
@@ -182,23 +197,37 @@ export async function fromLocal(lc: LocalConfig): Promise<ChainConfig> {
   return conf;
 }
 
-export function fromDirectory(source: DirectoryChain): ChainConfig {
-  const conf = {} as ChainConfig;
-  conf.cosmwasmEnabled = source.cosmwasm_enabled ?? false;
+// export function fromDirectory(source: DirectoryChain): ChainConfig {
+//   const conf = {} as ChainConfig;
+//   conf.cosmwasmEnabled = source.cosmwasm_enabled ?? false;
 
-  (conf.assets = source.assets),
-    (conf.bech32Prefix = source.bech32_prefix),
-    (conf.chainId = source.chain_id),
-    (conf.chainName = source.chain_name),
-    (conf.prettyName = source.pretty_name),
-    (conf.versions = {
-      application: source.versions?.application_version || '',
-      cosmosSdk: source.versions?.cosmos_sdk_version || '',
-      tendermint: source.versions?.tendermint_version || '',
-    }),
-    (conf.logo = pathConvert(source.image));
-  conf.endpoints = source.best_apis;
-  return conf;
+//   (conf.assets = source.assets),
+//     (conf.bech32Prefix = source.bech32_prefix),
+//     (conf.chainId = source.chain_id),
+//     (conf.chainName = source.chain_name),
+//     (conf.prettyName = source.pretty_name),
+//     (conf.versions = {
+//       application: source.versions?.application_version || '',
+//       cosmosSdk: source.versions?.cosmos_sdk_version || '',
+//       tendermint: source.versions?.tendermint_version || '',
+//     }),
+//     (conf.logo = pathConvert(source.image));
+//   conf.endpoints = source.best_apis;
+//   return conf;
+// }
+
+export function assetFromDirectory(source: any): Asset[] {
+  let assets = source?.assets.map((x: any) => ({
+    name: x.denom,
+    base: x.denom,
+    display: x.symbol,
+    symbol: x.symbol,
+    logo_URIs: x.logo_URIs,
+    coingecko_id: x.coingecko_id,
+    exponent: x.decimals,
+    denom_units: x.denom_units,
+  }));
+  return assets;
 }
 
 function pathConvert(path: string | undefined) {
@@ -291,7 +320,7 @@ export const useDashboard = defineStore('dashboard', {
   actions: {
     async initial() {
       await this.loadingFromLocal();
-      // await this.loadingFromRegistry()
+      await this.loadingAssetsFromRegistry();
     },
     loadingPrices() {
       const coinIds = [] as string[];
@@ -322,12 +351,19 @@ export const useDashboard = defineStore('dashboard', {
         this.prices = x;
       });
     },
-    async loadingFromRegistry() {
+    async loadingAssetsFromRegistry() {
       if (this.status === LoadingStatus.Empty) {
         this.status = LoadingStatus.Loading;
         get(this.source).then((res) => {
           res.chains.forEach((x: DirectoryChain) => {
-            this.chains[x.chain_name] = fromDirectory(x);
+            let chainName = x?.chain_name;
+            if (chainName === 'oraichain') chainName = 'Oraichain';
+            if (this.chains[chainName]) {
+              this.chains[chainName].assets = [
+                ...this.chains[chainName].assets,
+                ...assetFromDirectory(x),
+              ];
+            }
           });
           this.status = LoadingStatus.Loaded;
         });
@@ -341,20 +377,12 @@ export const useDashboard = defineStore('dashboard', {
         this.networkType === NetworkType.Mainnet
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
-
-      const valuesSource = Object.values<LocalConfig>(source);
-      const infoChainPromises = [];
-      for (let item of valuesSource) {
-        infoChainPromises.push(fromLocal(item));
-      }
-
-      const infoChains = await Promise.all(infoChainPromises);
-      for (let item of infoChains) {
-        this.chains[item.chainName] = item;
-      }
+      Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
+        this.chains[x.chain_name] = fromLocal(x, x.chain_name);
+      });
 
       this.setupDefault();
-      this.status = LoadingStatus.Loaded;
+      // this.status = LoadingStatus.Loaded;
     },
     async loadLocalConfig(network: NetworkType) {
       const config: Record<string, ChainConfig> = {};
@@ -362,18 +390,9 @@ export const useDashboard = defineStore('dashboard', {
         network === NetworkType.Mainnet
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
-
-      const valuesSource = Object.values<LocalConfig>(source);
-      const infoChainPromises = [];
-      for (let item of valuesSource) {
-        infoChainPromises.push(fromLocal(item));
-      }
-
-      const infoChains = await Promise.all(infoChainPromises);
-      for (let item of infoChains) {
-        config[item.chainName] = item;
-      }
-
+      Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
+        config[x.chain_name] = fromLocal(x, x.chain_name);
+      });
       return config;
     },
     setupDefault() {

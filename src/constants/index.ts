@@ -44,7 +44,7 @@ export const NEW_ASSETS = [
         exponent: 0,
       },
       {
-        denom: 'RACK',
+        denom: 'RACKS',
         exponent: 6,
       },
     ],
