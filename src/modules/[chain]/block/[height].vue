@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import { Icon } from '@iconify/vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useBaseStore, useFormatter } from '@/stores';
@@ -92,7 +92,7 @@ watch((current), () => {
   }
 })
 
-watch((sumAggregates), () => {
+watchEffect(() => {
   const blockInfo = blockInformation.value;
   if (sumAggregates.value)
     blockInformation.value = { ...blockInfo, 'Gas Used / Wanted': `${sumAggregates.value.gasUsed}/${sumAggregates.value.gasWanted}` };

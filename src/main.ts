@@ -22,7 +22,7 @@ const httpLink = createHttpLink({
   uri: 'https://indexer.scanium.io/',
 })
 
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
   cache,
   link: httpLink,
 });
