@@ -22,7 +22,7 @@ const blockchain = useBlockchain();
 const baseStore = useBaseStore();
 const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
-const tab = ref('log');
+const tab = ref('msg');
 const messageOpens = ref([true] as Array<boolean>);
 const logOpens = ref([true] as Array<boolean>);
 
@@ -96,29 +96,29 @@ const changeLogOpen = (index: number) => {
 <template>
   <div class="box-content !p-0">
     <div v-if="tx?.txResponse" class="p-4 md:p-6">
-      <h2 class="card-title truncate mb-2 text-white">{{ $t('tx.title') }}</h2>
+      <h2 class="card-title truncate mb-2 text-white xl:text-lg text-sm">{{ $t('tx.title') }}</h2>
       <div class="overflow-auto-x">
         <table class="table text-sm">
           <tbody>
             <tr>
-              <td>{{ $t('tx.tx_hash') }}</td>
-              <td>{{ tx?.txResponse.txhash }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.tx_hash') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ tx?.txResponse.txhash }}</td>
             </tr>
             <tr>
-              <td>{{ $t('account.height') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('account.height') }}</td>
+              <td class="xl:p-4 p-2">
                 <RouterLink
                   :to="`/${props.chain}/block/${tx.txResponse.height}`"
-                  class="text-primary dark:text-link"
+                  class="text-primary dark:text-link xl:text-sm text-xs"
                   >{{ tx.txResponse.height }}
                 </RouterLink>
               </td>
             </tr>
             <tr>
-              <td>{{ $t('staking.status') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('staking.status') }}</td>
+              <td class="xl:p-4 p-2">
                 <span
-                  class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center"
+                  class="truncate relative py-2 w-fit mr-2 rounded inline-flex items-center xl:text-sm text-xs"
                   :class="`${
                     tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
                   }`"
@@ -132,20 +132,20 @@ const changeLogOpen = (index: number) => {
               </td>
             </tr>
             <tr>
-              <td>{{ $t('account.time') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('account.time') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{ format.timestampFrom(tx.txResponse.timestamp) }}
               </td>
             </tr>
             <tr>
-              <td>{{ $t('tx.gas') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.gas') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{ tx.txResponse.gasUsed }} / {{ tx.txResponse.gasWanted }}
               </td>
             </tr>
             <tr>
-              <td>{{ $t('tx.fee') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.fee') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{
                   format.formatTokens(
                     tx.tx?.authInfo?.fee?.amount,
@@ -156,8 +156,8 @@ const changeLogOpen = (index: number) => {
               </td>
             </tr>
             <tr>
-              <td>{{ $t('tx.memo') }}</td>
-              <td>{{ tx.tx?.body?.memo || '--' }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.memo') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ tx.tx?.body?.memo || '--' }}</td>
             </tr>
           </tbody>
         </table>
@@ -168,19 +168,19 @@ const changeLogOpen = (index: number) => {
         class="tabs tabs-boxed customTabV2 bg-transparent xl:mb-4 mb-0 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
       >
         <a
-          class="tab text-gray-400 capitalize !pb-3"
+          class="tab text-gray-400 capitalize !pb-3 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'msg' }"
           @click="tab = 'msg'"
           >Messages ({{ messages.length }})</a
         >
         <a
-          class="tab text-gray-400 capitalize !pb-2"
+          class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'log' }"
           @click="tab = 'log'"
           >Logs ({{ txLogs.length }})</a
         >
         <a
-          class="tab text-gray-400 capitalize !pb-2"
+          class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'json' }"
           @click="tab = 'json'"
           >JSON</a
