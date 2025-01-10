@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { useFormatter } from "@/stores";
-import { computed, onMounted, ref, toRaw, watchEffect } from 'vue';
+import { computed, onMounted, ref} from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
@@ -10,7 +9,6 @@ import { labelInOutTxs } from "@/utils";
 import { getTxsAccount } from "@/service/transactionsService";
 
 const props = defineProps(['txs', 'chain', 'address']);
-const format = useFormatter();
 
 const transactions = ref([]);
 const totalCount = ref();

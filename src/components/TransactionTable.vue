@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, toRaw, watch, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import Pagination from './pagination/Pagination.vue';
 import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
