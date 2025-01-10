@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref} from 'vue';
+import { computed, onMounted, ref, watchEffect} from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
@@ -18,8 +18,9 @@ const pagination = reactive({
 });
 const loading = ref(true);
 
-onMounted(() => {
+watchEffect(() => {
   async function fetchTxs() {
+    loading.value = true;
     const res = await getTxsAccount(props.address, { ...pagination, count: true });
     if (res) {
       const { data, options } = res;
