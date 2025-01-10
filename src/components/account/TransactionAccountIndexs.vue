@@ -1,34 +1,54 @@
 <script lang="ts" setup>
 import { useFormatter } from "@/stores";
-import { computed, ref, watchEffect } from 'vue';
+import { computed, onMounted, ref, toRaw, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { reactive } from "vue";
 
 import TransactionTable from "../TransactionTable.vue";
 import { labelInOutTxs } from "@/utils";
+import { getTxsAccount } from "@/service/transactionsService";
 
 const props = defineProps(['txs', 'chain', 'address']);
 const format = useFormatter();
 
-const transactions = ref();
+const transactions = ref([]);
 const totalCount = ref();
 const pagination = reactive({
   limit: 10,
-  offset: 0
+  page: 1
 });
+const loading = ref(true);
+
+onMounted(() => {
+  async function fetchTxs() {
+    const res = await getTxsAccount(props.address, { ...pagination, count: true });
+    if (res) {
+      const { data, options } = res;
+      totalCount.value = options.totalCount;
+      transactions.value = data;
+    }
+    loading.value = false;
+  }
+  fetchTxs();
+})
+
+async function handlePagination(page: number) {
+  const res = await getTxsAccount(props.address, { ...pagination, page, count: false });
+  if (res) {
+    transactions.value = res.data;
+  }
+}
+
+const txHashes = computed(()=>{
+  return transactions.value?.map((tx: any) => tx.id);
+})
 
 const query = gql`
-      query GetTransactions($filter: TransactionFilter!, $orderBy: [TransactionsOrderBy!], $first: Int!, $offset: Int!) {
-        transactions(filter: $filter, orderBy: $orderBy, first: $first, offset:$offset) {
+      query GetTransactions($filter: TransactionFilter!) {
+        transactions(filter: $filter) {
           results: nodes {
             id
-            blockNumber
-            gasUsed
-            timestamp
-            sender
-            fee
-            code
             messages {
               nodes {
                 type
@@ -45,7 +65,6 @@ const query = gql`
               }
             }
           }
-          totalCount
         }
       }
     `;
@@ -53,49 +72,41 @@ const query = gql`
 const variables = computed(() => {
   return {
     filter: {
-      or: [
-        {
-          sender: { equalTo: props.address }
-        },
-        {
-          tokenTransfers: {
-            some: {
-              from: { equalTo: props.address }
-            }
-          }
-        },
-        {
-          tokenTransfers: {
-            some: {
-              to: { equalTo: props.address }
-            }
-          }
-        }
-      ]
+      id: { in: txHashes.value }
     },
-    orderBy: "BLOCK_NUMBER_DESC",
-    first: pagination.limit,
-    offset: pagination.offset
   };
 });
 
-const { result, refetch } = useQuery(query, variables);
+const { result } = useQuery(query, variables);
 
-watchEffect(() => {
-  if (result.value) {
-    transactions.value = labelInOutTxs(result.value.transactions.results, props.address);
-    totalCount.value = result.value.transactions.totalCount;
-  }
-});
+const txsMerge = computed(()=>{
+  const txsOptimal = transactions.value;
+  const txsIndexer = result.value?.transactions?.results;
 
-function handlePagination(page: number) {
-  pagination.offset = (page - 1) * pagination.limit;
-  refetch();
-}
+  const data = txsOptimal?.map((txOptimal: any) => {
+    const searchTx = txsIndexer?.find((txIndexer: any) => txIndexer.id === txOptimal.id);
+    const messages = searchTx?.messages;
+    const tokenTransfers = searchTx?.tokenTransfers;
+
+    return {
+      ...txOptimal,
+      messages,
+      tokenTransfers
+    };
+  });
+
+  return labelInOutTxs(data, props.address)
+})
 
 </script>
-
 <template>
-  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :pagination="pagination"
-    :handlePagination="handlePagination" :displayStatus="true"/>
+  <div>
+    <div v-if="loading" class="w-full h-[200px] flex items-center justify-center">
+      <div class="loading loading-spinner loading-lg !text-gray-400"></div>
+    </div>
+    <div v-else>
+      <TransactionTable :transactions="txsMerge" :chain="chain" :txTotal="totalCount" :pagination="pagination"
+        :handlePagination="handlePagination" :displayStatus="true" />
+    </div>
+  </div>
 </template>
