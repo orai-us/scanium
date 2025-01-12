@@ -75,6 +75,30 @@ export const NEW_ASSETS = [
     description: '$GNRT is an AI Agent built to revolutionize degen culture, providing the safest and fairest token launch mechanism available via agents.land . Community members can request token creation via X and the AI Agent will launch the most hype ideas spontaneously and without human intervention.',
     verify: true,
   },
+  {
+    name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
+    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
+    display: 'LEE', // Not used to display on assets and messages
+    symbol: 'LEE',
+    logo_URIs: {
+      svg: 'https://ipfs.io/ipfs/QmWh89Xh8bVMD1vP4VLtkazQjM7TyYxfoufMn5SZHuEJY1',
+    },
+    coingecko_id: 'lee-quid',
+    exponent: '6',
+    denom_units: [
+      {
+        denom:
+          'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
+        exponent: 0,
+      },
+      {
+        denom: 'LEE',
+        exponent: 6,
+      },
+    ],
+    description: '$LEE is the official token representing Lee Quid AI Agent, your personal helper in liquidity management. He auto-rebalances your fund to keep it in the most profitable price range. Currently managing Farm V3 on Raydium (Solana).',
+    verify: true,
+  },
 ];
 
 // id: symbol
