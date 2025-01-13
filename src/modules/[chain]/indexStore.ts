@@ -253,7 +253,7 @@ export const useIndexModule = defineStore('module-index', {
           .getMarketChart(this.days, firstAsset.coingecko_id)
           .then((x) => {
             this.marketData = x;
-          }).catch((error)=> console.log({error}));
+          }).catch((error) => console.log({ error }));
       }
     },
     selectTicker(i: number) {

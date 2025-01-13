@@ -349,7 +349,7 @@ export const useDashboard = defineStore('dashboard', {
         )}&ids=${coinIds.join(',')}`
       ).then((x) => {
         this.prices = x;
-      });
+      }).catch(error => console.log({ error }));
     },
     async loadingAssetsFromRegistry() {
       if (this.status === LoadingStatus.Empty) {

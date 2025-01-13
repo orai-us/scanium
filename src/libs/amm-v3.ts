@@ -91,7 +91,7 @@ export function displayPoolName(poolKey: any) {
     tmpPoolKey = parsePoolKey(poolKey);
   }
   return `${tokenMap[tmpPoolKey.token_x].coinDenom}-${
-    tokenMap[tmpPoolKey.token_y].coinDenom
+    tokenMap[tmpPoolKey.token_y]?.coinDenom
   } ${toDecimal(tmpPoolKey.fee_tier.fee, 10)}%`;
 }
 
