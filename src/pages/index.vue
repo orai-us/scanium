@@ -53,12 +53,12 @@ const chainStore = useBlockchain();
 </script>
 <template>
   <div class="section dark:bg-base-200 ml-3">
-    <div
+    <!-- <div
       v-if="dashboard.status !== LoadingStatus.Loaded"
       class="flex justify-center"
     >
       <progress class="progress progress-info w-80 h-1"></progress>
-    </div>
+    </div> -->
 
     <div
       v-if="featured.length > 0"
