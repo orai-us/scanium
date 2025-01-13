@@ -57,22 +57,22 @@ watchEffect(() => {
 function loadAccount(address: string) {
   blockchain.rpc.getAuthAccount(address).then((x) => {
     account.value = BaseAccount.decode(x?.value!);
-  });
+  }).catch(error => console.log({ error }));
   blockchain.rpc.getTxsBySender(address).then((x) => {
     txs.value = x.txs;
-  });
+  }).catch(error => console.log({ error }));
   blockchain.rpc.getDistributionDelegatorRewards(address).then((x) => {
     rewards.value = x;
     isRewardLoaded.value = true;
-  });
+  }).catch(error => console.log({ error }));
   blockchain.rpc.getStakingDelegations(address).then((x) => {
     delegations.value = x.delegationResponses;
     isDelegationLoaded.value = true;
-  });
+  }).catch(error => console.log({ error }));
   blockchain.rpc.getBankBalances(address).then((x) => {
     balances.value = x;
     isBalancesLoaded.value = true;
-  });
+  }).catch(error => console.log({ error }));
   const resultUnbondingList: any = [];
   let totalUnbond = 0;
   blockchain.rpc.getStakingDelegatorUnbonding(address).then((x) => {
@@ -98,7 +98,7 @@ function loadAccount(address: string) {
       unbondingList.value = resultUnbondingList
     }
     isUnbodingLoaded.value = true;
-  });
+  }).catch(error => console.log({ error }));
 
   blockchain.rpc
     .getTxs(
@@ -112,7 +112,7 @@ function loadAccount(address: string) {
     )
     .then((x) => {
       recentReceived.value = x.txs;
-    });
+    }).catch(error => console.log({ error }));
 }
 
 function updateEvent() {
