@@ -96,7 +96,7 @@ export const decodeProto = (msg: {
   type_url?: string;
   value: Uint8Array;
 }) => {
-  const typeUrl = msg.typeUrl ?? msg.type_url;
+  const typeUrl = msg?.typeUrl ?? msg?.type_url;
   if (!typeUrl) return msg;
   let type;
   if (typeUrl.startsWith('/osmosis.')) {

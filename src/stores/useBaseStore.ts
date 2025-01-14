@@ -43,8 +43,8 @@ export const useBaseStore = defineStore('baseStore', {
             this.earlest.block?.header?.time.toString()
           );
           const blocks =
-            Number(this.latest.block.header.height) -
-            Number(this.earlest.block.header.height);
+            Number(this.latest.block?.header?.height) -
+            Number(this.earlest.block?.header?.height);
           return diff / blocks;
         }
       }
