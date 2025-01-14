@@ -2,7 +2,7 @@
 import { formatNumber } from "@/utils";
 import Pagination from "../pagination/Pagination.vue";
 
-const props = defineProps(["owners", "totalHolder", "loading", "chain", "currentPrice", "limit", 'handlePagination', 'searchQuery']);
+const props = defineProps(["owners", "totalHolder", "loading", "chain", "currentPrice", "limit", 'handlePagination', 'searchQuery', 'page']);
 const emit = defineEmits(['search']);
 
 const handleSearch = (event: any) => {
@@ -54,7 +54,7 @@ const handleSearch = (event: any) => {
       </div>
 
       <div class="mt-4 text-center" v-if="totalHolder">
-        <Pagination :totalItems="totalHolder" :limit="limit" :onPagination="handlePagination" />
+        <Pagination :totalItems="totalHolder" :limit="limit" :onPagination="handlePagination" :page="page" />
       </div>
     </div>
     <div v-else class="w-full h-[200px] flex items-center justify-center">

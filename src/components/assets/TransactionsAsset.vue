@@ -21,10 +21,16 @@ const pagination = computed(() => {
     limit: 10,
   };
 });
+const denom = computed(() => {
+  if (props.denom?.includes("cw20:")) {
+    return props.denom.split("cw20:")[1];
+  }
+  return props.denom;
+})
 
 async function fetchTxs(pagination: ParamsGetTx) {
   try {
-    const res = await getTxsByDenom(encodeURIComponent(props.denom), pagination);
+    const res = await getTxsByDenom(encodeURIComponent(denom.value), pagination);
     if (res) {
       transactions.value = res.data;
     }
@@ -36,7 +42,7 @@ async function fetchTxs(pagination: ParamsGetTx) {
 
 async function fetchCountTxs() {
   try {
-    const res = await countTxsByDenom(encodeURIComponent(props.denom));
+    const res = await countTxsByDenom(encodeURIComponent(denom.value));
     if (res) {
       totalCount.value = res.data;
     }

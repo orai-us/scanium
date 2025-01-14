@@ -3,15 +3,23 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { getHolderAssetsNativeToken } from "@/service/assetsService";
 import { useBlockchain } from '@/stores';
 import HolderAssetComponent from './HolderAssetComponent.vue';
+import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute();
+const router = useRouter();
 const chainStore = useBlockchain();
 const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const props = defineProps(["denom", "chain", "currentPrice", "decimals"]);
 const ownersAll = ref([] as Array<any>);
 const ownersSearch = ref([] as Array<any>);
-const pagination = reactive({
-  offset: 0,
-  limit: 10,
+const pagination = computed(() => {
+  const page = route.query.page ? Number(route.query.page) : 1;
+  const offset = (page - 1) * 10;
+  return {
+    offset,
+    limit: 10,
+    page
+  };
 });
 const totalHolder = ref(0 as any);
 const loading = ref(true);
@@ -47,12 +55,12 @@ onMounted(async () => {
 });
 
 const owners = computed(() => {
-  const result =  ownersSearch.value.slice(pagination.offset, pagination.offset + pagination.limit);
+  const result =  ownersSearch.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.limit);
   return result.map((item) => ({ address: item.address, amount: item.balance?.amount }));
 });
 
 function handlePagination(page: number) {
-  pagination.offset = (page - 1) * pagination.limit;
+  router.push({ path: `/${props.chain}/assets/${encodeURIComponent(props.denom)}`, query: { ...route.query, page } });
 }
 
 const handleSearch=(keyword: string)=>{
@@ -68,5 +76,5 @@ const handleSearch=(keyword: string)=>{
 </script>
 <template>
   <HolderAssetComponent :owners="owners" :chain="chain" :loading="loading" :totalHolder="totalHolder"
-    :currentPrice="currentPrice" :limit="pagination.limit" :handlePagination="handlePagination" :searchQuery="searchQuery" @search="handleSearch" />
+    :currentPrice="currentPrice" :limit="pagination.limit" :handlePagination="handlePagination" :searchQuery="searchQuery" @search="handleSearch" :page="pagination.page" />
 </template>

@@ -2,12 +2,18 @@
 import { computed, reactive, ref, watchEffect } from 'vue';
 import HolderAssetComponent from './HolderAssetComponent.vue';
 import { getHolderAssetsCw20 } from '@/service/assetsService';
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(["denom", "chain", "currentPrice", "decimals"]);
+const route = useRoute();
+const router = useRouter();
 const holders = ref([] as Array<any>);
-const pagination = reactive({
-  page: 0,
-  limit: 10,
+const pagination = computed(() => {
+  const page = route.query.page ? Number(route.query.page) : 1;
+  return {
+    page,
+    limit: 10,
+  };
 });
 const totalHolder = ref(0 as any);
 const loading = ref(true);
@@ -19,7 +25,7 @@ const cw20Address = computed(() => {
 
 async function fetchHoldersAsset() {
   try {
-    const res = await getHolderAssetsCw20({ ...pagination, cw20Address: cw20Address.value, address: searchQuery.value });
+    const res = await getHolderAssetsCw20({ ...pagination.value, cw20Address: cw20Address.value, address: searchQuery.value });
     const data = res.data;
     holders.value = data.map((item: any) => ({ address: item.address, amount: item.amount }));
     totalHolder.value = res.options.totalResults;
@@ -35,11 +41,11 @@ watchEffect(() => {
 });
 
 function handlePagination(page: number) {
-  pagination.page = page;
+  router.push({ path: `/${props.chain}/assets/${encodeURIComponent(props.denom)}`, query: { ...route.query, page } });
 }
 
 function handleSearch(keyword: string) {
-  pagination.page = 1;
+  router.push({ path: `/${props.chain}/assets/${encodeURIComponent(props.denom)}`, query: { ...route.query, page: 1 } });
   searchQuery.value = keyword.length ? keyword : null;
 }
 
@@ -47,5 +53,5 @@ function handleSearch(keyword: string) {
 <template>
   <HolderAssetComponent :owners="holders" :chain="chain" :loading="loading" :totalHolder="totalHolder"
     :currentPrice="currentPrice" :limit="pagination.limit" :handlePagination="handlePagination"
-    :searchQuery="searchQuery" @search="handleSearch" />
+    :searchQuery="searchQuery" @search="handleSearch" :page="pagination.page" />
 </template>
