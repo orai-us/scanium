@@ -27,6 +27,7 @@ const denom = computed(() => {
   }
   return props.denom;
 })
+const loadingCountTxs = ref(true);
 
 async function fetchTxs(pagination: ParamsGetTx) {
   try {
@@ -42,12 +43,14 @@ async function fetchTxs(pagination: ParamsGetTx) {
 
 async function fetchCountTxs() {
   try {
+    loadingCountTxs.value = true;
     const res = await countTxsByDenom(encodeURIComponent(denom.value));
     if (res) {
       totalCount.value = res.data;
     }
+    loadingCountTxs.value = false;
   } catch (error) {
-
+    loadingCountTxs.value = false;
   }
 }
 
@@ -105,7 +108,7 @@ const txsMerge = computed(() => {
 
 <template>
   <div>
-    <div class="mb-3">
+    <div class="mb-3" v-if="!loadingCountTxs">
       <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalCount || 0)
           }}</span>
         transactions</span>
