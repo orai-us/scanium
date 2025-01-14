@@ -101,81 +101,86 @@ watch(searchQuery,()=>{
   <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
     <div class="text-white font-bold text-lg">Assets Dashboard</div>
     <div class="w-full h-[1px] bg-base-300"></div>
-    <div class="flex flex-row justify-between items-center mt-2 mb-2">
+    <div class="flex xl:flex-row flex-col justify-between xl:items-center mt-2 mb-2 gap-2">
       <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ totalAssets }}</span> Assets</span>
       <input
         class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
         v-model="searchQuery" placeholder="Search by Name, Denom" />
     </div>
 
-    <table class="table w-full text-sm" v-if="assets.length > 0">
-      <thead>
-        <tr>
-          <th class="text-white font-bold text-sm">Name</th>
-          <th class="text-white font-bold text-sm text-right"></th>
-          <th class="text-white font-bold text-sm text-right">Denom</th>
-          <th class="text-white font-bold text-sm text-right">Price</th>
-          <!-- <th class="text-white font-bold text-sm text-right">Total Supply</th> -->
-          <!-- <th class="text-white font-bold text-sm text-right">Circulating Supply</th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(v, index) in assets" :key="v.base" class="cursor-pointer"
-          @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}`)">
-          <td>
-            <div class="flex flex-row items-center gap-3">
-              <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"
-                class="w-8 h-8 rounded-full border border-blue-100 bg-white" />
-              <div v-else class="w-8 h-8 rounded-full border border-blue-100 bg-white"></div>
-              <span class="text-white text-sm" v-if="v.symbol">{{ shortenDenom(v.symbol) }}</span>
-              <span v-else>-</span>
-            </div>
-          </td>
-          <td class="text-right">
-            <div v-if="v.verify">
-              <div class="text-xs flex items-center justify-center !bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)] p-2 rounded-lg w-fit">
-                Verified</div>
-            </div>
-          </td>
-          <td class="text-right w-fit">
-            <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base" />
-          </td>
-          <td class="text-right">
-            <span v-if="priceTokens[v.id]?.usd" class="text-white">
-              $ {{ formatNumber(priceTokens[v.id].usd) }}
-            </span>
-            <span v-else>-</span>
-          </td>
-          <!-- <td class="text-right">
-            <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
-              <div>{{ formatNumber(priceTokens[v.id].total_supply) }}</div>
-              <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
-                formatNumber(priceTokens[v.id].total_supply *
-                priceTokens[v.id].current_price) }}</span>
-              <span v-else>-</span>
-            </div>
-            <span v-else>-</span>
-          </td> -->
-          <!-- <td class="text-right">
-            <div v-if="priceTokens[v.id]?.circulating_supply" class="text-white">
-              <div>{{ formatNumber(priceTokens[v.id].circulating_supply) }}
+    <div class="overflow-x-auto">
+      <table class="table w-full text-sm" v-if="assets.length > 0">
+        <thead>
+          <tr>
+            <th class="text-white font-bold text-sm">Name</th>
+            <th class="text-white font-bold text-sm text-right"></th>
+            <th class="text-white font-bold text-sm text-right">Denom</th>
+            <th class="text-white font-bold text-sm text-right">Price</th>
+            <!-- <th class="text-white font-bold text-sm text-right">Total Supply</th> -->
+            <!-- <th class="text-white font-bold text-sm text-right">Circulating Supply</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(v, index) in assets" :key="v.base" class="cursor-pointer"
+            @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}`)">
+            <td class="truncate">
+              <div class="flex flex-row items-center xl:gap-3 gap-1 min-w-[100px]">
+                <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"
+                  class="w-8 h-8 rounded-full border border-blue-100 bg-white" />
+                <div v-else class="w-8 h-8 rounded-full border border-blue-100 bg-white"></div>
+                <span class="text-white text-sm" v-if="v.symbol">{{ shortenDenom(v.symbol) }}</span>
+                <span v-else>-</span>
               </div>
-              <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
-                formatNumber(priceTokens[v.id].circulating_supply *
-                  priceTokens[v.id].current_price) }}</span>
+            </td>
+            <td class="text-right truncate">
+              <div v-if="v.verify">
+                <div
+                  class="text-xs flex items-center justify-center !bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)] p-2 rounded-lg w-fit">
+                  Verified</div>
+              </div>
+            </td>
+            <td class="text-right w-fit truncate">
+              <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base" />
+            </td>
+            <td class="text-right">
+              <span v-if="priceTokens[v.id]?.usd" class="text-white">
+                $ {{ formatNumber(priceTokens[v.id].usd) }}
+              </span>
               <span v-else>-</span>
-            </div>
-            <span v-else>-</span>
-          </td> -->
-        </tr>
-      </tbody>
-    </table>
-    <div v-else class="w-full h-full justify-center items-center">
-      No Assets
+            </td>
+            <!-- <td class="text-right">
+              <div v-if="priceTokens[v.id]?.total_supply" class="text-white">
+                <div>{{ formatNumber(priceTokens[v.id].total_supply) }}</div>
+                <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
+                  formatNumber(priceTokens[v.id].total_supply *
+                  priceTokens[v.id].current_price) }}</span>
+                <span v-else>-</span>
+              </div>
+              <span v-else>-</span>
+            </td> -->
+            <!-- <td class="text-right">
+              <div v-if="priceTokens[v.id]?.circulating_supply" class="text-white">
+                <div>{{ formatNumber(priceTokens[v.id].circulating_supply) }}
+                </div>
+                <span v-if="priceTokens[v.id]?.current_price" class="text-xs text-gray-400">$ {{
+                  formatNumber(priceTokens[v.id].circulating_supply *
+                    priceTokens[v.id].current_price) }}</span>
+                <span v-else>-</span>
+              </div>
+              <span v-else>-</span>
+            </td> -->
+          </tr>
+        </tbody>
+      </table>
+      <div v-else class="w-full h-full justify-center items-center">
+        No Assets
+      </div>
     </div>
+
     <div class="mt-4 text-center" v-if="totalAssets">
       <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination" />
     </div>
+
   </div>
 </template>
 

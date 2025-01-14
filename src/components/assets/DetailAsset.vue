@@ -80,20 +80,20 @@ const copyWebsite = async (url: string) => {
           }}</span>
       </div> -->
       <div class="flex flex-row">
-        <div class="w-[200px]">Description</div>
+        <div class="xl:w-[200px] w-[100px]">Description</div>
         <div class="w-[80%]">
           <span class="text-white">{{ asset.description }}</span>
         </div>
       </div>
-      <div class="flex flex-row">
-        <div class="w-[200px]">Denom</div>
-        <div class="flex flex-row items-center">
-          <span class="text-white">{{ asset.base }}</span>
-          <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="asset.base" @click="copyWebsite(asset.base || '')" />
+      <div class="flex flex-row items-center">
+        <div class="xl:w-[200px] w-[100px]">Denom</div>
+        <div class="flex flex-row items-center w-[65%] xl:w-fit">
+          <span class="text-white break-words truncate">{{ asset.base }}</span>
         </div>
+        <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="asset.base" @click="copyWebsite(asset.base || '')" />
       </div>
       <div class="flex flex-row">
-        <div class="w-[200px]">Decimals</div>
+        <div class="xl:w-[200px] w-[100px]">Decimals</div>
         <span class="text-white">{{ asset.denom_units?.slice(-1)[0].exponent }}</span>
       </div>
     </div>

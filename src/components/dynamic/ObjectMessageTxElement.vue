@@ -83,6 +83,19 @@ const isRenderJsonArray = computed(() => {
   width: 1200px;
 }
 
+@media (max-width:768px) {
+  .jv-key {
+    font-size: 12px
+  }
+  .jv-item{
+    font-size: 12px
+  }
+  .jv-container .jv-code.boxed {
+    padding: 10px;
+    max-width: fit-content;
+  }
+}
+
 .jv-more {
   opacity: 0;
 }

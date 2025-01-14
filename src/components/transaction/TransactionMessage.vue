@@ -66,40 +66,42 @@ watchEffect(() => {
 
 </script>
 <template>
-  <div>
-    <div class="min-h-[25px] m-4">
+  <div class="w-full">
+    <div class="min-h-[25px] xl:m-4 mt-4">
       <div v-if="executeMsgParams">
-        <div class="mb-4 flex flex-row gap-10">
-          <div class="w-40">Contract:</div>
+        <div class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
+          <div class="w-40 xl:text-sm text-xs">Contract:</div>
           <ContractMessage :contract="value.contract" :chain="chain" />
         </div>
-        <div class="mb-4 flex flex-row gap-10">
-          <div class="w-40">Sender:</div>
-          <div class="flex flex-row justify-center items-center">
-            <RouterLink :to="`/${chain}/account/${value.sender}`" class="text-link">{{ value.sender }}</RouterLink>
-            <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="value.sender"
+        <div class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
+          <div class="w-40 xl:text-sm text-xs">Sender:</div>
+          <div class="flex flex-row justify-start items-center">
+            <RouterLink :to="`/${chain}/account/${value.sender}`" class="text-link xl:text-sm text-[12px]">{{ value.sender }}</RouterLink>
+            <div class="xl:flex items-center hidden">
+              <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-3" v-show="value.sender"
               @click="copyWebsite(value.sender || '')" />
-            <div v-for="{ name, provider } in labelSenders">
-              <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success"
-                :data-tip="provider" :title="provider">
-                <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-                <button>{{ name }}</button>
-              </span>
+              <div v-for="{ name, provider } in labelSenders">
+                <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success"
+                  :data-tip="provider" :title="provider">
+                  <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
+                  <button>{{ name }}</button>
+                </span>
+                </div>
             </div>
           </div>
         </div>
-        <div class="mb-4 flex flex-row gap-10">
-          <div class="w-40">Funds:</div>
+        <div class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
+          <div class="w-40 xl:text-sm text-xs">Funds:</div>
           <div v-if="value.funds.length">
             <ArrayCoinElement :value="value.funds" />
           </div>
-          <div v-else>None</div>
+          <div v-else class="xl:text-sm text-xs">None</div>
         </div>
         <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
           :events="events" />
         <template v-else>
-          <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex flex-row gap-10">
-            <div class="w-40">{{ formatTitle(k) }}:</div>
+          <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
+            <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
             <div v-if="k === 'data'">
               <div v-for="(value, key) in v" class="flex gap-2">
                 <div class="flex gap-1">
@@ -121,7 +123,7 @@ watchEffect(() => {
         </template>
       </div>
       <div v-else>
-        <div v-for="(v, k) of value" class="mb-4 flex flex-row gap-10">
+        <div v-for="(v, k) of value" class="mb-4 flex xl:flex-row flex-col gap-10">
           <div class="w-40">{{ formatTitle(k.toString()) }}:</div>
           <div class="w-full">
             <DynamicComponent :value="v" />

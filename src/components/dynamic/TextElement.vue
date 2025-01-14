@@ -89,7 +89,7 @@ const copyWebsite = async (url: string) => {
     class="md-editor-recover"
   ></MdEditor>
   <span v-else-if="isAddress()" class="flex items-center">
-    <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link">{{
+    <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link xl:text-sm text-[12px]">{{
       text
     }}</RouterLink>
     <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="text" @click="copyWebsite(text || '')" />
@@ -104,8 +104,8 @@ const copyWebsite = async (url: string) => {
       </span>
     </div>
   </span>
-  <span v-else class="flex"
-    ><span class="break-words max-w-5xl">{{ text }}</span>
+  <div v-else class="flex">
+    <span class="break-words max-w-full xl:text-sm text-[12px]">{{ text }}</span>
     <span
       v-if="isConvertable"
       @click="toHexOutput = !toHexOutput"
@@ -126,7 +126,7 @@ const copyWebsite = async (url: string) => {
         />
       </svg>
     </span>
-  </span>
+  </div>
   <div class="toast" v-show="resultCopy === true">
     <div class="alert alert-success">
       <div class="text-xs md:!text-sm">

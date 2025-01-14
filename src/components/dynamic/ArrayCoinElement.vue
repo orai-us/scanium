@@ -10,7 +10,7 @@ const format = useFormatter()
 
 </script>
 <template>
-  <div>
+  <div class="xl:text-sm text-[12px]">
     {{ format.formatTokens(value, true, "0,0.[000000]") }}
   </div>
 </template>

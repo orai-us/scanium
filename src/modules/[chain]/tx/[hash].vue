@@ -96,29 +96,29 @@ const changeLogOpen = (index: number) => {
 <template>
   <div class="box-content !p-0">
     <div v-if="tx?.txResponse" class="p-4 md:p-6">
-      <h2 class="card-title truncate mb-2 text-white">{{ $t('tx.title') }}</h2>
+      <h2 class="card-title truncate mb-2 text-white xl:text-lg text-sm">{{ $t('tx.title') }}</h2>
       <div class="overflow-auto-x">
         <table class="table text-sm">
           <tbody>
             <tr>
-              <td>{{ $t('tx.tx_hash') }}</td>
-              <td>{{ tx?.txResponse.txhash }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.tx_hash') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ tx?.txResponse.txhash }}</td>
             </tr>
             <tr>
-              <td>{{ $t('account.height') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('account.height') }}</td>
+              <td class="xl:p-4 p-2">
                 <RouterLink
                   :to="`/${props.chain}/block/${tx.txResponse.height}`"
-                  class="text-primary dark:text-link"
+                  class="text-primary dark:text-link xl:text-sm text-xs"
                   >{{ tx.txResponse.height }}
                 </RouterLink>
               </td>
             </tr>
             <tr>
-              <td>{{ $t('staking.status') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('staking.status') }}</td>
+              <td class="xl:p-4 p-2">
                 <span
-                  class="text-xs truncate relative py-2 w-fit mr-2 rounded inline-flex items-center"
+                  class="truncate relative py-2 w-fit mr-2 rounded inline-flex items-center xl:text-sm text-xs"
                   :class="`${
                     tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
                   }`"
@@ -132,20 +132,20 @@ const changeLogOpen = (index: number) => {
               </td>
             </tr>
             <tr>
-              <td>{{ $t('account.time') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('account.time') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{ format.timestampFrom(tx.txResponse.timestamp) }}
               </td>
             </tr>
             <tr>
-              <td>{{ $t('tx.gas') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.gas') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{ tx.txResponse.gasUsed }} / {{ tx.txResponse.gasWanted }}
               </td>
             </tr>
             <tr>
-              <td>{{ $t('tx.fee') }}</td>
-              <td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.fee') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{
                   format.formatTokens(
                     tx.tx?.authInfo?.fee?.amount,
@@ -156,8 +156,8 @@ const changeLogOpen = (index: number) => {
               </td>
             </tr>
             <tr>
-              <td>{{ $t('tx.memo') }}</td>
-              <td>{{ tx.tx?.body?.memo || '--' }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('tx.memo') }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ tx.tx?.body?.memo || '--' }}</td>
             </tr>
           </tbody>
         </table>
@@ -165,22 +165,22 @@ const changeLogOpen = (index: number) => {
     </div>
     <div class="border-t border-b border-base-200">
       <div
-        class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
+        class="tabs tabs-boxed customTabV2 bg-transparent xl:mb-4 mb-0 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
       >
         <a
-          class="tab text-gray-400 capitalize !pb-3"
+          class="tab text-gray-400 capitalize !pb-3 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'msg' }"
           @click="tab = 'msg'"
           >Messages ({{ messages.length }})</a
         >
         <a
-          class="tab text-gray-400 capitalize !pb-2"
+          class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'log' }"
           @click="tab = 'log'"
           >Logs ({{ txLogs.length }})</a
         >
         <a
-          class="tab text-gray-400 capitalize !pb-2"
+          class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'json' }"
           @click="tab = 'json'"
           >JSON</a
@@ -190,7 +190,7 @@ const changeLogOpen = (index: number) => {
       <div v-if="tab === 'msg'">
         <div
           v-if="tx?.txResponse"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded mb-4"
+          class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 p-1 rounded mb-4"
         >
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
@@ -201,14 +201,14 @@ const changeLogOpen = (index: number) => {
               'collapse-close': !messageOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
-              <div class="flex justify-between p-5 collapse-title"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title max-w-screen"
                 :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
-                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
+                <h5 class="xl:text-lg text-sm font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
               <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
                 <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
               </div>
-              <div class="collapse-content" v-else>
+              <div class="collapse-content xl:max-w-full max-w-96" v-else>
                 <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
                   :chain="chain" />
               </div>
@@ -221,7 +221,7 @@ const changeLogOpen = (index: number) => {
       <div v-if="tab === 'log'">
         <div
           v-if="txLogs"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow mb-4"
+          class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 px-1 rounded shadow mb-4"
         >
           <div v-for="(msg, i) in txLogs" :key="i">
             <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
@@ -229,9 +229,9 @@ const changeLogOpen = (index: number) => {
               'collapse-close': !logOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
-              <div class="flex justify-between p-5 collapse-title"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title max-w-screen"
                 :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
-                <h5 class="text-lg font-bold">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
+                <h5 class="font-bold xl:text-lg text-sm">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>
               <div class="collapse-content">
                 <TransactionEvent :events="msg.events" />

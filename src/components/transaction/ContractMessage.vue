@@ -46,18 +46,19 @@ watchEffect(() => {
 </script>
 <template>
   <div>
-    <div class="flex flex-row justify-center items-center">
-      <RouterLink :to="urlContract" class="text-link hover:cursor-pointer">
+    <div class="flex flex-row xl:items-center justify-start break-words xl:flex-nowrap flex-wrap">
+      <RouterLink :to="urlContract" class="text-link hover:cursor-pointer xl:text-sm text-[12px] w-full">
         {{ contract }}
       </RouterLink>
-      <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="contract"
-        @click="copyWebsite(contract || '')" />
-      <div>
-        <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded-lg text-success"
-          v-if="labelContracts">
-          <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-          <button>{{ labelContracts }}</button>
-        </span>
+      <div class="xl:flex items-center hidden">
+        <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-3" v-show="contract"
+          @click="copyWebsite(contract || '')" />
+        <div>
+          <span class="text-xs truncate relative py-1 px-2 w-fit ml-2 rounded-lg text-success" v-if="labelContracts">
+            <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
+            <button>{{ labelContracts }}</button>
+          </span>
+        </div>
       </div>
     </div>
 

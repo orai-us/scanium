@@ -2,5 +2,5 @@
 const props = defineProps(['value']);
 </script>
 <template>
-  <span>{{ props.value.toString() }}</span>
+  <span class="xl:text-sm text-[12px]">{{ props.value.toString() }}</span>
 </template>
