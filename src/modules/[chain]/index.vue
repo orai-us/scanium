@@ -112,7 +112,10 @@ function trustColor(v: string) {
 const quantity = ref(100);
 const qty = computed({
   get: () => {
-    return parseFloat(quantity.value.toFixed(6));
+    if (quantity.value !== null && quantity.value !== undefined && !isNaN(parseFloat(quantity.value.toString()))) {
+      return parseFloat(quantity.value?.toFixed(6));
+    }
+    return 0;
   },
   set: (val) => {
     quantity.value = val;
