@@ -110,21 +110,24 @@ export const useParamStore = defineStore('paramstore', {
       }
     },
     async handleStakingParams() {
-      const res = await this.getStakingParams();
-      if (!res) return;
-      const bond_denom = res?.params.bondDenom;
-      this.staking.items = Object.entries(res.params)
-        .map(([key, value]) => ({ subtitle: key, value: value }))
-        .filter((item: any) => {
-          if (
-            !['min_commission_rate', 'min_self_delegation'].includes(
-              item.subtitle
+      try {
+        const res = await this.getStakingParams();
+        if (!res) return;
+        const bond_denom = res?.params.bondDenom;
+        this.staking.items = Object.entries(res.params)
+          .map(([key, value]) => ({ subtitle: key, value: value }))
+          .filter((item: any) => {
+            if (
+              !['min_commission_rate', 'min_self_delegation'].includes(
+                item.subtitle
+              )
             )
-          )
-            return item;
-        });
-      Promise.all([this.getStakingPool(), this.getBankTotal(bond_denom)]).then(
-        (resArr) => {
+              return item;
+          });
+        Promise.all([
+          this.getStakingPool(),
+          this.getBankTotal(bond_denom),
+        ]).then((resArr) => {
           const pool = resArr[0]?.pool;
           if (!pool) return;
           const amount = resArr[1]?.amount;
@@ -147,8 +150,10 @@ export const useParamStore = defineStore('paramstore', {
           this.chain.items[bondedRatio].value = `${percent(
             Number(pool.bondedTokens) / Number(amount)
           )}%`;
-        }
-      );
+        });
+      } catch (error) {
+        console.log({ error });
+      }
     },
     async handleMintParam() {
       const excludes = this.blockchain.current?.excludes;
@@ -162,60 +167,78 @@ export const useParamStore = defineStore('paramstore', {
       // const res = await this.getMintParam();
     },
     async handleSlashingParams() {
-      const res = await this.getSlashingParams();
-      this.slashing.items = Object.entries(res.params).map(([key, value]) => ({
-        subtitle: key,
-        value: value,
-      }));
+      try {
+        const res = await this.getSlashingParams();
+        this.slashing.items = Object.entries(res.params).map(
+          ([key, value]) => ({
+            subtitle: key,
+            value: value,
+          })
+        );
+      } catch (error) {
+        console.log({ error });
+      }
     },
     async handleDistributionParams() {
-      const res = await this.getDistributionParams();
-      // try to convert to ascii
-      this.distribution.items = Object.entries(res.params).map(
-        ([key, value]) => ({
-          subtitle: key,
-          value: typeof value === 'string' ? toAscii(value) : value,
-        })
-      );
+      try {
+        const res = await this.getDistributionParams();
+        // try to convert to ascii
+        this.distribution.items = Object.entries(res.params).map(
+          ([key, value]) => ({
+            subtitle: key,
+            value: typeof value === 'string' ? toAscii(value) : value,
+          })
+        );
+      } catch (error) {
+        console.log({ error });
+      }
     },
     async handleGovernanceParams() {
-      const excludes = this.blockchain.current?.excludes;
-      if (excludes && excludes.indexOf('governance') > -1) {
-        return;
+      try {
+        const excludes = this.blockchain.current?.excludes;
+        if (excludes && excludes.indexOf('governance') > -1) {
+          return;
+        }
+        Promise.all([
+          this.getGovParamsVoting(),
+          this.getGovParamsDeposit(),
+          this.getGovParamsTally(),
+        ]).then((resArr) => {
+          const govParams = {
+            ...resArr[0]?.votingParams,
+            ...resArr[1]?.depositParams,
+            ...resArr[2]?.tallyParams,
+          };
+          this.gov.items = Object.entries(govParams).map(([key, value]) => ({
+            subtitle: key,
+            value: value,
+          }));
+        });
+      } catch (error) {
+        console.log({ error });
       }
-      Promise.all([
-        this.getGovParamsVoting(),
-        this.getGovParamsDeposit(),
-        this.getGovParamsTally(),
-      ]).then((resArr) => {
-        const govParams = {
-          ...resArr[0]?.votingParams,
-          ...resArr[1]?.depositParams,
-          ...resArr[2]?.tallyParams,
-        };
-        this.gov.items = Object.entries(govParams).map(([key, value]) => ({
-          subtitle: key,
-          value: value,
-        }));
-      });
     },
     async handleAbciInfo() {
-      const res = await this.fetchAbciInfo();
+      try {
+        const res = await this.fetchAbciInfo();
 
-      if (!res) return;
+        if (!res) return;
 
-      localStorage.setItem(
-        `sdk_version_${this.blockchain.chainName}`,
-        res.applicationVersion?.cosmosSdkVersion ?? DEFAULT_SDK_VERSION
-      );
+        localStorage.setItem(
+          `sdk_version_${this.blockchain.chainName}`,
+          res.applicationVersion?.cosmosSdkVersion ?? DEFAULT_SDK_VERSION
+        );
 
-      this.appVersion.items = Object.entries(res.applicationVersion ?? {}).map(
-        ([key, value]) => ({ subtitle: key, value: value })
-      );
+        this.appVersion.items = Object.entries(
+          res.applicationVersion ?? {}
+        ).map(([key, value]) => ({ subtitle: key, value: value }));
 
-      this.nodeVersion.items = Object.entries(res.defaultNodeInfo ?? {}).map(
-        ([key, value]) => ({ subtitle: key, value: value })
-      );
+        this.nodeVersion.items = Object.entries(res.defaultNodeInfo ?? {}).map(
+          ([key, value]) => ({ subtitle: key, value: value })
+        );
+      } catch (error) {
+        console.log({ error });
+      }
     },
     async getBaseTendermintBlockLatest() {
       return await this.blockchain.rpc?.getBaseBlockLatest();
