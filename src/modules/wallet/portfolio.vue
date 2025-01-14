@@ -181,7 +181,7 @@ function loadPrice() {
     `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.value}&ids=${ids}&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=14d&locale=en`
   ).then((res) => {
     prices.value = res;
-  });
+  }).catch((error) => console.log({ error }));
 }
 const totalChangeIn24 = computed(() => {
   return Object.values(tokenQty.value)

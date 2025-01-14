@@ -12,20 +12,24 @@ const blockSummary = computed(()=>{
   return indexModule.stats
 })
 
-watch(blockSummary,async () => {
-  const heightNew = Number(blockSummary.value[0]?.stats);
-  if (heightNew > 5) {
-    const heightOld = Number(heightNew) - 5;
-    const [blockOld, blockNew] = await Promise.all([
-      store.fetchBlock(heightOld),
-      store.fetchBlock(heightNew),
-    ])
-    const blockTimeNew = new Date(blockNew.block?.header?.time?.toString()).getTime();
-    const blockTimeOld = new Date(blockOld.block?.header?.time?.toString()).getTime();
+watch(blockSummary, async () => {
+  try {
+    const heightNew = Number(blockSummary.value[0]?.stats);
+    if (heightNew > 5) {
+      const heightOld = Number(heightNew) - 5;
+      const [blockOld, blockNew] = await Promise.all([
+        store.fetchBlock(heightOld),
+        store.fetchBlock(heightNew),
+      ]);
+      const blockTimeNew = new Date(blockNew.block?.header?.time?.toString()).getTime();
+      const blockTimeOld = new Date(blockOld.block?.header?.time?.toString()).getTime();
 
-    blockTime.value = (blockTimeNew - blockTimeOld) / 5000 + " s"
+      blockTime.value = (blockTimeNew - blockTimeOld) / 5000 + " s";
+    }
+  } catch (error) {
+    console.log({ error });
   }
-})
+});
 </script>
 
 <template>
