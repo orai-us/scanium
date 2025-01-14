@@ -122,7 +122,7 @@ watch(searchQuery,()=>{
         </thead>
         <tbody>
           <tr v-for="(v, index) in assets" :key="v.base" class="cursor-pointer"
-            @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}`)">
+            @click="router.push(`/${chain}/assets/${encodeURIComponent(v.base)}?page=1`)">
             <td class="truncate">
               <div class="flex flex-row items-center xl:gap-3 gap-1 min-w-[100px]">
                 <img :src="v.logo_URIs?.png || v.logo_URIs?.svg" alt="img" v-if="v.logo_URIs?.png || v.logo_URIs?.svg"

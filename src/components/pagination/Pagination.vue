@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 
-const props = defineProps(['totalItems', 'limit', 'onPagination']);
+const props = defineProps(['totalItems', 'limit', 'onPagination', 'page']);
 
 const currentPage = ref(1);
+
+watchEffect(() => {
+  currentPage.value = props.page || 1;
+});
 const onClickHandler = (page: number) => {
   props.onPagination(page)
   currentPage.value = page;
