@@ -400,7 +400,7 @@ onMounted(() => {
 
   chainStore.rpc.getSlashingParams().then((x) => {
     slashingParam.value = x.params;
-  });
+  }).catch((error => console.log({ error })));
 });
 
 function updateTotalSigningInfo() {
