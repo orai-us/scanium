@@ -136,12 +136,18 @@ const totalChange = computed(() => {
 
 // Adding Model Boxes
 const availableAccount = computed(() => {
-  if (sourceAddress.value) {
-    return scanCompatibleAccounts([
-      { cosmosAddress: sourceAddress.value, hdPath: sourceHdPath.value },
-    ]).filter((x) => !addresses.value.includes(x.address));
+  try {
+    if (sourceAddress.value) {
+      return scanCompatibleAccounts([
+        { cosmosAddress: sourceAddress.value, hdPath: sourceHdPath.value },
+      ]).filter((x) => !addresses.value.includes(x.address));
+    }
+    return [];
+  } catch (error) {
+    console.log({ error })
+    return [];
   }
-  return [];
+
 });
 
 // helper functions
