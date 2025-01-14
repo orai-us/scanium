@@ -6,7 +6,7 @@ import { useFormatter } from '@/stores';
 import { CHAIN_INDEXS } from '@/constants';
 import { formatTitle } from '@/libs/utils';
 
-const props = defineProps(['transactions', 'chain', 'txTotal', 'limit', 'handlePagination', 'displayStatus']);
+const props = defineProps(['transactions', 'chain', 'txTotal', 'limit', 'handlePagination', 'displayStatus', 'page']);
 const format = useFormatter();
 const txs = ref([] as Array<any>)
 
@@ -98,7 +98,7 @@ watchEffect(() => {
   </div>
 
   <div class="mt-4 text-center" v-if="txTotal">
-    <Pagination :totalItems="txTotal" :limit="limit" :onPagination="handlePagination" />
+    <Pagination :totalItems="txTotal" :limit="limit" :onPagination="handlePagination" :page="page" />
   </div>
 </template>
 

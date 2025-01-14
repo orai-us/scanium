@@ -15,6 +15,11 @@ export interface ParamsGetTxsAccount {
   count: boolean
 }
 
+export interface ParamsGetTx {
+  page: number;
+  limit: number;
+}
+
 const urlTxsHistory = "/v1/txs-history/"
 export const getHistoryTxs = async (params: ParamsGetHistoryTxs) => {
   const config = {
@@ -40,4 +45,42 @@ export const getTxsAccount = async (
   };
   const res = await api.request(config);
   return res?.data;
+};
+
+const urlTxsByDenom = '/v1/transaction/by-denom';
+export const getTxsByDenom = async (denom: string, params: ParamsGetTx) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsByDenom}/${denom}`,
+    method: METHODS.GET,
+    params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countTxsByDenom = async (denom: string) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsByDenom}/${denom}/count`,
+    method: METHODS.GET,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const mergeTxsOptimalAndIndexer = (
+  txsOptimal: Array<any>,
+  txsIndexer: Array<any>
+) => {
+  return txsOptimal?.map((txOptimal: any) => {
+    const searchTx = txsIndexer?.find(
+      (txIndexer: any) => txIndexer.id === txOptimal.id
+    );
+    const messages = searchTx?.messages;
+    return {
+      ...txOptimal,
+      messages,
+    };
+  });
 };
