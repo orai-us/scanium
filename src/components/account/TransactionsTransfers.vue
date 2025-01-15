@@ -1,18 +1,25 @@
 <script lang="ts" setup>
 import { useFormatter } from '@/stores';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { getHistoryTxs } from '@/service/transactionsService';
 import { shortenTxHash } from '@/utils';
 import Pagination from '../pagination/Pagination.vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['address', 'chain']);
+const route = useRoute();
+const router = useRouter();
 const txs = ref([] as Array<any>);
 const format = useFormatter();
 const txTotal = ref(0);
-
-const pagination = reactive({
-  limit: 10,
-  offset: 0
+const pagination = computed(() => {
+  const page = route.query.page ? Number(route.query.page) : 1;
+  const offset = (page - 1) * 10;
+  return {
+    offset,
+    limit: 10,
+    page
+  };
 });
 onMounted(() => {
   fetchTransaction();
@@ -22,8 +29,8 @@ async function fetchTransaction() {
   try {
     const params = {
       addrByNetworks: `${props?.chain}+${props?.address}`,
-      limit: pagination.limit,
-      offset: pagination.offset
+      limit: pagination.value.limit,
+      offset: pagination.value.offset
     };
     const response = await getHistoryTxs(params);
     if (!!response) {
@@ -69,7 +76,7 @@ watch([() => props.address, pagination], () => {
 });
 
 function handlePagination(page: number) {
-  pagination.offset = (page - 1) * pagination.limit;
+  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page } });
 }
 </script>
 
@@ -132,7 +139,7 @@ function handlePagination(page: number) {
     </div>
 
     <div class="mt-4 text-center" v-if="txTotal">
-      <Pagination :totalItems="txTotal" :limit="pagination.limit" :onPagination="handlePagination" />
+      <Pagination :totalItems="txTotal" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
     </div>
   </div>
 </template>

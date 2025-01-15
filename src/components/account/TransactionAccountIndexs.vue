@@ -1,47 +1,65 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watchEffect} from 'vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { reactive } from "vue";
 
 import TransactionTable from "../TransactionTable.vue";
 import { labelInOutTxs } from "@/utils";
-import { getTxsAccount } from "@/service/transactionsService";
+import { countTxsByAccount, getTxsByAccount, ParamsGetTx } from "@/service/transactionsService";
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['txs', 'chain', 'address']);
 
+const route = useRoute();
+const router = useRouter();
 const transactions = ref([]);
 const totalCount = ref();
-const pagination = reactive({
-  limit: 10,
-  page: 1
+const pagination = computed(() => {
+  const page = route.query.page ? Number(route.query.page) : 1;
+  return {
+    page,
+    limit: 10,
+  };
 });
-const loading = ref(true);
 
-watchEffect(() => {
-  async function fetchTxs() {
-    loading.value = true;
-    const res = await getTxsAccount(props.address, { ...pagination, count: true });
+async function fetchTxs(pagination: ParamsGetTx) {
+  try {
+    const res = await getTxsByAccount(props.address, pagination);
     if (res) {
-      const { data, options } = res;
-      totalCount.value = options.totalCount;
-      transactions.value = data;
+      transactions.value = res.data;
     }
-    loading.value = false;
-  }
-  fetchTxs();
-})
-
-async function handlePagination(page: number) {
-  const res = await getTxsAccount(props.address, { ...pagination, page, count: false });
-  if (res) {
-    transactions.value = res.data;
+  } catch (error) {
+    console.log({ error });
   }
 }
 
-const txHashes = computed(()=>{
+async function fetchCountTxs() {
+  try {
+    const res = await countTxsByAccount(props.address);
+    if (res) {
+      totalCount.value = res.data;
+    }
+  } catch (error) {
+    console.log({ error });
+  }
+}
+
+onMounted(() => {
+  fetchCountTxs();
+});
+
+watchEffect(() => {
+  fetchTxs(pagination.value);
+});
+
+async function handlePagination(page: number) {
+  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page } });
+}
+
+// parse massage txs
+const txHashes = computed(() => {
   return transactions.value?.map((tx: any) => tx.id);
-})
+});
 
 const query = gql`
       query GetTransactions($filter: TransactionFilter!) {
@@ -78,7 +96,7 @@ const variables = computed(() => {
 
 const { result } = useQuery(query, variables);
 
-const txsMerge = computed(()=>{
+const txsMerge = computed(() => {
   const txsOptimal = transactions.value;
   const txsIndexer = result.value?.transactions?.results;
 
@@ -94,18 +112,15 @@ const txsMerge = computed(()=>{
     };
   });
 
-  return labelInOutTxs(data, props.address)
+  return labelInOutTxs(data, props.address);
 })
 
 </script>
 <template>
   <div>
-    <div v-if="loading" class="w-full h-[200px] flex items-center justify-center">
-      <div class="loading loading-spinner loading-lg !text-gray-400"></div>
-    </div>
-    <div v-else>
+    <div>
       <TransactionTable :transactions="txsMerge" :chain="chain" :txTotal="totalCount" :pagination="pagination"
-        :handlePagination="handlePagination" :displayStatus="true" />
+        :handlePagination="handlePagination" :displayStatus="true" :page="pagination.page" />
     </div>
   </div>
 </template>
