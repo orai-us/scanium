@@ -75,7 +75,7 @@ const value = computed(() => {
   const tokenIn = data[0].tokenIn;
   const tokenOut = data.slice(-1)[0].tokenOut;
   let postSwapAction = getDeepestObject(props.params?.post_swap_action);
-  if (postSwapAction?.memo) {
+  if (postSwapAction?.memo !== undefined) {
     const snapShotPostSwapAction = { ...postSwapAction };
     delete snapShotPostSwapAction.memo
     postSwapAction = {

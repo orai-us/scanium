@@ -12,11 +12,13 @@ import nameMatcha from '@leapwallet/name-matcha';
 import ContractMessage from './ContractMessage.vue';
 import ExecuteSwapOperationsMessage from './ExecuteSwapOperationsMessage.vue';
 import SwapAndActionMessage from './SwapAndActionMessage.vue';
+import SwapNoneAmmV3 from './SwapNoneAmmV3.vue';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 enum TypeMessage {
   EXECUTE_SWAP_OPERATIONS = 'execute_swap_operations',
   SWAP_AND_ACTION = 'swap_and_action',
+  SWAP_NONE_AMM_V3 = 'swap',
 }
 let showCopyToast = ref(0);
 const encoder = new TextEncoder();
@@ -43,6 +45,10 @@ const isExecuteSwapOperationsMessage = computed(() => {
 
 const isSwapAndActionMessage = computed(() => {
   return executeMsgParams.value?.action === TypeMessage.SWAP_AND_ACTION
+})
+
+const isSwapNoneAmmV3 = computed(()=>{
+  return executeMsgParams.value?.action === TypeMessage.SWAP_NONE_AMM_V3 && props.value.contract !== contractAddress;
 })
 
 const copyWebsite = async (url: string) => {
@@ -114,6 +120,7 @@ watchEffect(() => {
           :events="events" />
         <ExecuteSwapOperationsMessage v-else-if="isExecuteSwapOperationsMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
         <SwapAndActionMessage v-else-if="isSwapAndActionMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
+        <SwapNoneAmmV3 v-else-if="isSwapNoneAmmV3" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
         <template v-else>
           <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
             <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
