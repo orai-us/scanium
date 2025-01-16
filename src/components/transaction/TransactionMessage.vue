@@ -104,7 +104,8 @@ watchEffect(() => {
           </div>
           <div v-else class="xl:text-sm text-xs">None</div>
         </div>
-        <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
+        <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
+          :events="events" />
         <SwapMessage v-else-if="isSwapMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" :sender="value.sender"/>
         <template v-else>
           <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
