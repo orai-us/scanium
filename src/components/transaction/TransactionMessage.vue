@@ -4,12 +4,13 @@ import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { decodeBuffer, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import AmmV3Message from './AmmV3Message.vue';
-import { contractAddress } from '@/libs/amm-v3';
+import { contractAddress, contractAddressSwapOperations } from '@/libs/amm-v3';
 import { Icon } from '@iconify/vue';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import ArrayCoinElement from '../dynamic/ArrayCoinElement.vue';
 import nameMatcha from '@leapwallet/name-matcha';
 import ContractMessage from './ContractMessage.vue';
+import ExecuteSwapOperations from './ExecuteSwapOperations.vue';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 
@@ -31,6 +32,10 @@ const executeMsgParams = computed(() => {
 const isAmmV3ExecuteMessage = computed(() => {
   return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddress;
 });
+
+const isExecuteSwapOperations = computed(() => {
+  return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddressSwapOperations;
+})
 
 const copyWebsite = async (url: string) => {
   if (!url) {
@@ -99,6 +104,7 @@ watchEffect(() => {
         </div>
         <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
           :events="events" />
+        <ExecuteSwapOperations v-if="isExecuteSwapOperations" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
         <template v-else>
           <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
             <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
