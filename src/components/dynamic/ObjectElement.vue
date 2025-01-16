@@ -9,7 +9,7 @@ const props = defineProps(['value']);
     <table class="table table-compact w-full text-sm">
       <tbody class="w-full">
         <tr v-for="(v, k) of value" class="w-full">
-          <td class="whitespace-break-spaces min-w-max">
+          <td class="whitespace-break-spaces min-w-max xl:text-sm text-xs">
             {{ formatTitle(String(k)) }}:
           </td>
           <td class="w-4/5">
