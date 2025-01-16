@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 import { Event, EventAttribute } from 'cosmjs-types/tendermint/abci/types';
 import { formatTitle } from '@/libs/utils';
-import { displayListAssets, displayPoolName } from '@/libs/amm-v3';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
+import { displayMessageSwap } from '@/libs/swap-msg';
 
-const props = defineProps(['action', 'params', 'events']);
-
+const props = defineProps(['action', 'params', 'events', 'sender']);
 const value = computed(() => {
   const events = props.events?.filter(
     (e: Event) =>
@@ -30,43 +29,14 @@ const value = computed(() => {
       messages.push(result);
     }
   }
-  const data = [];
-  for (let message of messages) {
-    const token_x = message.offer_asset;
-    const token_y = message.ask_asset;
-    const amountIn = message.offer_amount;
-    const amountOut = message.return_amount;
+  return displayMessageSwap(props.action, messages, props.params, props.sender)
+});
 
-    const poolKey = {
-      token_x,
-      token_y,
-      fee_tier: {
-        fee: null,
-        tick_spacing: null
-      }
-    };
-    const result = {
-      pool: displayPoolName(poolKey),
-      tokenIn: displayListAssets([amountIn], [token_x]),
-      tokenOut: displayListAssets([amountOut], [token_y]),
-    }
-    data.push(result)
-  }
-  const tokenIn = data[0].tokenIn;
-  const tokenOut = data.slice(-1)[0].tokenOut;
-
-  return {
-    tokenIn,
-    tokenOut,
-    operations: data,
-    maxSpread: props.params?.max_spread,
-    beliefPrice: props.params?.belief_price
-  }
-})
 </script>
+
 <template>
   <div v-for="(v, k) of value" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-2">
-    <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k.toString()) }}:</div>
+    <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
     <div
       :class="{ 'border-gray-800 border rounded-md xl:w-[80%] w-full': typeof v === 'object' && !Array.isArray(v) && v }">
       <DynamicComponent :value="v" />

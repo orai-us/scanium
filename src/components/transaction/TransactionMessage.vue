@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, toRaw, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { decodeBuffer, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
@@ -10,20 +10,11 @@ import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import ArrayCoinElement from '../dynamic/ArrayCoinElement.vue';
 import nameMatcha from '@leapwallet/name-matcha';
 import ContractMessage from './ContractMessage.vue';
-import ExecuteSwapOperationsMessage from './ExecuteSwapOperationsMessage.vue';
-import SwapAndActionMessage from './SwapAndActionMessage.vue';
-import SwapNoneAmmV3 from './SwapNoneAmmV3.vue';
-import CreateSwapOrderMessage from './CreateSwapOrderMessage.vue';
-import UpdateMinimumSwapAmountMessage from './UpdateMinimumSwapAmountMessage.vue';
+import SwapMessage from './SwapMessage.vue';
+import { TypeMessage } from '@/libs/swap-msg';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
-enum TypeMessage {
-  EXECUTE_SWAP_OPERATIONS = 'execute_swap_operations',
-  SWAP_AND_ACTION = 'swap_and_action',
-  SWAP_NONE_AMM_V3 = 'swap',
-  CREATE_SWAP_ORDER = 'create_swap_order',
-  UPDATE_MINIMUM_SWAP_AMOUNT = 'update_minimum_swap_amount'
-}
+
 let showCopyToast = ref(0);
 const encoder = new TextEncoder();
 const labelSenders = ref([] as { name?: string | null; provider?: string }[]);
@@ -43,24 +34,9 @@ const isAmmV3ExecuteMessage = computed(() => {
   return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddress;
 });
 
-const isExecuteSwapOperationsMessage = computed(() => {
-  return executeMsgParams.value?.action === TypeMessage.EXECUTE_SWAP_OPERATIONS
-})
-
-const isSwapAndActionMessage = computed(() => {
-  return executeMsgParams.value?.action === TypeMessage.SWAP_AND_ACTION
-})
-
-const isSwapNoneAmmV3 = computed(()=>{
-  return executeMsgParams.value?.action === TypeMessage.SWAP_NONE_AMM_V3 && props.value.contract !== contractAddress;
-})
-
-const isCreateSwapOrderMessage = computed(() => {
-  return executeMsgParams.value?.action === TypeMessage.CREATE_SWAP_ORDER
-})
-
-const isUpdateMinimumSwapAmountMessage = computed(()=>{
-  return executeMsgParams.value?.action === TypeMessage.UPDATE_MINIMUM_SWAP_AMOUNT
+const isSwapMessage = computed(() => {
+  const typeMessages: Array<any> = Object.values(TypeMessage);
+  return typeMessages.includes(executeMsgParams.value?.action);
 })
 
 const copyWebsite = async (url: string) => {
@@ -128,13 +104,8 @@ watchEffect(() => {
           </div>
           <div v-else class="xl:text-sm text-xs">None</div>
         </div>
-        <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
-          :events="events" />
-        <ExecuteSwapOperationsMessage v-else-if="isExecuteSwapOperationsMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
-        <SwapAndActionMessage v-else-if="isSwapAndActionMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
-        <SwapNoneAmmV3 v-else-if="isSwapNoneAmmV3" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
-        <CreateSwapOrderMessage v-else-if="isCreateSwapOrderMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events"/>
-        <UpdateMinimumSwapAmountMessage v-else-if="isUpdateMinimumSwapAmountMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events"/>
+        <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" />
+        <SwapMessage v-else-if="isSwapMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" :sender="value.sender"/>
         <template v-else>
           <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
             <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
