@@ -274,3 +274,27 @@ export const wrapBinary = (value: any): any => {
   }
   return value;
 };
+
+export const getDeepestObject = (obj: any): any => {
+  let deepestObj = null;
+  let maxDepth = 0;
+
+  function traverse(currentObj: any, currentDepth: any) {
+    let hasNestedObject = false;
+
+    for (let key in currentObj) {
+      if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
+        hasNestedObject = true;
+        traverse(currentObj[key], currentDepth + 1);
+      }
+    }
+
+    if (!hasNestedObject && currentDepth > maxDepth) {
+      maxDepth = currentDepth;
+      deepestObj = currentObj;
+    }
+  }
+
+  traverse(obj, 1);
+  return deepestObj;
+};
