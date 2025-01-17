@@ -12,6 +12,8 @@ import nameMatcha from '@leapwallet/name-matcha';
 import ContractMessage from './ContractMessage.vue';
 import SwapMessage from './SwapMessage.vue';
 import { TypeMessage } from '@/libs/swap-msg';
+import { TypeMessageSend } from '@/libs/send-msg';
+import SendMessage from './SendMessage.vue';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 
@@ -37,6 +39,11 @@ const isAmmV3ExecuteMessage = computed(() => {
 const isSwapMessage = computed(() => {
   const typeMessages: Array<any> = Object.values(TypeMessage);
   return typeMessages.includes(executeMsgParams.value?.action);
+})
+
+const isSendMessage = computed(() => {
+  const typeMsgSends: Array<any> = Object.values(TypeMessageSend);
+  return typeMsgSends.includes(executeMsgParams.value?.action);
 })
 
 const copyWebsite = async (url: string) => {
@@ -107,6 +114,7 @@ watchEffect(() => {
         <AmmV3Message v-if="isAmmV3ExecuteMessage" :action="executeMsgParams.action" :params="executeMsgParams.params"
           :events="events" />
         <SwapMessage v-else-if="isSwapMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" :sender="value.sender"/>
+        <SendMessage v-else-if="isSendMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events"/>
         <template v-else>
           <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
             <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
