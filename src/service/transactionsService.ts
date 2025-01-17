@@ -9,12 +9,6 @@ export interface ParamsGetHistoryTxs {
   offset?: number;
 }
 
-export interface ParamsGetTxsAccount {
-  page: number;
-  limit: number,
-  count: boolean
-}
-
 export interface ParamsGetTx {
   page: number;
   limit: number;
@@ -33,15 +27,27 @@ export const getHistoryTxs = async (params: ParamsGetHistoryTxs) => {
 };
 
 const urlTxsByAccount = "/v1/transaction/by-account"
-export const getTxsAccount = async (
+export const getTxsByAccount = async (
   addressAcc: string,
-  params: ParamsGetTxsAccount
+  params: ParamsGetTx
 ) => {
   const config = {
     baseURL: baseUrlOptimalQueriesScanium,
     url: `${urlTxsByAccount}/${addressAcc}`,
     method: METHODS.GET,
     params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countTxsByAccount = async (
+  addressAcc: string,
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsByAccount}/${addressAcc}/count`,
+    method: METHODS.GET,
   };
   const res = await api.request(config);
   return res?.data;

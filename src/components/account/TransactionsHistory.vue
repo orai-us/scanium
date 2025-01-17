@@ -1,22 +1,25 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
 import TransactionsTransfers from "./TransactionsTransfers.vue";
 import TransactionAccountIndexs from './TransactionAccountIndexs.vue';
 import TransactionAccountRpc from './TransactionAccountRpc.vue';
 import { CHAIN_INDEXS } from '@/constants';
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['address', 'chain', 'txs']);
 
 const TRANSACTION_TYPE = {
-  ALL: "tx-all",
+  ALL: "all",
   TRANSFERS: "transfers",
 }
-const txType = ref(TRANSACTION_TYPE.ALL);
+const route = useRoute();
+const router = useRouter();
+const txType = computed(() => {
+  return route.query.type || TRANSACTION_TYPE.ALL;
+})
 
 function changeTypeTx(tx: string) {
-  txType.value = tx
-  // if (tx === TRANSACTION_TYPE.CW20) txs.value = txsTransfers.value?.filter(tx => tx.transactionType === TRANSACTION_TYPE.CW20)
-  // else txs.value = txsTransfers.value
+  router.push({ path: `/${props.chain}/account/${props.address}`, query: { type: tx } });
 }
 
 </script>
