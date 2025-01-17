@@ -59,7 +59,7 @@ export const NEW_ASSETS = [
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmNu1YU842i2imMX9bTV5kFK8ndUpUwxHD9ipRRXoBakD6',
     },
-    coingecko_id: 'GNRT',
+    coingecko_id: 'degenerator-project',
     exponent: '6',
     denom_units: [
       {
@@ -78,7 +78,7 @@ export const NEW_ASSETS = [
   {
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
-    display: 'LEE', // Not used to display on assets and messages
+    display: 'lee', // Not used to display on assets and messages
     symbol: 'LEE',
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmWh89Xh8bVMD1vP4VLtkazQjM7TyYxfoufMn5SZHuEJY1',
