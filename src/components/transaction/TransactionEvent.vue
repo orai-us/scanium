@@ -17,7 +17,7 @@ const changeLogOpen = (index: number) => {
     <div class="mb-2 xl:w-1/5 w-full xl:text-sm text-xs">Event Logs:</div>
     <div class="xl:w-4/5 w-full">
       <div v-for="(event, idx) of events" class="rounded border-solid border border-stone-800 mb-4">
-        <div class="collapse collapse-arrow w-[80%]" :class="{
+        <div class="collapse collapse-arrow xl:w-full w-[80%]" :class="{
           'collapse-open': idx === 0 && logOpens[idx],
           'collapse-close': !logOpens[idx]
         }">

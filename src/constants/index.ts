@@ -99,6 +99,30 @@ export const NEW_ASSETS = [
     description: '$LEE is the official token representing Lee Quid AI Agent, your personal helper in liquidity management. He auto-rebalances your fund to keep it in the most profitable price range. Currently managing Farm V3 on Raydium (Solana).',
     verify: true,
   },
+  {
+    name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
+    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
+    display: 'sol', // Not used to display on assets and messages
+    symbol: 'SOL',
+    logo_URIs: {
+      svg: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756',
+    },
+    coingecko_id: 'solana',
+    exponent: '9',
+    denom_units: [
+      {
+        denom:
+          'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
+        exponent: 0,
+      },
+      {
+        denom: 'SOL',
+        exponent: 9,
+      },
+    ],
+    description: '',
+    verify: true,
+  },
 ];
 
 // id: symbol
