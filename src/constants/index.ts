@@ -4,9 +4,10 @@ export const CHAIN_INDEXS = ['Oraichain'];
 
 export const NEW_ASSETS = [
   {
+    id: 'max',
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
-    display: 'max',
+    display: 'MAX',
     symbol: 'MAX',
     logo_URIs: {
       svg: 'https://assets.coingecko.com/coins/images/52378/standard/btc.png?1733257730',
@@ -28,9 +29,10 @@ export const NEW_ASSETS = [
     verify: true
   },
   {
+    id: 'racks',
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/D7yP4ycfsRWUGYionGpi64sLF2ddZ2JXxuRAti2M7uck',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/D7yP4ycfsRWUGYionGpi64sLF2ddZ2JXxuRAti2M7uck',
-    display: 'racks', // Not used to display on assets and messages
+    display: 'RACKS', // Not used to display on assets and messages
     symbol: 'RACKS',
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmVRPsBSHpamDzcDzVL9wsbB9gr4frtNrrFF7g44Xa9FuS',
@@ -52,14 +54,15 @@ export const NEW_ASSETS = [
     verify: true,
   },
   {
+    id: 'grnt',
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
-    display: 'gnrt', // Not used to display on assets and messages
+    display: 'GRNT', // Not used to display on assets and messages
     symbol: 'GNRT',
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmNu1YU842i2imMX9bTV5kFK8ndUpUwxHD9ipRRXoBakD6',
     },
-    coingecko_id: 'GNRT',
+    coingecko_id: 'degenerator-project',
     exponent: '6',
     denom_units: [
       {
@@ -76,6 +79,7 @@ export const NEW_ASSETS = [
     verify: true,
   },
   {
+    id: 'lee',
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
     display: 'LEE', // Not used to display on assets and messages
@@ -100,9 +104,10 @@ export const NEW_ASSETS = [
     verify: true,
   },
   {
+    id: 'sol',
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
-    display: 'sol', // Not used to display on assets and messages
+    display: 'SOL', // Not used to display on assets and messages
     symbol: 'SOL',
     logo_URIs: {
       svg: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756',

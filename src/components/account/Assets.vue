@@ -8,6 +8,7 @@ import { getCw20Balances, getListAsset, getPriceByIds } from '@/service/assetsSe
 import numeral from 'numeral';
 import ChainRegistryClient from '@ping-pub/chain-registry-client';
 import axios from 'axios';
+import { shortenDenom } from '@/utils';
 
 const props = defineProps(['balances', 'delegations', 'rewards', 'unbondingTotal', 'address', 'chain']);
 
@@ -148,11 +149,12 @@ const unbondingAssets = computed(() => {
   return supportedAssets.value ? resultSupported : resultUnSupported;
 })
 
-watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, supportedAssets], async () => {
-  const assets = [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value];
-  const ids = assets.map(item => item?.id);
+const assets = computed(()=>{
+  return [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value];
+})
 
-  console.log({ ids })
+watch([() => assets.value.length, supportedAssets, balancesChain], async () => {
+  const ids = assets.value.map(item => item?.id);
   const result: any = {};
   if (ids?.length > 0) {
     const res = await getPriceByIds({ ids: ids.join(",") });
@@ -162,8 +164,9 @@ watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, sup
     priceBySymbol.value = result;
 
     let total = 0;
-    for (let item of assets) {
-      total += item.amount * result[item.denom];
+    for (let item of assets.value) {
+      if (result[item.denom])
+        total += item.amount * result[item.denom];
     }
     totalValue.value = total;
   }
@@ -194,13 +197,38 @@ watch([balancesAssets, delegatesAssets, rewardsTotalAssets, unbondingAssets, sup
   }
 
   totalAmountByCategory.value = [sumBalance, sumDelegate, sumReward, sumUnbonding];
-})
+}, { flush: 'post' })
 
 function formatValue(amount: number, fmt = '0,0.[0]') {
   const result = `${numeral(amount).format(fmt)}`;
   return result === "NaN" ? 0 : result
 }
 
+let showCopyToast = ref(null as any);
+
+const copyWebsite = async (url: string) => {
+  if (!url) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showCopyToast.value = true;
+    setTimeout(() => {
+      showCopyToast.value = null;
+    }, 1000);
+  } catch (err) {
+    showCopyToast.value = false;
+    setTimeout(() => {
+      showCopyToast.value = null;
+    }, 1000);
+  }
+};
+
+const tipMsg = computed(() => {
+  return showCopyToast.value === false
+    ? { class: 'error', msg: 'Copy Error!' }
+    : { class: 'success', msg: 'Copy Success!' };
+});
 </script>
 
 <template>
@@ -231,8 +259,15 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
               <div class="absolute top-0 bottom-0 left-0 right-0 bg-info opacity-20"></div>
             </div>
             <div class="flex-1">
-              <div class="text-sm font-semibold">
+              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
                 {{ balanceItem?.amountDisplay }} {{ balanceItem?.denom?.toUpperCase() }}
+              </div>
+              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+                {{ balanceItem?.amountDisplay }} 
+                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(balanceItem?.denom?.toUpperCase() || '')" >
+                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(balanceItem?.denom?.toUpperCase()) }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3" />
+                </div>
               </div>
               <div class="text-xs">
                 {{ formatValue((priceBySymbol[balanceItem?.denom] * balanceItem?.amount) / totalValue * 100) }}%
@@ -249,8 +284,15 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
               <div class="absolute top-0 bottom-0 left-0 right-0 bg-warning opacity-20"></div>
             </div>
             <div class="flex-1">
-              <div class="text-sm font-semibold">
+              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
                 {{ delegationItem?.amountDisplay }} {{ delegationItem?.denom?.toUpperCase() }}
+              </div>
+              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+                {{ delegationItem?.amountDisplay }} 
+                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(delegationItem?.denom?.toUpperCase() || '')" >
+                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(delegationItem?.denom?.toUpperCase()) }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
+                </div>
               </div>
               <div class="text-xs">
                 {{ formatValue((priceBySymbol[delegationItem?.denom] * delegationItem?.amount) / totalValue * 100) }}%
@@ -267,8 +309,15 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
               <div class="absolute top-0 bottom-0 left-0 right-0 bg-success opacity-20"></div>
             </div>
             <div class="flex-1">
-              <div class="text-sm font-semibold">
+              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
                 {{ rewardItem?.amountDisplay }} {{ rewardItem?.denom?.toUpperCase() }}
+              </div>
+              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+                {{ rewardItem?.amountDisplay }} 
+                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(rewardItem?.denom?.toUpperCase() || '')" >
+                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(rewardItem?.denom?.toUpperCase()) }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
+                </div>
               </div>
               <div class="text-xs">
                 {{ formatValue((priceBySymbol[rewardItem?.denom] * rewardItem?.amount) / totalValue * 100) }}%
@@ -285,8 +334,15 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
               <div class="absolute top-0 bottom-0 left-0 right-0 bg-error opacity-20"></div>
             </div>
             <div class="flex-1">
-              <div class="text-sm font-semibold">
+              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
                 {{ unbondingAssets[0]?.amount }} {{ unbondingAssets[0]?.denom?.toUpperCase() }}
+              </div>
+              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+                {{ unbondingAssets[0]?.amountDisplay }} 
+                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(unbondingAssets[0]?.denom?.toUpperCase() || '')" >
+                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(unbondingAssets[0]?.denom?.toUpperCase()) }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
+                </div>
               </div>
               <div class="text-xs">
                 {{ formatValue((priceBySymbol[unbondingAssets[0]?.denom] * unbondingAssets[0]?.amount) / totalValue *
@@ -302,6 +358,20 @@ function formatValue(amount: number, fmt = '0,0.[0]') {
           {{ $t('account.total_value') }}: ${{
           totalValue ? formatValue(totalValue) : 0
           }}
+        </div>
+      </div>
+    </div>
+    <div class="toast z-10" v-show="showCopyToast === true">
+      <div class="alert alert-success">
+        <div class="text-xs md:!text-sm">
+          <span>{{ tipMsg.msg }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="toast z-10" v-show="showCopyToast === false">
+      <div class="alert alert-error">
+        <div class="text-xs md:!text-sm">
+          <span>{{ tipMsg.msg }}</span>
         </div>
       </div>
     </div>
