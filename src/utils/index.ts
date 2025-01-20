@@ -45,11 +45,11 @@ export const shortenDenom = (denom: string) => {
 };
 
 export const convertNewAssetToToken = (
-  newAssets: Array<{ coingecko_id: string; display: string }>
+  newAssets: Array<{ coingecko_id: string; id: string }>
 ) => {
   const token: any = {};
   for (let asset of newAssets) {
-    token[asset.coingecko_id] = asset.display;
+    token[asset.coingecko_id] = asset.id;
   }
   return token;
 };
