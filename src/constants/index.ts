@@ -54,10 +54,10 @@ export const NEW_ASSETS = [
     verify: true,
   },
   {
-    id: 'grnt',
+    id: 'gnrt',
     name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
     base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
-    display: 'GRNT', // Not used to display on assets and messages
+    display: 'GNRT', // Not used to display on assets and messages
     symbol: 'GNRT',
     logo_URIs: {
       svg: 'https://ipfs.io/ipfs/QmNu1YU842i2imMX9bTV5kFK8ndUpUwxHD9ipRRXoBakD6',
@@ -126,6 +126,31 @@ export const NEW_ASSETS = [
       },
     ],
     description: '',
+    verify: true,
+  },
+  {
+    id: 'jpow',
+    name: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/orairHM3Yw2PbTfCty1PXy7tEUx3uBMfjouNbm4KnRJ',
+    base: 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/orairHM3Yw2PbTfCty1PXy7tEUx3uBMfjouNbm4KnRJ',
+    display: 'JPOW',
+    symbol: 'JPOW',
+    logo_URIs: {
+      svg: 'https://ipfs.io/ipfs/QmTNx93FdeSwBxsqbZF5NuhVU9AWwodpwqjuHtGEMRTV38',
+    },
+    coingecko_id: 'jpow',
+    exponent: '6',
+    denom_units: [
+      {
+        denom:
+          'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/orairHM3Yw2PbTfCty1PXy7tEUx3uBMfjouNbm4KnRJ',
+        exponent: 0,
+      },
+      {
+        denom: 'JPOW',
+        exponent: 6,
+      },
+    ],
+    description: '$JPOW is the official token representing the JPOW AI Agent, your autonomous manager for stablecoin issuance and money markets. JPOW actively optimizes LTV, interest rates, liquidations, and liquidity pools, ensuring seamless and efficient operations. Currently powering the $USDAI stablecoin ecosystem and expanding the boundaries of AI-driven DeFi.',
     verify: true,
   },
 ];
