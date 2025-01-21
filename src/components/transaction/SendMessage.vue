@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, toRaw, watchEffect } from 'vue';
 import { Event, EventAttribute } from 'cosmjs-types/tendermint/abci/types';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { formatTitle } from '@/libs/utils';
 import { displayListAssets, tokenMap } from '@/libs/amm-v3';
 import { TypeMessageSend } from '@/libs/send-msg';
-const props = defineProps(['action', 'params', 'events', 'receiver', 'amount']);
+const props = defineProps(['action', 'params', 'events', 'receiver']);
+
+watchEffect(()=>{
+  console.log({ params: toRaw(props.params) });
+})
 
 const valueSend = computed(() => {
   const eventSends = props.events?.filter(
@@ -45,8 +49,8 @@ const valueSend = computed(() => {
   }
 
   return {
-    receiver,
-    amount: amountDisplay,
+    receiver: receiver || props.params?.contract,
+    amount: amountDisplay || props.params?.amount,
   };
 });
 
