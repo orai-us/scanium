@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { computed, toRaw, watchEffect } from 'vue';
+import { computed } from 'vue';
 import { Event, EventAttribute } from 'cosmjs-types/tendermint/abci/types';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { formatTitle } from '@/libs/utils';
 import { displayListAssets, tokenMap } from '@/libs/amm-v3';
+import { TypeMessageSend } from '@/libs/send-msg';
 const props = defineProps(['action', 'params', 'events', 'receiver', 'amount']);
 
 const valueSend = computed(() => {
@@ -12,7 +13,7 @@ const valueSend = computed(() => {
       e.type === 'wasm' &&
       e.attributes.some((attr) =>
         attr.key === 'action' &&
-        attr.value === 'send'
+        Object.values(TypeMessageSend).includes(attr.value as TypeMessageSend)
       )
   );
   const messages: any[] = [];
@@ -20,22 +21,32 @@ const valueSend = computed(() => {
     for (let event of eventSends) {
       const result = event?.attributes.reduce((obj: { [key: string]: any; }, attr: EventAttribute) => {
         if (attr.key in obj) {
-          obj[attr.key] = [obj[attr.key], attr.value];
+          if (!obj[attr.key])
+            obj[attr.key] = [obj[attr.key], attr.value];
           return obj;
         }
-        obj[attr.key] = attr.value;
+        if (!obj[attr.key])
+          obj[attr.key] = attr.value;
         return obj;
       }, {} as any) || {};
       messages.push(result);
     }
   }
 
-  const receiver = messages.slice(-1)[0]?.to;
+  const messageSend = messages.slice(-1)[0]
+  const receiver = messageSend?.to || messageSend?.recipient;
   const amount = messages[0]?.amount;
+  let amountDisplay = amount;
+  if(denom.value){
+    if(tokenMap[denom.value])
+      amountDisplay = displayListAssets([amount], [denom.value]);
+    else 
+      amountDisplay = `${amount} ${denom.value}`
+  }
 
   return {
     receiver,
-    amount: tokenMap[denom.value] ? displayListAssets([amount], [denom.value]) : `${amount} ${denom.value}`,
+    amount: amountDisplay,
   };
 });
 
@@ -43,31 +54,33 @@ const denom = computed(() => {
   const eventContracts = props.events?.filter(
     (e: Event) => e.type === 'wasm' &&
       e.attributes.some((attr) =>
-        attr.key === '_contract_address' &&
-        attr.value === props.params?.contract
+        attr.key === '_contract_address'
       )
   );
+  
   const messageContracts: any[] = [];
   if (Array.isArray(eventContracts)) {
     for (let event of eventContracts) {
-      console.log({ event: toRaw(event) })
       const result = event?.attributes.reduce((obj: { [key: string]: any; }, attr: EventAttribute) => {
         if (attr.key in obj) {
-          obj[attr.key] = [obj[attr.key], attr.value];
+          if (!obj[attr.key])
+            obj[attr.key] = [obj[attr.key], attr.value];
           return obj;
         }
-        obj[attr.key] = attr.value;
+        if (!obj[attr.key])
+          obj[attr.key] = attr.value;
         return obj;
       }, {} as any) || {};
       messageContracts.push(result);
     }
   }
 
-  console.log({ messageContracts })
-
   for (let message of messageContracts) {
-    console.log({ event: toRaw(message) });
-    let denom = message.denom_in || message.denom;
+    let denom = message.denom_in || message.denom || message.offer_asset || message.staking_token || message.currency || message._contract_address;
+    if (!denom && message.pool_key) {
+      const poolKey = message.pool_key;
+      denom = poolKey.split("-")[0];
+    }
     if (denom) return denom;
   }
 

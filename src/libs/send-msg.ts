@@ -1,3 +1,4 @@
 export enum TypeMessageSend {
-  SEND = 'send'
+  SEND = 'send',
+  SEND_NFT = 'send_nft'
 }
