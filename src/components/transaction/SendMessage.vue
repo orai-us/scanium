@@ -1,101 +1,70 @@
 <script lang="ts" setup>
-import { computed, toRaw, watchEffect } from 'vue';
-import { Event, EventAttribute } from 'cosmjs-types/tendermint/abci/types';
 import DynamicComponent from '../dynamic/DynamicComponent.vue';
+import { computed, toRaw, watchEffect } from 'vue';
 import { formatTitle } from '@/libs/utils';
-import { displayListAssets, tokenMap } from '@/libs/amm-v3';
-import { TypeMessageSend } from '@/libs/send-msg';
-const props = defineProps(['action', 'params', 'events', 'receiver']);
+import { displayListAssets } from '@/libs/amm-v3';
+import { BONDING_CONTRACT_ADDRESS, BRIDGE_EVM_CONTRACT_ADDRESS, BRIDGE_TON_ADDRESS, EXECUTE_SWAP_OPERATIONS_ROUTER, EXECUTE_SWAP_OPERATIONS_SMART_CONTRACT, PREFIX_MEMO_MSG_BRIDGE_EVMS, SWAP_AND_ACTION_CONTRACT_ADDRESS } from '@/libs/send-msg';
+import ContractMessage from './ContractMessage.vue';
 
-watchEffect(()=>{
-  console.log({ params: toRaw(props.params) });
-})
+const props = defineProps(['params', 'events', 'denom', 'sender', 'chain']);
+
+const receiver = computed(() => {
+  let result = "";
+
+  if (props.params?.msg) {
+    const msg = JSON.parse(atob(props.params.msg));
+    console.log({ msg })
+    const contract = props.params?.contract;
+    switch (contract) {
+      case BRIDGE_EVM_CONTRACT_ADDRESS:
+        const memo = msg.memo;
+        PREFIX_MEMO_MSG_BRIDGE_EVMS.forEach((item) => {
+          if (memo.startsWith(item)) {
+            result = memo.replace(item, "");
+          }
+        });
+        return result;
+      case BRIDGE_TON_ADDRESS:
+        return msg.to;
+      case SWAP_AND_ACTION_CONTRACT_ADDRESS:
+        return msg.swap_and_action?.post_swap_action?.transfer?.to_address || msg.swap_and_action?.post_swap_action?.ibc_transfer?.ibc_info?.receiver;
+      case EXECUTE_SWAP_OPERATIONS_SMART_CONTRACT:
+      case EXECUTE_SWAP_OPERATIONS_ROUTER:
+        return props.sender;
+      case BONDING_CONTRACT_ADDRESS:
+        return props.params?.contract;
+      default:
+        return result;
+    }
+  }
+  return result;
+
+});
 
 const valueSend = computed(() => {
-  const eventSends = props.events?.filter(
-    (e: Event) =>
-      e.type === 'wasm' &&
-      e.attributes.some((attr) =>
-        attr.key === 'action' &&
-        Object.values(TypeMessageSend).includes(attr.value as TypeMessageSend)
-      )
-  );
-  const messages: any[] = [];
-  if (Array.isArray(eventSends)) {
-    for (let event of eventSends) {
-      const result = event?.attributes.reduce((obj: { [key: string]: any; }, attr: EventAttribute) => {
-        if (attr.key in obj) {
-          if (!obj[attr.key])
-            obj[attr.key] = [obj[attr.key], attr.value];
-          return obj;
-        }
-        if (!obj[attr.key])
-          obj[attr.key] = attr.value;
-        return obj;
-      }, {} as any) || {};
-      messages.push(result);
-    }
-  }
-
-  const messageSend = messages.slice(-1)[0]
-  const receiver = messageSend?.to || messageSend?.recipient;
-  const amount = messages[0]?.amount;
-  let amountDisplay = amount;
-  if(denom.value){
-    if(tokenMap[denom.value])
-      amountDisplay = displayListAssets([amount], [denom.value]);
-    else 
-      amountDisplay = `${amount} ${denom.value}`
-  }
-
   return {
-    receiver: receiver || props.params?.contract,
-    amount: amountDisplay || props.params?.amount,
+    receiver: receiver.value,
+    amount: displayListAssets([props.params?.amount], [props.denom]),
   };
-});
+})
 
-const denom = computed(() => {
-  const eventContracts = props.events?.filter(
-    (e: Event) => e.type === 'wasm' &&
-      e.attributes.some((attr) =>
-        attr.key === '_contract_address'
-      )
-  );
-  
-  const messageContracts: any[] = [];
-  if (Array.isArray(eventContracts)) {
-    for (let event of eventContracts) {
-      const result = event?.attributes.reduce((obj: { [key: string]: any; }, attr: EventAttribute) => {
-        if (attr.key in obj) {
-          if (!obj[attr.key])
-            obj[attr.key] = [obj[attr.key], attr.value];
-          return obj;
-        }
-        if (!obj[attr.key])
-          obj[attr.key] = attr.value;
-        return obj;
-      }, {} as any) || {};
-      messageContracts.push(result);
-    }
-  }
-
-  for (let message of messageContracts) {
-    let denom = message.denom_in || message.denom || message.offer_asset || message.staking_token || message.currency || message._contract_address;
-    if (!denom && message.pool_key) {
-      const poolKey = message.pool_key;
-      denom = poolKey.split("-")[0];
-    }
-    if (denom) return denom;
-  }
-
-});
 </script>
 <template>
-  <div v-for="(v, k) of valueSend" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-2">
-    <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
-    <div
-      :class="{ 'border-gray-800 border rounded-md xl:w-[80%] w-full': typeof v === 'object' && !Array.isArray(v) && v }">
-      <DynamicComponent :value="v" />
+  <div>
+    <div v-for="(v, k) of valueSend" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-2">
+      <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>
+      <div
+        :class="{ 'border-gray-800 border rounded-md xl:w-[80%] w-full': typeof v === 'object' && !Array.isArray(v) && v }">
+        <DynamicComponent :value="v" />
+      </div>
     </div>
+    <div class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-2">
+      <div class="w-40 xl:text-sm text-xs">Contract :</div>
+      <ContractMessage :contract="props.params?.contract" :chain="chain" />
+    </div>
+    <!-- <div class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-2">
+      <div class="w-40 xl:text-sm text-xs">Msg :</div>
+      <DynamicComponent :value="props.params?.msg" :direct="'messageTx'"/>
+    </div> -->
   </div>
 </template>
