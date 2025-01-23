@@ -28,9 +28,9 @@ interface ChainType {
 }
 
 export const CHAIN: ChainType = {
-  oraib: 'Binance',
+  oraib: 'BNB Chain',
   'eth-mainnet': 'Ethereum',
-  'trontrx-mainnet': 'Tron',
+  'trontrx-mainnet': 'TRON Network',
 };
 
 export const displayMessageSend = (
@@ -56,7 +56,7 @@ export const displayMessageSend = (
         });
         return { amount, receiver, chain };
       case BRIDGE_TON_ADDRESS:
-        return { amount, receiver: msg.to, chain: 'Ton' };
+        return { amount, receiver: msg.to, chain: 'Telegram Open Network(TON)' };
       case SWAP_AND_ACTION_CONTRACT_ADDRESS:
         return {
           amount,
