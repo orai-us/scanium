@@ -22,3 +22,9 @@ const props = defineProps(['value']);
     </table>
   </div>
 </template>
+<style scoped>
+::v-deep span {
+  background-color: #18181A !important;
+  color: white !important;
+}
+</style>
