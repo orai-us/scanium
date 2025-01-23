@@ -19,7 +19,7 @@ const txType = computed(() => {
 })
 
 function changeTypeTx(tx: string) {
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { type: tx } });
+  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, type: tx, page: 1 } });
 }
 
 </script>
