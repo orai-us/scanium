@@ -6,22 +6,24 @@ import { Icon } from '@iconify/vue';
 import { LIST_COIN } from '@/constants';
 import { getCw20Balances, getListAsset, getPriceByIds } from '@/service/assetsService';
 import numeral from 'numeral';
-import ChainRegistryClient from '@ping-pub/chain-registry-client';
-import axios from 'axios';
 import { shortenDenom } from '@/utils';
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['balances', 'delegations', 'rewards', 'unbondingTotal', 'address', 'chain']);
-
-const client = new ChainRegistryClient();
 
 const coingeckoSymbols = Object.values(LIST_COIN);
 const coingeckoIds = Object.keys(LIST_COIN);
 
+const route = useRoute();
+const router = useRouter();
 const format = useFormatter();
-const supportedAssets = ref(true);
+const supportedAssets = computed(() => {
+  const supported = route.query.supported === 'false' ? false : true;
+  return supported;
+});
 const stakingStore = useStakingStore();
 
-const totalValue = ref();
+const totalValue = ref(0);
 const totalAmountByCategory = ref([] as Array<any>);
 const balancesChain = ref([] as Array<any>);
 
@@ -30,7 +32,7 @@ const priceBySymbol = ref({} as any);
 const labels = ['Balance', 'Delegation', 'Reward', 'Unbonding'];
 
 function changeStatusSupported(supported: boolean) {
-  supportedAssets.value = supported;
+  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, supported: supported.toString() } });
 }
 
 async function fetchBalancesCw20() {
@@ -169,6 +171,8 @@ watch([() => assets.value.length, supportedAssets, balancesChain], async () => {
         total += item.amount * result[item.denom];
     }
     totalValue.value = total;
+  } else {
+    totalValue.value = 0;
   }
 
   let sumBalance = 0;
