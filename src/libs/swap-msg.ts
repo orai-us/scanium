@@ -14,7 +14,7 @@ export function displayMessageSwap(
   action: TypeMessage,
   messages: Array<any>,
   params: any,
-  sender: string
+  sender?: string
 ) {
   switch (action) {
     case TypeMessage.EXECUTE_SWAP_OPERATIONS:
@@ -35,7 +35,7 @@ export function displayMessageSwap(
 export function executeSwapOperationsMessage(
   messages: Array<any>,
   params: any,
-  sender: string
+  sender?: string
 ) {
   const data = [];
   let denomMinimumReceive;
@@ -187,6 +187,9 @@ export function swapAndActionMessage(messages: Array<any>, params: any) {
   if (minAsset?.cw20) {
     amountMinAsset = minAsset.cw20.amount;
     addressMinAsset = minAsset.cw20.address;
+  } else if (minAsset?.native) {
+    amountMinAsset = minAsset.native?.amount;
+    addressMinAsset = minAsset.native?.denom;
   }
   return {
     tokenIn,
@@ -203,7 +206,7 @@ export function swapAndActionMessage(messages: Array<any>, params: any) {
 export function swapNoneAmmV3(
   messages: Array<any>,
   params: any,
-  sender: string
+  sender?: string
 ) {
   const data = [];
   for (let message of messages) {
