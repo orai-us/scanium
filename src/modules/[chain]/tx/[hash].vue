@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
-import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
 import type { GetTxResponse } from 'cosmjs-types/cosmos/tx/v1beta1/service';
 import { logs } from '@cosmjs/stargate';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
@@ -8,13 +7,15 @@ import { JsonViewer } from 'vue3-json-viewer';
 // if you used v1.0.5 or latster ,you should add import "vue3-json-viewer/dist/index.css"
 import 'vue3-json-viewer/dist/index.css';
 import { Icon } from '@iconify/vue';
-import { ref, computed, watchEffect, toRaw } from 'vue';
+import { ref, computed, watchEffect } from 'vue';
 import { decodeProto } from '@/components/dynamic';
 import TransactionMessage from '@/components/transaction/TransactionMessage.vue';
 import { formatTitle, wrapBinary } from '@/libs/utils';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
 import IBCMessage from '@/components/transaction/IBCMessage.vue';
+import gql from 'graphql-tag';
+import { useQuery } from '@vue/apollo-composable';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -92,6 +93,37 @@ const changeLogOpen = (index: number) => {
   logOpens.value[index] = !status
 };
 
+const query = gql`
+      query GetBlocks($filter: BlockFilter!) {
+        blocks(filter: $filter) {
+          results: nodes {
+            time
+          }
+        }
+      }
+    `;
+
+const variables = computed(() => {
+  return {
+    filter: {
+      height: { equalTo: Number(tx.value?.txResponse?.height).toString() }
+    },
+  };
+});
+
+const timestamp = computed(() => {
+  const txResponse = tx.value?.txResponse;
+  if (!txResponse) return;
+  const result = txResponse.timestamp;
+  if (result && result.length) return result;
+  const { result: blocks } = useQuery(query, variables);
+  const nodes = blocks.value?.blocks?.results;
+  if (Array.isArray(nodes)) {
+    if (nodes[0]?.time) return Number(nodes[0]?.time);
+  }
+  return;
+})
+
 </script>
 <template>
   <div class="box-content !p-0">
@@ -133,8 +165,11 @@ const changeLogOpen = (index: number) => {
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('account.time') }}</td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">
-                {{ format.timestampFrom(tx.txResponse.timestamp) }}
+              <td class="xl:p-4 p-2 xl:text-sm text-xs" v-if="timestamp">
+                {{ format.timestampFrom(timestamp) }}
+              </td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs" v-else>
+                -
               </td>
             </tr>
             <tr>
