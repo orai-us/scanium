@@ -505,7 +505,8 @@ export const useFormatter = defineStore('formatter', {
           }, {});
         const output: string[] = [];
         Object.keys(sum).forEach((k) => {
-          output.push(sum[k] > 1 ? `${k}×${sum[k]}` : k);
+          // output.push(sum[k] > 1 ? `${k}×${sum[k]}` : k);
+          output.push(k);
         });
         return output.join(', ');
       }

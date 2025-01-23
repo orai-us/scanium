@@ -20,7 +20,7 @@ watchEffect(() => {
         return {
           txhash: item?.id,
           result: item.code === 0 ? "Success" : "Failed",
-          message: message ? formatTitle(message) : "-",
+          message: message ? `${formatTitle(message)} ${(item.messages?.nodes?.length - 1) > 0 ? `(+${item.messages?.nodes?.length - 1})` : ""}` : "-",
           height: item.blockNumber,
           fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
           timestamp: format.toDay(new Date(Number(item.timestamp)), 'from'),
