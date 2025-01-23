@@ -1,56 +1,35 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { getInfoToken, getListAssetOnChainAndRegistry, getPriceByIds } from '@/service/assetsService';
+import { getListAssetOnChainAndRegistry, getPriceByIds } from '@/service/assetsService';
 import { LIST_COIN } from '@/constants';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
 import TooltipComponent from '@/components/TooltipComponent.vue';
-import router from '@/router';
 import { useBlockchain } from '@/stores';
+import { useRoute, useRouter } from 'vue-router';
 
 const chainStore = useBlockchain();
 const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const props = defineProps(["chain"]);
 
+const route = useRoute();
+const router = useRouter();
 const coingeckoSymbols = Object.values(LIST_COIN);
 const coingeckoIds = Object.keys(LIST_COIN);
 
 const assetsAll = ref([] as Array<any>);
 const assetsSearch = ref([] as Array<any>);
 const priceTokens = ref({} as any);
-const pagination = reactive({
-  limit: 10,
-  offset: 0
+const pagination = computed(() => {
+  const page = route.query.page ? Number(route.query.page) : 1;
+  const offset = (page - 1) * 10;
+  return {
+    offset,
+    limit: 10,
+    page
+  };
 });
 const searchQuery = ref("");
-
-// onMounted(async () => {
-//   try {
-//     const assets = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
-//     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
-//       .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
-//     const assetsUnSupported = assets.filter(item => !(item.logo_URIs && item.symbol && coingeckoSymbols.includes(item.symbol.toLowerCase())));
-//     assetsAll.value = [...assetsSupported, ...assetsUnSupported];
-//     assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
-//     const ids = assetsSupported.map((item: any) => item?.id);
-//     console.log({ ids })
-//     if (ids?.length > 0) {
-//       try {
-//         const res = await getInfoToken({ ids: ids.join(",") });
-//         const prices: any = {};
-//         for (let item of res) {
-//           prices[item.id] = item;
-//         }
-//         priceTokens.value = prices;
-//       } catch (error) {
-//         console.log({ error });
-//       }
-//     }
-//   } catch (error) {
-//     console.log({ error });
-//   }
-
-// });
 
 onMounted(async () => {
   try {
@@ -58,9 +37,6 @@ onMounted(async () => {
     const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
       .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
 
-    // const assetsUnSupported = assets.filter(item => !(item.logo_URIs && coingeckoSymbols.includes(item.symbol.toLowerCase())) && item.symbol);
-    // assetsAll.value = [...assetsSupported, ...assetsUnSupported];
-    // assetsSearch.value = [...assetsSupported, ...assetsUnSupported];
     assetsAll.value = assetsSupported;
     assetsSearch.value = assetsSupported;
 
@@ -82,11 +58,11 @@ onMounted(async () => {
 const totalAssets = computed(() => { return assetsSearch.value.length; });
 
 function handlePagination(page: number) {
-  pagination.offset = (page - 1) * pagination.limit;
+  router.push({ path: `/${props.chain}/assets`, query: { ...route.query, page } });
 }
 
 const assets = computed(() => {
-  return assetsSearch.value.slice(pagination.offset, pagination.offset + pagination.limit);
+  return assetsSearch.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.limit);
 });
 
 watch(searchQuery,()=>{
@@ -178,7 +154,7 @@ watch(searchQuery,()=>{
     </div>
 
     <div class="mt-4 text-center" v-if="totalAssets">
-      <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination" />
+      <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
     </div>
 
   </div>
