@@ -53,7 +53,7 @@ export const DEFAULT: RequestRegistry = {
   gov_params_deposit: { url: '/cosmos/gov/v1beta1/params/deposit', adapter },
   gov_proposals: { url: '/cosmos/gov/v1beta1/proposals', adapter },
   gov_proposals_proposal_id: {
-    url: '/cosmos/gov/v1beta1/proposals/{proposal_id}',
+    url: '/cosmos/gov/v1/proposals/{proposal_id}',
     adapter,
   },
   gov_proposals_deposits: {
