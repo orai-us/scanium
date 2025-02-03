@@ -906,8 +906,29 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   ): Promise<ExtraQueryProposalsResponse> {
     try {
       // v1 for sdk version > 0.45
-      if (semver.gt(this.version, DEFAULT_SDK_VERSION)) {
-        const resV1 = await this.queryClient.extra.proposalsV1(status, page);
+      // if (semver.gt(this.version, DEFAULT_SDK_VERSION)) {
+      //   const resV1 = await this.queryClient.extra.proposalsV1(status, page);
+      //   return {
+      //     // @ts-ignore
+      //     proposals: resV1.proposals.map((v) => {
+      //       return {
+      //         ...v,
+      //         proposalId: v.id,
+      //       };
+      //     }),
+      //     pagination: resV1.pagination,
+      //   };
+      // } else {
+      //   const res = await this.queryClient.extra.proposals(status, page);
+      //   res?.proposals.forEach((item) => {
+      //     if (item.content) {
+      //       Object.assign(item, TextProposal.decode(item.content.value));
+      //     }
+      //   });
+
+      //   return res as ExtraQueryProposalsResponse;
+      // }
+      const resV1 = await this.queryClient.extra.proposalsV1(status, page);
         return {
           // @ts-ignore
           proposals: resV1.proposals.map((v) => {
@@ -918,16 +939,6 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
           }),
           pagination: resV1.pagination,
         };
-      } else {
-        const res = await this.queryClient.extra.proposals(status, page);
-        res?.proposals.forEach((item) => {
-          if (item.content) {
-            Object.assign(item, TextProposal.decode(item.content.value));
-          }
-        });
-
-        return res as ExtraQueryProposalsResponse;
-      }
     } catch (ex) {
       console.log(ex);
       return {
