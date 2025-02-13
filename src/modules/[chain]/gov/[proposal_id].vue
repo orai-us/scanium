@@ -15,7 +15,7 @@ import { PageRequest } from '@/types';
 import { fromBech32, toHex } from '@cosmjs/encoding';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 import type { Params } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
-import type { Proposal, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import type { Proposal, TallyResult, Vote } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   ProposalStatus,
   proposalStatusToJSON,
@@ -29,12 +29,16 @@ import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
 import { computed, onMounted, reactive, ref } from 'vue';
 
-export type ExtraProposal = Proposal & {
-  title?: string
-  content: ParameterChangeProposal &
-  MsgSoftwareUpgrade & {
-    current: Params[];
-  };
+export type ExtraProposal = {
+  title: string,
+  content: any;
+  status: ProposalStatus;
+  finalTallyResult: TallyResult;
+  submitTime: Timestamp;
+  depositEndTime: Timestamp;
+  votingStartTime: Timestamp;
+  votingEndTime: Timestamp;
+  contentProto: any
 };
 
 const props = defineProps(['proposal_id', 'chain']);
@@ -48,30 +52,21 @@ const summary = ref()
 const blockTime = ref(1);
 
 store.fetchProposal(props.proposal_id).then((res) => {
-  summary.value = res.proposal.summary;
-  const proposalDetail = reactive(res.proposal);
-  const changeProposal = decodeProto(
-    proposalDetail.content! as any
+  if (!res.content?.content?.description) summary.value = res.summary;
+  let changeProposal
+  if(res.contentProto) changeProposal = decodeProto(
+    res.contentProto as any
   ) as ParameterChangeProposal;
-  Object.assign(proposalDetail.content!, changeProposal);
-  // @ts-ignore
-  delete proposalDetail.content.value;
+  if (changeProposal) Object.assign(res.contentProto!, changeProposal);
+  proposal.value = res;
   // when status under the voting, final_tally_result are no data, should request fetchTally
-  if (proposalDetail.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD || proposalDetail.status === "PROPOSAL_STATUS_VOTING_PERIOD") {
+  if (res.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD) {
     // 'PROPOSAL_STATUS_VOTING_PERIOD') {
     store.fetchTally(props.proposal_id).then((tallRes) => {
       proposal.value = { ...proposal.value, finalTallyResult: tallRes.tally };
     });
   }
-  // @ts-ignore
-  // proposal.value = proposalDetail;
-  proposal.value = { ...proposalDetail, 
-    submitTime: proposalDetail.submitTime || proposalDetail.submit_time, 
-    depositEndTime: proposalDetail.depositEndTime || proposalDetail.deposit_end_time, 
-    votingStartTime: proposalDetail.votingStartTime || proposalDetail.voting_start_time,
-    votingEndTime: proposalDetail.votingEndTime || proposalDetail.voting_end_time,
-  }
-
+ 
   // load origin params if the proposal is param change
   if (changeProposal?.changes) {
     changeProposal.changes.forEach((item) => {
@@ -379,7 +374,7 @@ onMounted(async() => {
             <div class="flex items-center">
               <div class="w-2 h-2 rounded-full bg-yes mr-3"></div>
               <div class="text-base flex-1 text-main">
-                {{ $t('gov.vote_start_from') }}
+                {{ $t('gov.vote_start_from') }}:
                 {{ format.toDay(proposal.votingStartTime) }}
               </div>
               <div class="text-sm">
@@ -395,7 +390,7 @@ onMounted(async() => {
             <div class="flex items-center mb-1">
               <div class="w-2 h-2 rounded-full bg-success mr-3"></div>
               <div class="text-base flex-1 text-main">
-                {{ $t('gov.vote_end') }}
+                {{ $t('gov.vote_end') }}:
                 {{ format.toDay(proposal.votingEndTime) }}
               </div>
               <div class="text-sm">
@@ -485,3 +480,10 @@ onMounted(async() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+::v-deep span {
+  background-color: #18181A !important;
+  color: white !important;
+}
+</style>
