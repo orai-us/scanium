@@ -71,9 +71,9 @@ import {
 } from 'cosmjs-types/cosmos/base/tendermint/v1beta1/query';
 import {
   Proposal,
+  ProposalStatus,
   TextProposal,
   VoteOption,
-  type ProposalStatus,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 
 import { useBlockchain, type ChainConfig } from '@/stores';
@@ -951,23 +951,34 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     return await this.queryClient.gov.proposal(proposal_id);
   }
   async getGovProposal1(proposal_id: string) {
-    let data1: any, data2: any;
+    let resRegistry: any, resQueryClient: any;
     try {
-      data1 = await this.request(this.registry.gov_proposals_proposal_id, {
+      resRegistry = await this.request(this.registry.gov_proposals_proposal_id, {
         proposal_id,
       });
     } catch (error) {}
 
     try {
-      data2 = await this.queryClient.gov.proposal(proposal_id);
+      resQueryClient = await this.queryClient.gov.proposal(proposal_id);
     } catch (error) {}
 
-    return {
-      proposal: {
-        ...data2?.proposal,
-        ...data1?.proposal,
-      },
+    const proposalRegistry = resRegistry?.proposal;
+    const proposalQueryClient = resQueryClient?.proposal;
+
+    const result = {
+      title: proposalRegistry?.title,
+      content: proposalRegistry?.messages[0],
+      summary: proposalRegistry?.summary,
+      status: ProposalStatus[proposalRegistry?.status] as unknown as ProposalStatus,
+      submitTime: proposalQueryClient?.submitTime || proposalRegistry?.submit_time,
+      depositEndTime: proposalQueryClient?.depositEndTime || proposalRegistry?.deposit_end_time,
+      votingStartTime: proposalQueryClient?.votingStartTime || proposalRegistry?.voting_start_time,
+      votingEndTime: proposalQueryClient?.votingEndTime || proposalRegistry?.voting_end_time,
+      finalTallyResult: proposalQueryClient?.finalTallyResult || proposalRegistry?.final_tally_result,
+      contentProto: proposalQueryClient?.content || proposalRegistry?.content
     };
+
+    return result;
   }
   async getGovProposalDeposits(proposal_id: string) {
     return this.queryClient.gov.deposits(proposal_id);
