@@ -1,4 +1,4 @@
-import { NEW_ASSETS } from '@/constants';
+import { NEW_ASSETS, USDC_ASSET } from '@/constants';
 import { api, METHODS } from './api';
 import { Tendermint37Client } from '@cosmjs/tendermint-rpc';
 import { QueryClient, setupBankExtension } from '@cosmjs/stargate';
@@ -126,7 +126,7 @@ export const getListAsset = async (chain: string) => {
           item.base !== 'cw20:orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw'
       )
       .map((item: any) => ({ ...item, verify: true }));
-    if (chain.toLowerCase() === 'oraichain') return [...assets, ...NEW_ASSETS];
+    if (chain.toLowerCase() === 'oraichain') return [...assets, USDC_ASSET, ...NEW_ASSETS];
     return assets;
   } catch (error) {
     console.log({ error });

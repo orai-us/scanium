@@ -155,9 +155,40 @@ export const NEW_ASSETS = [
   },
 ];
 
+export const USDC_ASSET = {
+  id: 'usdc',
+  name: 'orai15un8msx3n5zf9ahlxmfeqd2kwa5wm0nrpxer304m9nd5q6qq0g6sku5pdd',
+  address: 'orai15un8msx3n5zf9ahlxmfeqd2kwa5wm0nrpxer304m9nd5q6qq0g6sku5pdd',
+  base: 'cw20:orai15un8msx3n5zf9ahlxmfeqd2kwa5wm0nrpxer304m9nd5q6qq0g6sku5pdd',
+  display: 'USDC',
+  symbol: 'USDC',
+  logo_URIs: {
+    svg: 'https://assets.coingecko.com/coins/images/6319/standard/usdc.png?1696506694',
+  },
+  coingecko_id: 'usd-coin',
+  exponent: '6',
+  denom_units: [
+    {
+      denom:
+        'cw:20orai15un8msx3n5zf9ahlxmfeqd2kwa5wm0nrpxer304m9nd5q6qq0g6sku5pdd',
+      exponent: 0,
+    },
+    {
+      denom: 'usdc',
+      exponent: 6,
+    },
+  ],
+  description: 'The USDC token is the cw20 token for the Oraichain.',
+  verify: true,
+  type_asset: "cw20",
+};
+
+
 // id: symbol
 export const LIST_COIN = {
   ...convertNewAssetToToken(NEW_ASSETS),
+  'usd-coin': 'usdc',
+  'tether': 'usdt',
   '01coin': 'zoc',
   '0chain': 'zcn',
   '0dog': '0dog',
@@ -13070,7 +13101,6 @@ export const LIST_COIN = {
   'test-2': 'test',
   testo: 'testo',
   'test-token-please-ignore': 'test',
-  tether: 'usdt',
   'tether-6069e553-7ebb-487e-965e-2896cd21d6ac': 'zusdt',
   'tether-avalanche-bridged-usdt-e': 'usdte',
   tethereum: 't99',
@@ -13826,7 +13856,6 @@ export const LIST_COIN = {
   usd: 'usd+',
   'usd0-liquid-bond': 'usd0++',
   usdb: 'usdb',
-  'usd-coin': 'usdc',
   'usd-coin-avalanche-bridged-usdc-e': 'usdc.e',
   'usd-coin-bridged-zed20': 'usdc.z',
   'usd-coin-celer': 'ceusdc',
