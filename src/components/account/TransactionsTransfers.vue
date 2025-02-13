@@ -47,9 +47,9 @@ async function fetchTransaction() {
         if (Array.isArray(item.tokenInfos) && item.tokenInfos[0]?.abbr)
           token = item.tokenInfos[0].abbr.toUpperCase();
 
-        let timestamp = "-";
+        let timestamp: any = "-";
         if (!!item.timestamp)
-          timestamp = format.toLocaleDate(new Date(item.timestamp * 1000));
+          timestamp = new Date(item.timestamp * 1000);
         let status = "";
         if (item.fromAddress === props.address) status = "OUT";
         else status = "IN"
@@ -96,7 +96,7 @@ function handlePagination(page: number) {
           </tr>
         </thead>
         <tbody class="text-sm">
-          <tr v-for="(v, index) in txs" :key="v.txhash">
+          <tr v-for="(v, index) in txs" :key="v.uniqKey">
             <td class="truncate py-3" style="max-width: 200px">
               <RouterLink :to="`/${chain}/tx/${v.txhash}`" class="text-primary dark:text-link">
                 {{ shortenTxHash(v.txhash) }}
