@@ -129,6 +129,7 @@ import { AccessType } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import type { JsonObject } from '@cosmjs/cosmwasm-stargate';
 import { Decimal } from '@cosmjs/math';
 import { assert } from '@cosmjs/utils';
+import axios from 'axios';
 
 export const DEFAULT_SDK_VERSION = '0.45.16';
 export const LCD_FALLBACK_CHAINS = ['OraiBtcMainnet'];
@@ -1436,7 +1437,43 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
         return await this.queryClient.tx.getTx(hash);
       }
     } catch (ex) {
-      console.log(ex);
+      console.log({ ex });
+      const res = await axios(`https://rpc.orai.io/tx?hash=0x${hash}`)
+      if(res?.data?.result){
+        const result = res.data.result;
+        const tx = Tx.decode(fromBase64(result.tx));
+        return {
+          tx,
+          txResponse: {
+            height: result.height,
+            gasUsed: result.tx_result.gas_used,
+            gasWanted: result.tx_result.gas_wanted,
+            txhash: result.hash,
+            code: result.tx_result.code,
+            codespace: result.tx_result.codespace ?? '',
+            data: result.tx_result.data ? toHex(result.tx_result.data) : '',
+            rawLog: result.tx_result.log ?? '',
+            logs: [],
+            info: '',
+            timestamp: '',
+            events: result.tx_result.events.map((e: any) => {
+              const event: Event = {
+                type: e.type,
+                attributes: e.attributes.map((a: any) => {
+                  const attribute: EventAttribute = {
+                    key: typeof a.key === 'string' ? a.key : toBase64(a.key),
+                    value:
+                      typeof a.value === 'string' ? a.value : toBase64(a.value),
+                    index: false,
+                  };
+                  return attribute;
+                }),
+              };
+              return event;
+            }),
+          },
+        };
+      }
     }
   }
 
