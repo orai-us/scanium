@@ -232,7 +232,7 @@ const timestamp = computed(() => {
           </h2> -->
           <div v-for="(msg, i) in messages" :key="i">
             <div class="rounded-lg mt-4 collapse collapse-arrow bg-base-200" :class="{
-              'collapse-open': i === 0 && messageOpens[i], 
+              'collapse-open': messageOpens[i], 
               'collapse-close': !messageOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
@@ -260,7 +260,7 @@ const timestamp = computed(() => {
         >
           <div v-for="(msg, i) in txLogs" :key="i">
             <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
-              'collapse-open': i === 0 && logOpens[i],
+              'collapse-open': logOpens[i],
               'collapse-close': !logOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />

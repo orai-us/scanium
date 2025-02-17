@@ -27,7 +27,9 @@ const changeLogOpen = (index: number) => {
           <div class="pt-2 collapse-content w-[100%] xl:overflow-scroll">
             <div v-for="v of event.attributes" class="mb-4 flex xl:flex-row flex-col gap-2">
               <div class="xl:w-1/5 w-full xl:text-sm text-xs">{{ formatTitle(v.key) }}:</div>
-              <DynamicComponent :value="v.value" direct="horizontal" />
+              <div class=" xl:max-w-[70%] sm:max-w-[600px] max-w-[280px]">
+                <DynamicComponent :value="v.value" direct="horizontal" />
+              </div>
             </div>
           </div>
         </div>
