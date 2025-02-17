@@ -88,23 +88,25 @@ const copyWebsite = async (url: string) => {
     previewOnly
     class="md-editor-recover"
   ></MdEditor>
-  <span v-else-if="isAddress()" class="flex items-center">
-    <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link xl:text-sm text-[12px]">{{
-      text
-    }}</RouterLink>
-    <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="text" @click="copyWebsite(text || '')" />
-    <div v-for="{ name, provider } in names">
-      <span
-        class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
-        :data-tip="provider"
-        :title="provider"
-      >
-        <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-        <button>{{ name }}</button>
-      </span>
-    </div>
-  </span>
-  <div v-else class="flex">
+  <div v-else-if="isAddress()" class="flex xl:max-w-[70%] max-w-[280px]">
+    <span class="flex items-center">
+      <RouterLink :to="`/${chainStore.chainName}/account/${text}`" class="text-link xl:text-sm text-[12px]">{{
+        text
+      }}</RouterLink>
+      <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-3" v-show="text" @click="copyWebsite(text || '')" />
+      <div v-for="{ name, provider } in names">
+        <span
+          class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
+          :data-tip="provider"
+          :title="provider"
+        >
+          <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
+          <button>{{ name }}</button>
+        </span>
+      </div>
+    </span>
+  </div>
+  <div v-else class="flex xl:max-w-[70%] sm:max-w-[600px] max-w-[280px]">
     <span class="break-words max-w-full xl:text-sm text-[12px]">{{ text }}</span>
     <span
       v-if="isConvertable"

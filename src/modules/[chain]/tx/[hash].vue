@@ -236,7 +236,7 @@ const timestamp = computed(() => {
               'collapse-close': !messageOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
-              <div class="flex justify-between xl:p-5 p-4 collapse-title max-w-screen"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title"
                 :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
                 <h5 class="xl:text-lg text-sm font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
@@ -264,7 +264,7 @@ const timestamp = computed(() => {
               'collapse-close': !logOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
-              <div class="flex justify-between xl:p-5 p-4 collapse-title max-w-screen"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title"
                 :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
                 <h5 class="font-bold xl:text-lg text-sm">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>
