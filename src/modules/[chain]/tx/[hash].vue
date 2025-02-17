@@ -241,11 +241,11 @@ const timestamp = computed(() => {
           </h2> -->
           <div v-for="(msg, i) in messages" :key="i">
             <div class="rounded-lg mt-4 collapse collapse-arrow bg-base-200" :class="{
-              'collapse-open': i === 0 && messageOpens[i], 
+              'collapse-open': messageOpens[i], 
               'collapse-close': !messageOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
-              <div class="flex justify-between xl:p-5 p-4 collapse-title max-w-screen"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title"
                 :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
                 <h5 class="xl:text-lg text-sm font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
@@ -269,11 +269,11 @@ const timestamp = computed(() => {
         >
           <div v-for="(msg, i) in txLogs" :key="i">
             <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
-              'collapse-open': i === 0 && logOpens[i],
+              'collapse-open': logOpens[i],
               'collapse-close': !logOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
-              <div class="flex justify-between xl:p-5 p-4 collapse-title max-w-screen"
+              <div class="flex justify-between xl:p-5 p-4 collapse-title"
                 :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
                 <h5 class="font-bold xl:text-lg text-sm">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>

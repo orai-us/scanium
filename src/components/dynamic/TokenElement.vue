@@ -29,7 +29,7 @@ watchEffect(() => {
 
 </script>
 <template>
-  <div class="overflow-auto">
+  <div class="overflow-auto xl:text-sm text-[12px]">
     {{ (Number(value["amount"]) / Math.pow(10, exponent)).toLocaleString("en-US", {}) }} {{ nameToken }}
   </div>
 </template>
