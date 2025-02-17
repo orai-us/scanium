@@ -16,6 +16,7 @@ import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
 import IBCMessage from '@/components/transaction/IBCMessage.vue';
 import gql from 'graphql-tag';
 import { useQuery } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -23,9 +24,13 @@ const blockchain = useBlockchain();
 const baseStore = useBaseStore();
 const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
-const tab = ref('msg');
 const messageOpens = ref([true] as Array<boolean>);
 const logOpens = ref([true] as Array<boolean>);
+const route = useRoute();
+const router = useRouter();
+const tab = computed(() => {
+  return route.query.tab ? route.query.tab : 'msg';
+})
 
 watchEffect(() => {
   if (props.hash) {
@@ -92,6 +97,10 @@ const changeLogOpen = (index: number) => {
   const status = logOpens.value[index];
   logOpens.value[index] = !status
 };
+
+const updateTab = (tab: string) => {
+  router.push({ path: `/${props.chain}/tx/${props.hash}`, query: { ...route.query, tab } });
+}
 
 const query = gql`
       query GetBlocks($filter: BlockFilter!) {
@@ -205,19 +214,19 @@ const timestamp = computed(() => {
         <a
           class="tab text-gray-400 capitalize !pb-3 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'msg' }"
-          @click="tab = 'msg'"
+          @click="updateTab('msg')"
           >Messages ({{ messages.length }})</a
         >
         <a
           class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'log' }"
-          @click="tab = 'log'"
+          @click="updateTab('log')"
           >Logs ({{ txLogs.length }})</a
         >
         <a
           class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
           :class="{ 'tab-active': tab === 'json' }"
-          @click="tab = 'json'"
+          @click="updateTab('json')"
           >JSON</a
         >
       </div>
