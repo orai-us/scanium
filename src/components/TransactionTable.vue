@@ -20,12 +20,13 @@ watchEffect(() => {
         return {
           txhash: item?.id,
           result: item.code === 0 ? "Success" : "Failed",
-          message: message ? `${formatTitle(message)} ${(item.messages?.nodes?.length - 1) > 0 ? `(+${item.messages?.nodes?.length - 1})` : ""}` : "-",
+          message: message ? `${formatTitle(message)}` : "-",
+          numberMsg: item.messages?.nodes?.length - 1 > 0 ? `+${item.messages.nodes.length - 1}` : "",
           height: item.blockNumber,
           fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
           timestamp: format.toDay(new Date(Number(item.timestamp)), 'from'),
           state: item.state
-        }
+        };
       });
     } else {
       txs.value = props.transactions
@@ -69,8 +70,12 @@ watchEffect(() => {
             {{ v.result }}
           </td>
           <td class="py-3 !break-normal">
-            <span
-              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
+            <div class="flex gap-1">
+              <span
+                class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{
+                v.message }}</span>
+              <span>{{ v.numberMsg }}</span>
+            </div>
           </td>
           <td class="text-sm py-3 !break-normal">
             <RouterLink :to="`/${chain}/block/${v.height}`" class="text-primary dark:text-link">{{
