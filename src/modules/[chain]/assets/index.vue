@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { getListAssetOnChainAndRegistry, getPriceByIds } from '@/service/assetsService';
-import { LIST_COIN } from '@/constants';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { getPriceByIds } from '@/service/assetsService';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
 import TooltipComponent from '@/components/TooltipComponent.vue';
@@ -9,13 +8,10 @@ import { useBlockchain } from '@/stores';
 import { useRoute, useRouter } from 'vue-router';
 
 const chainStore = useBlockchain();
-const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const props = defineProps(["chain"]);
 
 const route = useRoute();
 const router = useRouter();
-const coingeckoSymbols = Object.values(LIST_COIN);
-const coingeckoIds = Object.keys(LIST_COIN);
 
 const assetsAll = ref([] as Array<any>);
 const assetsSearch = ref([] as Array<any>);
@@ -31,27 +27,17 @@ const pagination = computed(() => {
 });
 const searchQuery = ref("");
 
-onMounted(async () => {
-  try {
-    const assets = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
-    const assetsSupported = assets.filter(item => item.logo_URIs && item.symbol.length && coingeckoSymbols.includes(item.symbol.toLowerCase()))
-      .map(asset => ({ ...asset, id: coingeckoIds[coingeckoSymbols.indexOf(asset.display.toLowerCase())] }));
+watchEffect(async () => {
+  const assets = chainStore.current?.assets;
+  if (Array.isArray(assets)) {
+    let assetsSupported = assets.filter(item => item.coingecko_id);
+    const oraiAsset = assets.find((item) => item.base === "orai");
+    let assetResult = assetsSupported.filter(item => item.base !== "orai");
+    if (!!oraiAsset)
+      assetResult = [oraiAsset, ...assetsSupported.filter(item => item.base !== "orai")];
 
-    assetsAll.value = assetsSupported;
-    assetsSearch.value = assetsSupported;
-
-    const ids = assetsSupported.map((item: any) => item?.id);
-
-    if (ids?.length > 0) {
-      try {
-        const res = await getPriceByIds({ ids: ids.join(",") });
-        priceTokens.value = res;
-      } catch (error) {
-        console.log({ error });
-      }
-    }
-  } catch (error) {
-    console.log({ error });
+    assetsAll.value = assetResult;
+    assetsSearch.value = assetResult;
   }
 });
 
@@ -64,6 +50,18 @@ function handlePagination(page: number) {
 const assets = computed(() => {
   return assetsSearch.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.limit);
 });
+
+watchEffect(async () => {
+  const ids = assets.value.map((item: any) => item.coingecko_id);
+  if (ids?.length > 0) {
+    try {
+      const res = await getPriceByIds({ ids: ids.join(",") });
+      priceTokens.value = res;
+    } catch (error) {
+      console.log({ error });
+    }
+  }
+}) 
 
 watch(searchQuery,()=>{
   handlePagination(1);
@@ -109,18 +107,22 @@ watch(searchQuery,()=>{
               </div>
             </td>
             <td class="text-right truncate">
-              <div v-if="v.verify">
-                <div
-                  class="text-xs flex items-center justify-center !bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)] p-2 rounded-lg w-fit">
-                  Verified</div>
-              </div>
+              <div
+                class="text-xs flex items-center justify-center !bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)] p-2 rounded-lg w-fit">
+                Verified</div>
             </td>
             <td class="text-right w-fit truncate">
-              <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base" />
+              <div v-if="v.type_asset==='cw20'">
+                <TooltipComponent :value="shortenDenom(`cw20:${v.base}`)" :description="`cw20:${v.base}`"
+                  :copyValue="`cw20:${v.base}`" />
+              </div>
+              <div v-else>
+                <TooltipComponent :value="shortenDenom(v.base)" :description="v.base" :copyValue="v.base" />
+              </div>
             </td>
             <td class="text-right">
-              <span v-if="priceTokens[v.id]?.usd" class="text-white">
-                $ {{ formatNumber(priceTokens[v.id].usd) }}
+              <span v-if="priceTokens[v.coingecko_id]?.usd" class="text-white">
+                $ {{ formatNumber(priceTokens[v.coingecko_id].usd) }}
               </span>
               <span v-else>-</span>
             </td>
@@ -154,7 +156,8 @@ watch(searchQuery,()=>{
     </div>
 
     <div class="mt-4 text-center" v-if="totalAssets">
-      <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
+      <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination"
+        :page="pagination.page" />
     </div>
 
   </div>

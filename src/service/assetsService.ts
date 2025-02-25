@@ -1,12 +1,9 @@
-import { NEW_ASSETS, USDC_ASSET } from '@/constants';
 import { api, METHODS } from './api';
 import { Tendermint37Client } from '@cosmjs/tendermint-rpc';
 import { QueryClient, setupBankExtension } from '@cosmjs/stargate';
 import {
   QueryDenomOwnersRequest,
   QueryDenomOwnersResponse,
-  QueryDenomsMetadataRequest,
-  QueryDenomsMetadataResponse,
 } from 'cosmjs-types/cosmos/bank/v1beta1/query';
 
 const baseMarketOrai = 'https://price.market.orai.io';
@@ -111,90 +108,52 @@ export const getCw20Balances = async (
   return res?.data;
 };
 
-export const getListAsset = async (chain: string) => {
+const LIST_ASSETS_DISABLE = [
+  'orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5',
+  'orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw'
+]
+
+export const getListAssetOfOraichain = async()=>{
   try {
     const config = {
-      baseURL: 'https://registry.ping.pub',
-      url: `${chain.toLowerCase()}/assetlist.json`,
+      baseURL: 'https://oraicommon.oraidex.io/api/v1',
+      url: 'chains/Oraichain',
       method: METHODS.GET,
     };
     const res = await api.request(config);
-    const assets = res.data.assets
-      .filter(
-        (item: any) =>
-          item.base !== 'cw20:orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5' &&
-          item.base !== 'cw20:orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw'
-      )
-      .map((item: any) => ({ ...item, verify: true }));
-    if (chain.toLowerCase() === 'oraichain') return [...assets, USDC_ASSET, ...NEW_ASSETS];
+    const assets = res.data?.currencies?.filter((item: any) => !LIST_ASSETS_DISABLE.includes(item.contractAddress));
     return assets;
   } catch (error) {
     console.log({ error });
-    return NEW_ASSETS;
+    return []
   }
-};
+}
 
-export const normalizeAssets = async (chain: string) => {
-  try {
-    const config = {
-      baseURL: 'https://registry.ping.pub',
-      url: `${chain.toLowerCase()}/assetlist.json`,
-      method: METHODS.GET,
-    };
-    const res = await api.request(config);
-    let assets = res.data.assets
-    if (chain.toLowerCase() === 'oraichain') assets = [...assets, ...NEW_ASSETS];
-    const result = assets.map((asset: any) => {
-      const denomUnits = asset.denom_units;
-      const logoURIs = asset.logo_URIs;
-      return {
-        name: asset.base,
-        base: asset.base,
-        display: assets.symbol,
-        symbol: asset.symbol,
-        logo_URIs: logoURIs,
-        exponent: denomUnits?.slice(-1)[0].exponent || 6,
-        coingecko_id: asset.coingecko_id,
-        denom_units: denomUnits,
-      };
-    });
-    return result;
-  } catch (error) {
-    console.log({ error });
-    return NEW_ASSETS;
-  }
-};
-
-export const getListAssetOnChainAndRegistry = async (endpointAddress: string, chain: string) => {
-  try {
-    const cometClient = await Tendermint37Client.connect(endpointAddress);
-    const queryClient = QueryClient.withExtensions(
-      cometClient as any,
-      setupBankExtension
-    );
-    const requestData = Uint8Array.from(
-      QueryDenomsMetadataRequest.encode(
-        QueryDenomsMetadataRequest.fromPartial({})
-      ).finish()
-    );
-    const { value } = await queryClient.queryAbci(
-      '/cosmos.bank.v1beta1.Query/DenomsMetadata',
-      requestData
-    );
-    const bankAssets = QueryDenomsMetadataResponse.decode(value);
-    const registryAssets = await getListAsset(chain);
-    const seenBase = new Set();
-    return [...registryAssets, ...bankAssets.metadatas].filter((item) => {
-      if (!seenBase.has(item.base)) {
-        seenBase.add(item.base);
-        return true;
+export const transformAssetsFromRegister = (asset: Array<any>) => {
+  return asset.map((item) => {
+    const description = item.description;
+    const denomUnits = item.denomUnits;
+    let coinDenom = item.display;
+    let coinDecimals = 6;
+    if (Array.isArray(denomUnits)) {
+      const denomUnit = denomUnits[1];
+      if (denomUnit) {
+        coinDenom = denomUnit.denom;
+        coinDecimals = denomUnit.exponent;
       }
-      return false;
-    });
-  } catch (error) {
-    console.log({ error });
-    return [];
-  }
+    }
+    const coinMinimalDenom = item.base;
+    const coinGeckoId = item.coingecko_id;
+    const coinImageUrl = item.logo_URIs?.png;
+    return {
+      description,
+      coinDenom,
+      coinDecimals,
+      coinMinimalDenom,
+      coinGeckoId,
+      coinImageUrl,
+    };
+  });
 };
 
 export const getHolderAssetsNativeToken = async (pagination: any, denom: string, endpointAddress: string) => {
