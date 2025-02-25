@@ -26,7 +26,6 @@ const sector = computed(() => {
 
 onMounted(async () => {
   const chainAssets = chainStore.current?.assets;
-  console.log({ chainAssets })
   if (Array.isArray(chainAssets))
     assets.value = chainAssets;
 });

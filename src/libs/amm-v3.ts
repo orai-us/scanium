@@ -1,70 +1,21 @@
+import { useBlockchain } from "@/stores";
 import { formatNumber } from "@/utils";
 
-export enum DENOM {
-  ORAI = 'orai',
-  ATOM = 'ibc/A2E2EEC9057A4A1C2C0A6A4C78B0239118DF5F278830F50B4A6BDD7A66506B78',
-  NTMPI = 'ibc/576B1D63E401B6A9A071C78A1D1316D016EC9333D2FEB14AD503FAC4B8731CD1',
-  AIRI = 'orai10ldgzued6zjp0mkqwsv2mux3ml50l97c74x8sg',
-  USDT = 'orai12hzjxfh77wl572gdzct2fxv2arxcwh6gykc7qh',
-  USDC = 'orai15un8msx3n5zf9ahlxmfeqd2kwa5wm0nrpxer304m9nd5q6qq0g6sku5pdd',
-  IBC_OSMO = 'ibc/9C4DCD21B48231D0BC2AC3D1B74A864746B37E4292694C93C617324250D002FC',
-  ORAIX = 'orai1lus0f0rhx8s03gdllx2n6vhkmf0536dv57wfge',
-  scORAI = 'orai1065qe48g7aemju045aeyprflytemx7kecxkf5m7u5h5mphd0qlcs47pclp',
-  wTRX = 'orai1c7tpjenafvgjtgm9aqwm7afnke6c56hpdms8jc6md40xs3ugd0es5encn0',
-  scATOM = 'orai19q4qak2g3cj2xc2y3060t0quzn3gfhzx08rjlrdd3vqxhjtat0cq668phq',
-  INJ = 'orai19rtmkk6sn4tppvjmp5d5zj6gfsdykrl5rw2euu5gwur3luheuuusesqn49',
-  WETH = 'orai1dqa52a7hxxuv8ghe7q5v0s36ra0cthea960q2cukznleqhk0wpnshfegez',
-  BTC = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/obtc',
-  OCH = 'orai1hn8w33cqvysun2aujk5sv33tku4pgcxhhnsxmvnkfvdxagcx0p8qa4l98q',
-  TON = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/ton',
-  PEPE = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/extPEPE',
-  DOGE = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/DogeBNB',
-  WSOL = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraib0x4VH72cCsNwZwLtHtBnXuCxHWf4mB',
-  orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml = 'orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml', //tx af3e3ee18e40502117a164a87491ca1ced224505e2f0a32b7d3982b7b0d0e5f7
-  RACKS = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/D7yP4ycfsRWUGYionGpi64sLF2ddZ2JXxuRAti2M7uck',
-  GRNT = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraiJP7H3LAt57DkFXNLDbLdBFNRRPvS8jg2j5AZkd9',
-  MAX = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraim8c9d1nkfuQk9EzGYEUGxqL3MHQYndRw1huVo5h',
-  LEE = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/oraix39mVDGnusyjag97Tz5H8GvGriSZmhVvkvXRoc4',
-  SOL = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
-  JPOW = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/orairHM3Yw2PbTfCty1PXy7tEUx3uBMfjouNbm4KnRJ',
-  // IBC_INJ = 'ibc/49D820DFDE9F885D7081725A58202ABA2F465CAEE4AFBC683DFB79A8E013E83E',
-  // BEP20 KWT= 'ibc/4F7464EEE736CCFB6B444EB72DE60B3B43C0DD509FFA2B87E05D584467AAE8C8';
-  // KWT= 'orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5';
-  // BEP20 MILKY= 'ibc/E12A2298AC40011C79F02F26C324BD54DF20F4B2904CB9028BFDEDCFAA89B906';
-  // MILKY= 'orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw';
-  // BTC.legacy= 'usat';
-  // CAT = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/extCAT',
-  // HMSTR = 'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/HMSTR',
+const chainStore = useBlockchain();
+
+function createTokenMap() {
+  const result = {};
+  const assets = chainStore.current?.assets;
+  if (Array.isArray(assets)) {
+    assets.forEach((asset) => {
+      // @ts-ignore
+      result[asset.base] = { coinDenom: asset.display, coinDecimals: asset.exponent };
+    });
+  }
+  return result;
 }
 
-export const tokenMap = {
-  [DENOM.ORAI as string]: { coinDenom: 'ORAI', coinDecimals: 6 },
-  [DENOM.ATOM as string]: { coinDenom: 'ATOM', coinDecimals: 6 },
-  [DENOM.NTMPI as string]: { coinDenom: 'NTMPI', coinDecimals: 6 },
-  [DENOM.AIRI as string]: { coinDenom: 'AIRI', coinDecimals: 6 },
-  [DENOM.USDT as string]: { coinDenom: 'USDT', coinDecimals: 6 },
-  [DENOM.USDC as string]: { coinDenom: 'USDC', coinDecimals: 6 },
-  [DENOM.IBC_OSMO as string]: { coinDenom: 'OSMO', coinDecimals: 6 },
-  [DENOM.ORAIX as string]: { coinDenom: 'ORAIX', coinDecimals: 6 },
-  [DENOM.scORAI as string]: { coinDenom: 'scORAI', coinDecimals: 6 },
-  [DENOM.wTRX as string]: { coinDenom: 'WTRX', coinDecimals: 6 },
-  [DENOM.scATOM as string]: { coinDenom: 'scATOM', coinDecimals: 6 },
-  [DENOM.INJ as string]: { coinDenom: 'INJ', coinDecimals: 6 },
-  [DENOM.WETH as string]: { coinDenom: 'WETH', coinDecimals: 6 },
-  [DENOM.BTC as string]: { coinDenom: 'BTC', coinDecimals: 14 },
-  [DENOM.OCH as string]: { coinDenom: 'OCH', coinDecimals: 6 },
-  [DENOM.TON as string]: { coinDenom: 'TON', coinDecimals: 9 },
-  [DENOM.PEPE as string]: { coinDenom: 'PEPE', coinDecimals: 6 },
-  [DENOM.DOGE as string]: { coinDenom: 'PEPE', coinDecimals: 8 },
-  [DENOM.WSOL as string]: { coinDenom: 'TON', coinDecimals: 9 },
-  [DENOM.orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml as string]: { coinDenom: 'orai1k5d5cgekt8kkzcrnxrx860wadvz5esjwtyv299g0ht75a92yfn6qvgu0ml', coinDecimals: 6 },
-  [DENOM.RACKS as string]: { coinDenom: 'RACKS', coinDecimals: 6 },
-  [DENOM.GRNT as string]: { coinDenom: 'GRNT', coinDecimals: 6 },
-  [DENOM.MAX as string]: { coinDenom: 'MAX', coinDecimals: 6 },
-  [DENOM.LEE as string]: { coinDenom: 'LEE', coinDecimals: 6 },
-  [DENOM.SOL as string]: { coinDenom: 'SOL', coinDecimals: 9 },
-  [DENOM.JPOW as string]: { coinDenom: 'JPOW', coinDecimals: 6 },
-};
+export const tokenMap: any = createTokenMap();
 
 export const contractAddress = 'orai10s0c75gw5y5eftms5ncfknw6lzmx0dyhedn75uz793m8zwz4g8zq4d9x9a';
 

@@ -72,18 +72,23 @@ const balancesAssets = computed(() => {
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   for (const balance of balances) {
-    const asset = assets?.find((item) => item.name === balance.denom || item.base === balance.denom);
-    const id = asset?.coingecko_id;
-    // @ts-ignore
-    const exponent = asset?.exponent;
     const denom = balance.denom;
-    const display = asset?.display;
-    const amount = balance.amount / 10 ** exponent;
-    if (id) {
-      resultSupported.push({ amount, denom, display, id });
-    } else {
-      resultUnSupported.push({ amount, denom, display });
+    let id, exponent = 0;
+    let display = denom.toUpperCase();
+    if (Array.isArray(assets)) {
+      const asset = assets.find((item) => item.name === denom || item.base === denom);
+      if (!!asset) {
+        // @ts-ignore
+        exponent = asset.exponent;
+        display = asset.display;
+        id = asset.coingecko_id;
+      }
     }
+    const amount = (balance.amount || 0) / 10 ** exponent;
+    if (id)
+      resultSupported.push({ amount, denom, display, id });
+    else
+      resultUnSupported.push({ amount, denom, display });
   }
   return supportedAssets.value ? resultSupported : resultUnSupported;
 })
@@ -93,17 +98,25 @@ const delegatesAssets = computed(() => {
   const resultUnSupported: Array<any> = [];
   const assets = blockchain.current?.assets;
   for (let delegation of props.delegations) {
-    const denom = delegation.balance?.denom
-    const asset = assets?.find((item) => item.name === denom || item.base === denom);
-    const id = asset?.coingecko_id;
-    // @ts-ignore
-    const exponent = asset?.exponent;
-    const display = asset?.display;
-    const amount = delegation.balance?.amount / 10 ** exponent;
-    if (id) {
-      resultSupported.push({ amount, denom, display, id });
-    } else {
-      resultUnSupported.push({ amount, denom, display });
+    const balance = delegation.balance;
+    if (!!balance) {
+      const denom = balance.denom;
+      let id, exponent = 0;
+      let display = denom.toUpperCase();
+      if (Array.isArray(assets)) {
+        const asset = assets.find((item) => item.name === denom || item.base === denom);
+        if (!!asset) {
+          // @ts-ignore
+          exponent = asset.exponent;
+          display = asset.display;
+          id = asset.coingecko_id;
+        }
+      }
+      const amount = (balance.amount || 0) / 10 ** exponent;
+      if (id)
+        resultSupported.push({ amount, denom, display, id });
+      else
+        resultUnSupported.push({ amount, denom, display });
     }
   }
   return supportedAssets.value ? resultSupported : resultUnSupported;
@@ -113,20 +126,26 @@ const rewardsTotalAssets = computed(() => {
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   const assets = blockchain.current?.assets;
-  if (!!props.rewards?.total) {
-    for (let reward of props.rewards?.total) {
-      const asset = assets?.find((item) => item.name === reward.denom || item.base === reward.denom);
-      const id = asset?.coingecko_id;
-      // @ts-ignore
-      const exponent = asset?.exponent;
+  const rewardsTotal = props.rewards?.total
+  if (Array.isArray(rewardsTotal)) {
+    for (let reward of rewardsTotal) {
       const denom = reward.denom;
-      const display = asset?.display;
-      const amount = (reward.amount / 10 ** 18) / 10 ** exponent;
-      if (id) {
-        resultSupported.push({ amount, denom, display, id });
-      } else {
-        resultUnSupported.push({ amount, denom, display });
+      let id, exponent = 0;
+      let display = denom.toUpperCase();
+      if (Array.isArray(assets)) {
+        const asset = assets.find((item) => item.name === reward.denom || item.base === reward.denom);
+        if (asset) {
+          // @ts-ignore
+          exponent = asset.exponent;
+          display = asset.display;
+          id = asset.coingecko_id;
+        }
       }
+      const amount = ((reward.amount || 0) / 10 ** 18) / 10 ** exponent;
+      if (id)
+        resultSupported.push({ amount, denom, display, id });
+      else
+        resultUnSupported.push({ amount, denom, display });
     }
   }
   return supportedAssets.value ? resultSupported : resultUnSupported;
@@ -138,23 +157,24 @@ const unbondingAssets = computed(() => {
   const assets = blockchain.current?.assets;
   const totalUnbonding = Number(props.unbondingTotal);
   if (!!totalUnbonding) {
-    const formatToken = {
-      amount: totalUnbonding,
-      denom: stakingStore.params.bondDenom,
+    const denom = stakingStore.params.bondDenom;
+    let id, exponent = 0;
+    let display = denom.toUpperCase();
+    if (Array.isArray(assets)) {
+      const asset = assets.find((item) => item.name === denom || item.base === denom);
+      if (asset) {
+        // @ts-ignore
+        exponent = asset.exponent;
+        id = asset.coingecko_id;
+        display = asset.display;
+      }
     }
-    const asset = assets?.find((item) => item.name === formatToken.denom || item.base === formatToken.denom);
-    const id = asset?.coingecko_id;
-    const denom = formatToken.denom;
-    // @ts-ignore
-    const exponent = asset?.exponent;
-    const display = asset?.display;
-    const amount = formatToken.amount / 10 ** exponent;
-    if (id) {
+    const amount = totalUnbonding / 10 ** exponent;
+    if (id)
       resultSupported.push({ amount, denom, display, id });
-    } else {
+    else
       resultUnSupported.push({ amount, denom, display });
-    }
-  }  
+  }
   return supportedAssets.value ? resultSupported : resultUnSupported;
 })
 
@@ -207,8 +227,6 @@ watch([() => assets.value.length, supportedAssets, balancesChain], async () => {
     const price = result[item.id] ? result[item.id] : 1;
     sumUnbonding += item.amount * price;
   }
-
-  console.log({ sumBalance, sumDelegate, sumReward, sumUnbonding })
 
   totalAmountByCategory.value = [sumBalance, sumDelegate, sumReward, sumUnbonding];
 }, { flush: 'post' })

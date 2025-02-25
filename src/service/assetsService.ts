@@ -109,8 +109,8 @@ export const getCw20Balances = async (
 };
 
 const LIST_ASSETS_DISABLE = [
-  'orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5',
-  'orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw'
+  'orai1nd4r053e3kgedgld2ymen8l9yrw8xpjyaal7j5', // kawaii-islands
+  'orai1gzvndtzceqwfymu2kqhta2jn6gmzxvzqwdgvjw', // milky-token
 ]
 
 export const getListAssetOfOraichain = async()=>{

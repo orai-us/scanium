@@ -156,8 +156,7 @@ watch(searchQuery,()=>{
     </div>
 
     <div class="mt-4 text-center" v-if="totalAssets">
-      <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination"
-        :page="pagination.page" />
+      <Pagination :totalItems="totalAssets" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
     </div>
 
   </div>
