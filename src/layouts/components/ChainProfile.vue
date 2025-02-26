@@ -67,7 +67,7 @@ onMounted(() => {
         >
           {{
             baseStore.latest?.block?.header?.height
-              ? `#${baseStore.latest.block.header.height}`
+              ? `#${baseStore.latest?.block.header.height}`
               : chainStore.chainName || ''
           }}
           <span class="text-error">{{
@@ -91,7 +91,7 @@ onMounted(() => {
         <div class="py-2 px-4">
           Chain Id:
           {{
-            baseStore.latest.block?.header.chainId && baseStore.connected
+            baseStore.latest?.block?.header.chainId && baseStore.connected
               ? baseStore.latest.block.header.chainId
               : 'N/A'
           }}
@@ -99,7 +99,7 @@ onMounted(() => {
         <div class="py-2 px-4">
           Height:
           {{
-            baseStore.latest.block?.header.height && baseStore.connected
+            baseStore.latest?.block?.header.height && baseStore.connected
               ? baseStore.latest.block.header.height
               : '0'
           }}
