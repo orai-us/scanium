@@ -36,8 +36,8 @@ export const useBaseStore = defineStore('baseStore', {
     blocktime(): number {
       if (this.earlest && this.latest) {
         if (
-          this.latest.block?.header?.height !==
-          this.earlest.block?.header?.height
+          this.latest?.block?.header?.height !==
+          this.earlest?.block?.header?.height
         ) {
           const diff = dayjs(this.latest.block?.header?.time.toString()).diff(
             this.earlest.block?.header?.time.toString()
@@ -54,7 +54,7 @@ export const useBaseStore = defineStore('baseStore', {
       return useBlockchain();
     },
     currentChainId(): string {
-      return this.latest.block?.header.chainId || '';
+      return this.latest?.block?.header.chainId || '';
     },
     txsInRecents() {
       const txs = [] as {
@@ -63,7 +63,7 @@ export const useBaseStore = defineStore('baseStore', {
         tx: DecodedTxRaw;
       }[];
       this.recents.forEach((b) =>
-        b.block?.txs.forEach((raw) => {
+        b?.block?.txs.forEach((raw) => {
           if (raw) {
             try {
               txs.push({
