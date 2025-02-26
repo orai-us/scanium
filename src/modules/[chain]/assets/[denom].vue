@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import { getPriceByIds } from "@/service/assetsService";
 import DetailAsset from "@/components/assets/DetailAsset.vue";
 import HolderAssetNativeToken from "@/components/assets/HolderAssetNativeToken.vue";
@@ -24,11 +24,12 @@ const sector = computed(() => {
   else return SECTOR.TRANSACTIONS;
 });
 
-onMounted(async () => {
+watchEffect(async () => {
   const chainAssets = chainStore.current?.assets;
   if (Array.isArray(chainAssets))
     assets.value = chainAssets;
 });
+
 watch([() => props.denom, () => assets.value], async () => {
   const info = assets.value.find((item) => item.base === props.denom);
   const id = info?.coingecko_id;
