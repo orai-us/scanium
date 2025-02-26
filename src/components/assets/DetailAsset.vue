@@ -1,11 +1,23 @@
 <script lang="ts" setup>
 import { formatNumber, shortenDenom } from "@/utils";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { Icon } from '@iconify/vue';
+import { getPricePoolTokens } from "@/service/assetsService";
 
 const props = defineProps(['asset']);
 
 let resultCopy = ref();
+
+const pricePoolTokens = ref({} as any);
+
+onMounted(async () => {
+  try {
+    const res = await getPricePoolTokens();
+    pricePoolTokens.value = res;
+  } catch (error) {
+    console.log({ error })
+  }
+})
 
 const copyWebsite = async (url: string) => {
   if (!url) {
@@ -45,7 +57,10 @@ const copyWebsite = async (url: string) => {
             <span v-if="asset.current_price" class="text-white">
               $ {{ formatNumber(asset.current_price) }}
             </span>
-            <span v-else>-</span>
+            <span v-else-if="pricePoolTokens[asset.base]" class="text-white">
+              {{ pricePoolTokens[asset.base] }}
+            </span>
+            <span v-else class="text-white">-</span>
           </div>
           <!-- <div>
             <span v-if="asset.price_change_24h"

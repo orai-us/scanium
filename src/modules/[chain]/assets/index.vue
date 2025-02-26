@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
-import { getPriceByIds } from '@/service/assetsService';
+import { getPriceByIds, getPricePoolTokens } from '@/service/assetsService';
 import { formatNumber, shortenDenom } from '@/utils';
 import Pagination from '@/components/pagination/Pagination.vue';
 import TooltipComponent from '@/components/TooltipComponent.vue';
@@ -26,6 +26,16 @@ const pagination = computed(() => {
   };
 });
 const searchQuery = ref("");
+const pricePoolTokens = ref({} as any);
+
+onMounted(async () => {
+  try {
+    const res = await getPricePoolTokens();
+    pricePoolTokens.value = res;
+  } catch (error) {
+    console.log({ error })
+  }
+})
 
 watchEffect(async () => {
   const assets = chainStore.current?.assets;
@@ -124,7 +134,8 @@ watch(searchQuery,()=>{
               <span v-if="priceTokens[v.coingecko_id]?.usd" class="text-white">
                 $ {{ formatNumber(priceTokens[v.coingecko_id].usd) }}
               </span>
-              <span v-else>-</span>
+              <span v-else-if="pricePoolTokens[v.base]" class="text-white">{{ pricePoolTokens[v.base] }}</span>
+              <span v-else class="text-white">-</span>
             </td>
             <!-- <td class="text-right">
               <div v-if="priceTokens[v.id]?.total_supply" class="text-white">

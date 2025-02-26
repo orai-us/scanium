@@ -13,6 +13,7 @@ const baseCosmwasm = 'https://lcd.orai.io/cosmwasm/wasm';
 const multiCallContractAddress =
   'orai1q7x644gmf7h8u8y6y8t9z9nnwl8djkmspypr6mxavsk9ual7dj0sxpmgwd';
 const baseURLScanium = 'https://api-services.scanium.io';
+const baseURLOraidex = 'https://api.oraidex.io'
 const urlBalancesCw20 = 'v1/balance';
 export interface ParamsSimplePrice {
   ids: string;
@@ -194,6 +195,16 @@ export const getHolderAssetsCw20 = async (params: ParamsHolderAssetsCw20) => {
       limit: params.limit,
       address: params.address,
     },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const getPricePoolTokens = async () => {
+  const config = {
+    baseURL: baseURLOraidex,
+    url: 'prices/pool-tokens',
+    method: METHODS.GET,
   };
   const res = await api.request(config);
   return res?.data;
