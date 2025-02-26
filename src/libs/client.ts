@@ -791,7 +791,19 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
     const res = await this.queryClient.distribution.delegationTotalRewards(
       delegator_addr
     );
-    return res;
+    const total = res.total?.filter((item) => item.denom !== 'aorai');
+    const rewards = res.rewards?.map((item) => {
+      const reward = item.reward?.filter((item) => item.denom !== 'aorai');
+      return {
+        ...item,
+        reward,
+      };
+    });
+
+    return {
+      rewards,
+      total,
+    };
   }
   async getDistributionValidatorCommission(validator_address: string) {
     // return this.request(this.registry.distribution_validator_commission, {
