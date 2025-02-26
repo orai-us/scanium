@@ -44,19 +44,9 @@ export const shortenDenom = (denom: string) => {
   return `${prefixHash} . . . ${suffixHash}`;
 };
 
-export const convertNewAssetToToken = (
-  newAssets: Array<{ coingecko_id: string; id: string }>
-) => {
-  const token: any = {};
-  for (let asset of newAssets) {
-    token[asset.coingecko_id] = asset.id;
-  }
-  return token;
-};
-
 export function formatNumber(number: string | number) {
   const result = Number(number);
-  if (result === 0) return 0;
+  if (result === 0 || result < 0.00001) return 0;
   if (isNaN(result)) return "-";
   if (Math.abs(result) < 1) {
     return result.toLocaleString("en-US", {

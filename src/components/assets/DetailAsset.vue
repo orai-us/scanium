@@ -79,7 +79,7 @@ const copyWebsite = async (url: string) => {
         <span class="text-white">$ {{ formatNumber(asset.circulating_supply * asset.current_price)
           }}</span>
       </div> -->
-      <div class="flex flex-row">
+      <div class="flex flex-row" v-if="!!asset.description">
         <div class="xl:w-[200px] w-[100px]">Description</div>
         <div class="w-[80%]">
           <span class="text-white">{{ asset.description }}</span>
@@ -88,7 +88,7 @@ const copyWebsite = async (url: string) => {
       <div class="flex flex-row items-center">
         <div class="xl:w-[200px] w-[100px]">Denom</div>
         <div class="flex flex-row items-center w-[65%] xl:w-fit">
-          <span class="text-white break-words truncate">{{ asset.base }}</span>
+          <span class="text-white break-words truncate">{{ asset.type_asset === "cw20" ? `cw20:${asset.base}`: asset.base }}</span>
         </div>
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="asset.base" @click="copyWebsite(asset.base || '')" />
       </div>

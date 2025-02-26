@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { getListAssetOnChainAndRegistry, getPriceByIds } from "@/service/assetsService";
+import { getPriceByIds } from "@/service/assetsService";
 import DetailAsset from "@/components/assets/DetailAsset.vue";
 import HolderAssetNativeToken from "@/components/assets/HolderAssetNativeToken.vue";
 import TransactionsAsset from "@/components/assets/TransactionsAsset.vue";
 import { RouterLink, useRoute } from "vue-router";
-import { LIST_COIN } from '@/constants';
 import { useBlockchain } from '@/stores';
 import HolderAssetCw20 from '@/components/assets/HolderAssetCw20.vue';
 
@@ -17,7 +16,6 @@ enum SECTOR {
 const props = defineProps(["denom", "chain"]);
 
 const chainStore = useBlockchain();
-const endpointAddress = chainStore.connErr || chainStore.endpoint.address;
 const assets = ref([] as Array<any>);
 const asset = ref({} as any);
 const route = useRoute();
@@ -26,31 +24,21 @@ const sector = computed(() => {
   else return SECTOR.TRANSACTIONS;
 });
 
-const coingeckoSymbols = Object.values(LIST_COIN);
-const coingeckoIds = Object.keys(LIST_COIN);
-
 onMounted(async () => {
-  try {
-    assets.value = await getListAssetOnChainAndRegistry(endpointAddress, props.chain);
-  } catch (error) {
-    console.log({ error });
-  }
+  const chainAssets = chainStore.current?.assets;
+  if (Array.isArray(chainAssets))
+    assets.value = chainAssets;
 });
 watch([() => props.denom, () => assets.value], async () => {
   const info = assets.value.find((item) => item.base === props.denom);
-  const id = info?.coingecko_id || coingeckoIds[coingeckoSymbols.indexOf(info?.display)];
+  const id = info?.coingecko_id;
   if (id) {
-    // const res = await getInfoToken({ ids: id });
     const res = await getPriceByIds({ ids: id });
     const infoToken = {
       id,
       current_price: res[id]?.usd
     };
     asset.value = { ...infoToken, ...info };
-    // // console.log({ res, res1 })
-    // if (Array.isArray(infoToken))
-    //   asset.value = { ...infoToken, ...info };
-    // else asset.value = info;
   } else {
     asset.value = info;
   }
@@ -78,11 +66,11 @@ watch([() => props.denom, () => assets.value], async () => {
         <TransactionsAsset :denom="denom" :chain="chain" />
       </div>
       <div v-show="sector === SECTOR.HOLDERS">
-        <div v-if="denom.includes('cw20:')">
-          <HolderAssetCw20 :denom="denom" :chain="chain" :currentPrice="asset.current_price" />
+        <div v-if="asset?.type_asset === 'cw20'">
+          <HolderAssetCw20 :denom="`cw20:${denom}`" :chain="chain" :currentPrice="asset?.current_price" />
         </div>
         <div v-else>
-          <HolderAssetNativeToken :denom="denom" :chain="chain" :currentPrice="asset.current_price" />
+          <HolderAssetNativeToken :denom="denom" :chain="chain" :currentPrice="asset?.current_price" />
         </div>
       </div>
     </div>

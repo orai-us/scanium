@@ -1,27 +1,31 @@
 <script lang="ts" setup>
-import { getListAsset } from '@/service/assetsService';
-import axios from 'axios';
+import { useBlockchain } from '@/stores';
 import { ref, watchEffect } from 'vue';
-import { useRoute } from 'vue-router';
 
 const props = defineProps(['value']);
 
-const route = useRoute();
-const nameToken = ref("");
+const symbol = ref("");
 let exponent = ref(0);
+const blockchain = useBlockchain();
 
 watchEffect(() => {
+  const assets = blockchain.current?.assets;
+  const denom = props.value["denom"];
   async function fetchName() {
-    const denom = props.value["denom"];
-    const assets = await getListAsset(route.params?.chain?.toString());
-    const asset = assets.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
+    const asset = assets?.find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
     if (asset) {
-      const name = asset.display;
-      const denomUnits = asset.denom_units;
-      if (Array.isArray(denomUnits)) {
-        exponent.value = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
+      const symbolToken = asset.symbol;
+      const display = asset.display;
+      // @ts-ignore
+      let decimals = asset.exponent;
+      if (!decimals) {
+        const denomUnits = asset.denom_units;
+        if (Array.isArray(denomUnits)) {
+          decimals = denomUnits.find((denomUnit: any) => denomUnit.denom === display)?.exponent;
+        }
       }
-      nameToken.value = name;
+      symbol.value = symbolToken;
+      exponent.value = decimals;
     }
   }
   fetchName();
@@ -30,6 +34,6 @@ watchEffect(() => {
 </script>
 <template>
   <div class="overflow-auto xl:text-sm text-[12px]">
-    {{ (Number(value["amount"]) / Math.pow(10, exponent)).toLocaleString("en-US", {}) }} {{ nameToken }}
+    {{ (Number(value["amount"]) / Math.pow(10, exponent)).toLocaleString("en-US", {}) }} {{ symbol }}
   </div>
 </template>

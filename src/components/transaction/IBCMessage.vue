@@ -1,18 +1,13 @@
 <script lang="ts" setup>
-import { ref, toRaw, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { select } from '../dynamic';
-import { getListAsset } from '@/service/assetsService';
-import { useRoute } from 'vue-router';
+import { useBlockchain } from '@/stores';
+import { formatNumber } from '@/utils';
 
 const props = defineProps(['value', 'type']);
 const data = ref({} as any);
-const route = useRoute();
-
-function formatNumber(number: string | number, options = {}) {
-  const result = Number(number);
-  if (isNaN(result)) return "-";
-  return result.toLocaleString("en-US", options);
-}
+const blockchain = useBlockchain();
+const assets = blockchain.current?.assets;
 
 const TOKEN_IBCS = [
   {
@@ -45,6 +40,12 @@ const TOKEN_IBCS = [
     display: "ORAI ERC20",
     exponent: 18
   },
+  {
+    base: "uosmo",
+    denom: "uosmo",
+    display: "OSMO",
+    exponent: 6
+  },
 ]
 
 watchEffect(async () => {
@@ -62,29 +63,32 @@ watchEffect(async () => {
       const packet = props.value?.packet;
       const dataPacket = packet?.data;
       const parseData = JSON.parse(decoder.decode(dataPacket));
-      let amount = parseData?.amount;
-      const denom = parseData?.denom;
-      const assets = await getListAsset(route.params?.chain?.toString());
-      const asset = [...assets, ...TOKEN_IBCS].find((asset: any) => asset.base === denom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === denom));
+      const amountOrigin = parseData?.amount;
+      const originDenom = parseData?.denom;
+      let newAssets = Array.isArray(assets) ? [...assets, ...TOKEN_IBCS] : TOKEN_IBCS;
+      const asset = newAssets.find((asset: any) => asset.base === originDenom || (Array.isArray(asset.traces) && asset.traces[0]?.chain?.path === originDenom));
       let exponent = 0;
       if (asset) {
-        const name = asset.display;
-        if (asset.exponent) {
-          exponent = Number(asset.exponent);
+        // @ts-ignore
+        const decimals = asset.exponent;
+        const display = asset.display;
+        if (decimals) {
+          exponent = Number(decimals);
         } else {
+          // @ts-ignore
           const denomUnits = asset.denom_units;
           if (Array.isArray(denomUnits)) {
-            exponent = denomUnits.find((denomUnit: any) => denomUnit.denom === name)?.exponent;
+            exponent = denomUnits.find((denomUnit: any) => denomUnit.denom === display)?.exponent;
           }
         }
       }
-      amount = formatNumber(Number(amount) / 10 ** exponent);
-      const originDenom =  asset?.display || denom;
+      let amount = formatNumber(Number(amountOrigin) / 10 ** exponent);
+      const denomAmount =  asset?.display || originDenom;
       data.value = {
         sequence: formatNumber(packet?.sequence),
-        amount: `${amount} ${originDenom}`,
-        originAmount: amount,
-        originDenom: originDenom,
+        amount: `${amount} ${denomAmount}`,
+        originAmount: formatNumber(amountOrigin),
+        originDenom,
         receiver: parseData?.receiver,
         sender: parseData?.sender,
         sourcePort: packet?.sourcePort,
