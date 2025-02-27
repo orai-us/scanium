@@ -16,7 +16,7 @@ enum SECTOR {
 const props = defineProps(["denom", "chain"]);
 
 const chainStore = useBlockchain();
-const assets = ref([] as Array<any>);
+// const assets = ref([] as Array<any>);
 const asset = ref({} as any);
 const route = useRoute();
 const sector = computed(() => {
@@ -25,23 +25,20 @@ const sector = computed(() => {
 });
 
 watchEffect(async () => {
-  const chainAssets = chainStore.current?.assets;
-  if (Array.isArray(chainAssets))
-    assets.value = chainAssets;
-});
-
-watch([() => props.denom, () => assets.value], async () => {
-  const info = assets.value.find((item) => item.base === props.denom);
-  const id = info?.coingecko_id;
-  if (id) {
-    const res = await getPriceByIds({ ids: id });
-    const infoToken = {
-      id,
-      current_price: res[id]?.usd
-    };
-    asset.value = { ...infoToken, ...info };
-  } else {
-    asset.value = info;
+  const assets = chainStore.current?.assets;
+  if (Array.isArray(assets)) {
+    const info = assets.find((item) => item.base === props.denom);
+    const id = info?.coingecko_id;
+    if (id) {
+      const res = await getPriceByIds({ ids: id });
+      const infoToken = {
+        id,
+        current_price: res[id]?.usd
+      };
+      asset.value = { ...infoToken, ...info };
+    } else {
+      asset.value = info;
+    }
   }
 });
 
