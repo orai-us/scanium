@@ -2,6 +2,24 @@ export const CHAIN_INDEXS = ['Oraichain'];
 
 export const ASSET_SDKS = [
   {
+    coinDenom: 'ORAI',
+    coinMinimalDenom: 'orai',
+    coinDecimals: 6,
+    coinGeckoId: 'oraichain-token',
+    bridgeTo: [
+      '0x38',
+      '0x01',
+      'injective-1',
+      'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+    ],
+    coinImageUrl: 'https://images.orai.io/logo/orai-token.png',
+    gasPriceStep: {
+      low: 0.003,
+      average: 0.005,
+      high: 0.007,
+    },
+  },
+  {
     coinDenom: 'SOL',
     coinMinimalDenom:
       'factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/So11111111111111111111111111111111111111112',
@@ -41,24 +59,6 @@ export const ASSET_SDKS = [
     coinGeckoId: 'banker',
     coinImageUrl:
       'https://ipfs.io/ipfs/QmXPbVpdytLBnQHy5vTJPaetnvvGMDZpBRcWB3XVCnbiBK',
-  },
-  {
-    coinDenom: 'ORAI',
-    coinMinimalDenom: 'orai',
-    coinDecimals: 6,
-    coinGeckoId: 'oraichain-token',
-    bridgeTo: [
-      '0x38',
-      '0x01',
-      'injective-1',
-      'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
-    ],
-    coinImageUrl: 'https://images.orai.io/logo/orai-token.png',
-    gasPriceStep: {
-      low: 0.003,
-      average: 0.005,
-      high: 0.007,
-    },
   },
   {
     coinDenom: 'ATOM',
