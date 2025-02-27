@@ -54,9 +54,13 @@ const blockTime = ref(1);
 store.fetchProposal(props.proposal_id).then((res) => {
   if (!res.content?.content?.description) summary.value = res.summary;
   let changeProposal
-  if(res.contentProto) changeProposal = decodeProto(
-    res.contentProto as any
-  ) as ParameterChangeProposal;
+  try {
+    if (res.contentProto) changeProposal = decodeProto(
+      res.contentProto as any
+    ) as ParameterChangeProposal;
+  } catch (error) {
+    console.log({ error });
+  }
   if (changeProposal) Object.assign(res.contentProto!, changeProposal);
   proposal.value = res;
   // when status under the voting, final_tally_result are no data, should request fetchTally
