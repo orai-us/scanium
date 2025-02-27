@@ -3,6 +3,7 @@ import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
 import { getListAssetOfOraichain } from '@/service/assetsService';
+import { ASSET_SDKS } from '@/constants';
 
 export enum EndpointType {
   rpc,
@@ -139,11 +140,11 @@ function apiConverter(api: any[]) {
   });
 }
 
-export function fromLocal(lc: LocalConfig, chainName: string, assetOfOraichain?: Array<any>): ChainConfig {
+export function fromLocal(lc: LocalConfig, chainName: string): ChainConfig {
   const conf = {} as ChainConfig;
   let assets = [];
-  if (chainName.toLowerCase() === 'oraichain' && Array.isArray(assetOfOraichain)) {
-    for (let item of assetOfOraichain) {
+  if (chainName.toLowerCase() === 'oraichain') {
+    for (let item of ASSET_SDKS) {
       let base = item.coinMinimalDenom;
       const type = item.type;
       if(type === "cw20") base = item.contractAddress;
@@ -401,13 +402,13 @@ export const useDashboard = defineStore('dashboard', {
       if (window.location.hostname.search('testnet') > -1) {
         this.networkType = NetworkType.Testnet;
       }
-      const assetOfOraichain = await getListAssetOfOraichain();
+      // const assetOfOraichain = await getListAssetOfOraichain();
       const source: Record<string, LocalConfig> =
         this.networkType === NetworkType.Mainnet
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
       Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
-        this.chains[x.chain_name] = fromLocal(x, x.chain_name, assetOfOraichain);
+        this.chains[x.chain_name] = fromLocal(x, x.chain_name);
       });
 
       this.setupDefault();
