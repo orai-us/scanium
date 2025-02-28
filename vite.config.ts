@@ -28,6 +28,7 @@ export default defineConfig({
               'ping-connect-wallet',
               'ping-token-convert',
               'ping-tx-dialog',
+              'ping-create-proposal'
             ].includes(tag),
         },
       },
