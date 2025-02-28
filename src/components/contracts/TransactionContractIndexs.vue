@@ -71,15 +71,6 @@ const query = gql`
                 subType
               }
             }
-            tokenTransfers {
-              nodes {
-                denom
-                from
-                to
-                amount
-                type
-              }
-            }
           }
         }
       }
@@ -102,12 +93,10 @@ const txsMerge = computed(() => {
   const data = txsOptimal?.map((txOptimal: any) => {
     const searchTx = txsIndexer?.find((txIndexer: any) => txIndexer.id === txOptimal.id);
     const messages = searchTx?.messages;
-    const tokenTransfers = searchTx?.tokenTransfers;
 
     return {
       ...txOptimal,
       messages,
-      tokenTransfers
     };
   });
 
