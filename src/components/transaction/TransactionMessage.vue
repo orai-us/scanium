@@ -14,6 +14,7 @@ import SwapMessage from './SwapMessage.vue';
 import { TypeMessage } from '@/libs/swap-msg';
 import { TypeMessageSend } from '@/libs/send-msg';
 import SendMessage from './SendMessage.vue';
+import { LABELING_ADDRESS } from '@/constants';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 
@@ -94,13 +95,19 @@ watchEffect(() => {
             <div class="xl:flex items-center hidden">
               <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-3" v-show="value.sender"
               @click="copyWebsite(value.sender || '')" />
-              <div v-for="{ name, provider } in labelSenders">
+              <div v-for="{ name, provider } in labelSenders" v-if="!!labelSenders.length">
                 <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success"
                   :data-tip="provider" :title="provider">
                   <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
                   <button>{{ name }}</button>
                 </span>
-                </div>
+              </div>
+              <div v-else-if="LABELING_ADDRESS[value.contract]">
+                <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success">
+                <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
+                <button>{{ LABELING_ADDRESS[value.contract] }}</button>
+              </span>
+              </div>
             </div>
           </div>
         </div>
