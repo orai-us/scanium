@@ -102,10 +102,10 @@ watchEffect(() => {
                   <button>{{ name }}</button>
                 </span>
               </div>
-              <div v-else-if="LABELING_ADDRESS[value.contract]">
+              <div v-else-if="LABELING_ADDRESS[value.sender]">
                 <span class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success">
                 <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-                <button>{{ LABELING_ADDRESS[value.contract] }}</button>
+                <button>{{ LABELING_ADDRESS[value.sender] }}</button>
               </span>
               </div>
             </div>
