@@ -3,7 +3,6 @@ import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
 import { getListAssetOfOraichain } from '@/service/assetsService';
-import { ASSET_SDKS } from '@/constants';
 
 export enum EndpointType {
   rpc,
@@ -142,55 +141,19 @@ function apiConverter(api: any[]) {
 
 export function fromLocal(lc: LocalConfig, chainName: string): ChainConfig {
   const conf = {} as ChainConfig;
-  let assets = [];
-  if (chainName.toLowerCase() === 'oraichain') {
-    for (let item of ASSET_SDKS) {
-      let base = item.coinMinimalDenom;
-      const type = item.type;
-      if(type === "cw20") base = item.contractAddress;
-      const asset = {
-        name: item.coinMinimalDenom === 'orai' ? 'orai' : item.coinDenom,
-        base,
-        display: item.coinDenom,
-        symbol: item.coinDenom,
-        logo_URIs: {
-          svg: item.coinImageUrl,
-        },
-        coingecko_id: item.coinGeckoId,
-        exponent: item.coinDecimals,
-        denom_units: [
-          {
-            denom: item.coinMinimalDenom,
-            exponent: 0,
-          },
-          {
-            denom: item.coinDenom,
-            exponent: item.coinDecimals,
-          },
-        ],
-        type_asset: type,
-      };
-      assets.push(asset);
-    }
-  }
-  lc.assets.forEach((x) => {
-    if (!assets.find((item) => item.base === x.base)) {
-      const asset = {
-        name: x.base,
-        base: x.base,
-        display: x.symbol,
-        symbol: x.symbol,
-        logo_URIs: { svg: x.logo },
-        coingecko_id: x.coingecko_id,
-        exponent: x.exponent,
-        denom_units: [
-          { denom: x.base, exponent: 0 },
-          { denom: x.symbol, exponent: Number(x.exponent) },
-        ],
-      };
-      assets.push(asset);
-    }
-  });
+  let assets = lc.assets.map((x) => ({
+    name: x.base,
+    base: x.base,
+    display: x.symbol,
+    symbol: x.symbol,
+    logo_URIs: { svg: x.logo },
+    coingecko_id: x.coingecko_id,
+    exponent: x.exponent,
+    denom_units: [
+      { denom: x.base, exponent: 0 },
+      { denom: x.symbol, exponent: Number(x.exponent) },
+    ],
+  }));
   conf.assets = assets;
   conf.cosmwasmEnabled = lc.cosmwasm_enabled ?? false;
   conf.versions = {
@@ -344,6 +307,7 @@ export const useDashboard = defineStore('dashboard', {
     async initial() {
       await this.loadingFromLocal();
       await this.loadingAssetsFromRegistry();
+      await this.loadingAssetsFromOraiSDK();
     },
     loadingPrices() {
       const coinIds = [] as string[];
@@ -413,6 +377,56 @@ export const useDashboard = defineStore('dashboard', {
 
       this.setupDefault();
       // this.status = LoadingStatus.Loaded;
+    },
+    async loadingAssetsFromOraiSDK() {
+      const assetOfOraichain = await getListAssetOfOraichain();
+      let assets = [];
+      const assetsOnOraiChains = this.chains['Oraichain'].assets;
+      if (Array.isArray(assetOfOraichain)) {
+        for (let item of assetOfOraichain) {
+          let base = item.coinMinimalDenom;
+          const type = item.type;
+          if (type === 'cw20') base = item.contractAddress;
+          const asset = {
+            name: item.coinMinimalDenom === 'orai' ? 'orai' : item.coinDenom,
+            base,
+            display: item.coinDenom,
+            symbol: item.coinDenom,
+            logo_URIs: {
+              svg: item.coinImageUrl,
+            },
+            coingecko_id: item.coinGeckoId,
+            exponent: item.coinDecimals,
+            denom_units: [
+              {
+                denom: item.coinMinimalDenom,
+                exponent: 0,
+              },
+              {
+                denom: item.coinDenom,
+                exponent: item.coinDecimals,
+              },
+            ],
+            type_asset: type,
+          };
+          assets.push(asset);
+        }
+      }
+      if (Array.isArray(assetsOnOraiChains)) {
+        assetsOnOraiChains.forEach((x) => {
+          if (!assets.find((item) => item.base === x.base)) {
+            assets.push(x);
+          }
+        });
+      }
+      const oraiAsset = assets.find((item) => item.base === 'orai');
+      let assetResult = assets.filter((item) => item.base !== 'orai');
+      if (!!oraiAsset)
+        assetResult = [
+          oraiAsset,
+          ...assets.filter((item) => item.base !== 'orai'),
+        ];
+      this.chains['Oraichain'].assets = assetResult;
     },
     async loadLocalConfig(network: NetworkType) {
       const config: Record<string, ChainConfig> = {};
