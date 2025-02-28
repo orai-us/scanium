@@ -14,7 +14,7 @@ export interface ParamsGetTx {
   limit: number;
 }
 
-const urlTxsHistory = "/v1/txs-history/"
+const urlTxsHistory = "/v1/txs-history/";
 export const getHistoryTxs = async (params: ParamsGetHistoryTxs) => {
   const config = {
     baseURL: baseUrlOraidex,
@@ -26,7 +26,7 @@ export const getHistoryTxs = async (params: ParamsGetHistoryTxs) => {
   return res?.data;
 };
 
-const urlTxsByAccount = "/v1/transaction/by-account"
+const urlTxsByAccount = "/v1/transaction/by-account";
 export const getTxsByAccount = async (
   addressAcc: string,
   params: ParamsGetTx
@@ -74,6 +74,31 @@ export const countTxsByDenom = async (denom: string) => {
   const res = await api.request(config);
   return res?.data;
 };
+
+const urlTxsOnContract = "/v1/transaction/on-contract";
+export const getTxsOnContract = async (
+  contract: string,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsOnContract}/${contract}`,
+    method: METHODS.GET,
+    params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countTxsOnContract = async(contract: string,)=>{
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsOnContract}/${contract}/count`,
+    method: METHODS.GET,
+  };
+  const res = await api.request(config);
+  return res?.data;
+}
 
 export const mergeTxsOptimalAndIndexer = (
   txsOptimal: Array<any>,
