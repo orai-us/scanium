@@ -41,13 +41,8 @@ watchEffect(async () => {
   const assets = chainStore.current?.assets;
   if (Array.isArray(assets)) {
     let assetsSupported = assets.filter(item => item.coingecko_id);
-    const oraiAsset = assets.find((item) => item.base === "orai");
-    let assetResult = assetsSupported.filter(item => item.base !== "orai");
-    if (!!oraiAsset)
-      assetResult = [oraiAsset, ...assetsSupported.filter(item => item.base !== "orai")];
-
-    assetsAll.value = assetResult;
-    assetsSearch.value = assetResult;
+    assetsAll.value = assetsSupported;
+    assetsSearch.value = assetsSupported;
   }
 });
 
