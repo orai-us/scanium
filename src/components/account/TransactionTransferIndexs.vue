@@ -21,7 +21,8 @@ const pagination = computed(() => {
 
 async function fetchTxsTokenTransfer() {
   try {
-    const response = await getTxsTokenTransfer(props.address, pagination.value);
+    const chain = props.chain === "Oraichain" ? "orai" : props.chain;
+    const response = await getTxsTokenTransfer(chain, props.address, pagination.value);
     if (!!response) {
       tokenTransfers.value = response.data;
     }
