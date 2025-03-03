@@ -134,20 +134,21 @@ watchEffect(async () => {
   const promiseAll = [];
   if (Array.isArray(votes.value)) {
     for (let item of votes.value) {
-      const { data } = fromBech32(item.voter);
-      const hex = toHex(data);
-      const v = stakingStore.validators.find(
-        (x) => toHex(fromBech32(x.operatorAddress).data) === hex
-      );
-      if (!!v) {
-        const votingPowerValidator = format.calculatePercent(
-          v.delegatorShares,
-          totalPower
-        );
-        result[item.voter] = votingPowerValidator;
-      } else {
-        promiseAll.push(chainStore.rpc.getStakingDelegations(item.voter));
-      }
+      // const { data } = fromBech32(item.voter);
+      // const hex = toHex(data);
+      // const v = stakingStore.validators.find(
+      //   (x) => toHex(fromBech32(x.operatorAddress).data) === hex
+      // );
+      // if (!!v) {
+      //   const votingPowerValidator = format.calculatePercent(
+      //     v.delegatorShares,
+      //     totalPower
+      //   );
+      //   result[item.voter] = votingPowerValidator;
+      // } else {
+      //   promiseAll.push(chainStore.rpc.getStakingDelegations(item.voter));
+      // }
+      promiseAll.push(chainStore.rpc.getStakingDelegations(item.voter));
     }
   }
   if (promiseAll.length) {
@@ -164,16 +165,12 @@ watchEffect(async () => {
             voter = delegation.delegatorAddress;
             
           }
-          result[voter] = ((totalAmount / (totalPower / 10 ** 24)) / 100).toFixed(12) + "%";
+          result[voter] = ((totalAmount / (totalPower / 10 ** 24)) / 100).toFixed(10) + "%";
         }
       }
     }
   }
   votingPowers.value = result;
-})
-
-watchEffect(() => {
-  console.log({ votingPowers: toRaw(votingPowers.value) });
 })
 
 function shortTime(v: string | Date | Timestamp) {
