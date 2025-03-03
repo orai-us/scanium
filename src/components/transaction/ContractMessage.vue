@@ -3,6 +3,7 @@ import { useWasmStore } from '@/modules/[chain]/cosmwasm/WasmStore';
 import { computed, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
+import { LABELING_ADDRESS } from '@/constants';
 
 const props = defineProps(['contract', 'chain']);
 const vueRouters = useRouter();
@@ -54,9 +55,10 @@ watchEffect(() => {
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-3" v-show="contract"
           @click="copyWebsite(contract || '')" />
         <div>
-          <span class="text-xs truncate relative py-1 px-2 w-fit ml-2 rounded-lg text-success" v-if="labelContracts">
+          <span class="text-xs truncate relative py-1 px-2 w-fit ml-2 rounded-lg text-success">
             <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-            <button>{{ labelContracts }}</button>
+            <button v-if="labelContracts">{{ labelContracts }}</button>
+            <button v-else-if="LABELING_ADDRESS[props.contract]">{{ LABELING_ADDRESS[props.contract] }}</button>
           </span>
         </div>
       </div>
