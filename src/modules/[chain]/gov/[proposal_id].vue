@@ -27,7 +27,7 @@ import type { MsgSoftwareUpgrade } from 'cosmjs-types/cosmos/upgrade/v1beta1/tx'
 import type { Timestamp } from 'cosmjs-types/google/protobuf/timestamp';
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import MdEditor from 'md-editor-v3';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, toRaw, watch, watchEffect } from 'vue';
 
 export type ExtraProposal = {
   title: string,
@@ -48,8 +48,9 @@ const store = useGovStore();
 const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const chainStore = useBlockchain();
-const summary = ref()
+const summary = ref();
 const blockTime = ref(1);
+const votingPowers = ref({} as any);
 
 store.fetchProposal(props.proposal_id).then((res) => {
   if (!res.content?.content?.description) summary.value = res.summary;
@@ -126,6 +127,54 @@ store.fetchProposalVotes(props.proposal_id).then((x) => {
   votes.value = x.votes;
   pageResponse.value = x.pagination;
 });
+
+watchEffect(async () => {
+  const result: any = {};
+  const totalPower = stakingStore.totalPower;
+  const promiseAll = [];
+  if (Array.isArray(votes.value)) {
+    for (let item of votes.value) {
+      const { data } = fromBech32(item.voter);
+      const hex = toHex(data);
+      const v = stakingStore.validators.find(
+        (x) => toHex(fromBech32(x.operatorAddress).data) === hex
+      );
+      if (!!v) {
+        const votingPowerValidator = format.calculatePercent(
+          v.delegatorShares,
+          totalPower
+        );
+        result[item.voter] = votingPowerValidator;
+      } else {
+        promiseAll.push(chainStore.rpc.getStakingDelegations(item.voter));
+      }
+    }
+  }
+  if (promiseAll.length) {
+    const delegations = await Promise.all(promiseAll);
+    if (Array.isArray(delegations)) {
+      for (let delegation of delegations) {
+        const { delegationResponses } = delegation;
+        for (let delegationResponse of delegationResponses) {
+          let totalAmount = 0;
+          let voter = "";
+          const { balance, delegation } = delegationResponse;
+          if (balance.denom === "orai") {
+            totalAmount += Number(balance.amount) / 10 ** 6;
+            voter = delegation.delegatorAddress;
+            
+          }
+          result[voter] = ((totalAmount / (totalPower / 10 ** 24)) / 100).toFixed(12) + "%";
+        }
+      }
+    }
+  }
+  votingPowers.value = result;
+})
+
+watchEffect(() => {
+  console.log({ votingPowers: toRaw(votingPowers.value) });
+})
 
 function shortTime(v: string | Date | Timestamp) {
   if (v) {
@@ -475,6 +524,9 @@ onMounted(async() => {
                       if (result === "No With Veto") return "Veto"
                     return result}).join(', ')
                 }}
+              </td>
+              <td class="flex justify-end">
+                {{ votingPowers[item.voter] || "0%" }}
               </td>
             </tr>
           </tbody>
