@@ -28,16 +28,18 @@ watchEffect(async () => {
   const assets = chainStore.current?.assets;
   if (Array.isArray(assets)) {
     const info = assets.find((item) => item.base === props.denom);
-    const id = info?.coingecko_id;
-    if (id) {
-      const res = await getPriceByIds({ ids: id });
-      const infoToken = {
-        id,
-        current_price: res[id]?.usd
-      };
-      asset.value = { ...infoToken, ...info };
-    } else {
-      asset.value = info;
+    if (info) {
+      const id = info.coingecko_id;
+      if (id) {
+        const res = await getPriceByIds({ ids: id });
+        const infoToken = {
+          id,
+          current_price: res[id]?.usd
+        };
+        asset.value = { ...infoToken, ...info };
+      } else {
+        asset.value = info;
+      }
     }
   }
 });
