@@ -115,3 +115,18 @@ export const mergeTxsOptimalAndIndexer = (
     };
   });
 };
+
+const urlTxsTokenTransfer = "/v1/token-transfer/by-denom-account/orai";
+export const getTxsTokenTransfer = async (
+  address: string,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsTokenTransfer}/${address}`,
+    method: METHODS.GET,
+    params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
