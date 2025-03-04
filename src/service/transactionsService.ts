@@ -116,15 +116,14 @@ export const mergeTxsOptimalAndIndexer = (
   });
 };
 
-const urlTxsTokenTransfer = "/v1/token-transfer/by-denom-account";
+const urlTxsTokenTransfer = "/v1/token-transfer/by-account";
 export const getTxsTokenTransfer = async (
-  chain: string,
   address: string,
   params: ParamsGetTx
 ) => {
   const config = {
     baseURL: baseUrlOptimalQueriesScanium,
-    url: `${urlTxsTokenTransfer}/${chain}/${address}`,
+    url: `${urlTxsTokenTransfer}/${address}`,
     method: METHODS.GET,
     params,
   };
