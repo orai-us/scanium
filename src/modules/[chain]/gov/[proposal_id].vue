@@ -12,6 +12,7 @@ import {
   useTxDialog,
 } from '@/stores';
 import { PageRequest } from '@/types';
+import { formatSmallNumber } from '@/utils';
 import { fromBech32, toHex } from '@cosmjs/encoding';
 import type { PageResponse } from 'cosmjs-types/cosmos/base/query/v1beta1/pagination';
 import type { Params } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
@@ -165,7 +166,7 @@ watchEffect(async () => {
             voter = delegation.delegatorAddress;
             
           }
-          result[voter] = ((totalAmount / (totalPower / 10 ** 24)) / 100).toFixed(10) + "%";
+          result[voter] = formatSmallNumber(((totalAmount / (totalPower / 10 ** 24)) / 100)) + "%";
         }
       }
     }
@@ -523,7 +524,7 @@ onMounted(async() => {
                 }}
               </td>
               <td class="flex justify-end">
-                {{ votingPowers[item.voter] || "0%" }}
+                <span v-html="votingPowers[item.voter] || '0%'"></span>
               </td>
             </tr>
           </tbody>
