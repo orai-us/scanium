@@ -4,7 +4,7 @@ import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { shortenTxHash } from '@/utils';
+import { formatNumber, shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import { tokenMap } from '@/libs/amm-v3';
 import { formatTitle } from '@/libs/utils';
@@ -102,9 +102,11 @@ const transactions = computed(() => {
         }
         const fee = `${amountFee} ${denomFee}`;
         let denomTransfer = item.denom;
+        let amountTransfer = item.amount;
         const tokenInfoTransfer = tokenMap[denomTransfer];
         if (tokenInfoTransfer) {
           denomTransfer = tokenInfoTransfer.coinDenom;
+          amountTransfer = formatNumber(amountTransfer / 10 ** tokenInfoTransfer.coinDecimals);
         }
         let timestamp: any = "-";
         if (!!txTransfer.timestamp)
@@ -128,6 +130,7 @@ const transactions = computed(() => {
           fee,
           status: state,
           token: denomTransfer,
+          amount: amountTransfer,
           timestamp,
           numberMessageRemain
         })
@@ -162,6 +165,7 @@ function handleNext() {
           <th>Fee</th>
           <th>Status</th>
           <th>Token</th>
+          <th>Amount</th>
           <th>Time</th>
         </tr>
       </thead>
@@ -199,6 +203,9 @@ function handleNext() {
                 {{ v.status }}
               </button>
             </div>
+          </td>
+          <td class="py-3">
+            <span>{{ v.amount }}</span>
           </td>
           <td class="py-3">
             <span>{{ v.token }}</span>
