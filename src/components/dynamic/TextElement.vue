@@ -6,7 +6,7 @@ import { computed, onMounted, ref } from 'vue';
 import nameMatcha from '@leapwallet/name-matcha';
 import { fromBase64, toHex } from '@cosmjs/encoding';
 import { Icon } from '@iconify/vue';
-import { LABELING_ADDRESS } from '@/constants';
+import { labelingForAddress } from '@/utils';
 
 const chainStore = useBlockchain();
 const props = defineProps(['value']);
@@ -94,7 +94,15 @@ const copyWebsite = async (url: string) => {
       text
     }}</RouterLink>
     <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="text" @click="copyWebsite(text || '')" />
-    <div v-for="{ name, provider } in names" v-if="!!names.length">
+    <div v-if="!!labelingForAddress(text)">
+      <span
+        class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
+      >
+        <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
+        <button>{{ labelingForAddress(text) }}</button>
+      </span>
+    </div>
+    <div v-for="{ name, provider } in names" v-else-if="!!names.length">
       <span
         class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
         :data-tip="provider"
@@ -102,14 +110,6 @@ const copyWebsite = async (url: string) => {
       >
         <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
         <button>{{ name }}</button>
-      </span>
-    </div>
-    <div v-else-if="!!LABELING_ADDRESS[text]">
-      <span
-        class="text-xs truncate relative py-1 px-2 p2-4 w-fit ml-2 rounded text-success tooltip"
-      >
-        <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-        <button>{{ LABELING_ADDRESS[text] }}</button>
       </span>
     </div>
   </span>

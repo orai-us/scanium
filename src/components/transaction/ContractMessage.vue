@@ -3,7 +3,7 @@ import { useWasmStore } from '@/modules/[chain]/cosmwasm/WasmStore';
 import { computed, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
-import { LABELING_ADDRESS } from '@/constants';
+import { labelingForAddress } from '@/utils';
 
 const props = defineProps(['contract', 'chain']);
 const vueRouters = useRouter();
@@ -57,8 +57,8 @@ watchEffect(() => {
         <div>
           <span class="text-xs truncate relative py-1 px-2 w-fit ml-2 rounded-lg text-success">
             <span class="inset-x-0 inset-y-0 opacity-10 absolute bg-success"></span>
-            <button v-if="labelContracts">{{ labelContracts }}</button>
-            <button v-else-if="LABELING_ADDRESS[props.contract]">{{ LABELING_ADDRESS[props.contract] }}</button>
+            <button v-if="!!labelingForAddress(props.contract)">{{ labelingForAddress(props.contract) }}</button>
+            <button v-else-if="labelContracts">{{ labelContracts }}</button>
           </span>
         </div>
       </div>
