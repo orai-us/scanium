@@ -66,3 +66,29 @@ export function labelingForAddress(address: string) {
   if (LABELING_ADDRESS[address]) return LABELING_ADDRESS[address];
   return;
 }
+
+export function formatSmallNumber(number: number) {
+  if (number === 0) return '0';
+  if (number >= 0.001) return number.toFixed(4);
+  const str = number.toFixed(10).toString();
+  const decimalIndex = str.indexOf('.');
+  if (decimalIndex === -1) {
+    return str;
+  }
+
+  let firstNonZeroIndex = -1;
+  for (let i = decimalIndex + 1; i < str.length; i++) {
+    if (str[i] !== '0') {
+      firstNonZeroIndex = i;
+      break;
+    }
+  }
+
+  if (firstNonZeroIndex === -1) {
+    return str;
+  }
+
+  const zeroCount = firstNonZeroIndex - decimalIndex - 2;
+  const result = '0.0<sub>' + zeroCount + '</sub>' + str.substring(firstNonZeroIndex);
+  return result;
+}
