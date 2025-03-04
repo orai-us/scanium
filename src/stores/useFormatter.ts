@@ -136,9 +136,11 @@ export const useFormatter = defineStore('formatter', {
     },
     tokenValue(token?: Coin, decimal?: number) {
       if (token) {
-        return numeral(this.tokenValueNumber(token, decimal)).format(
+        const result = numeral(this.tokenValueNumber(token, decimal)).format(
           '0,0.[00]'
         );
+        if (result === 'NaN') return '0';
+        return result;
       }
       return '';
     },
@@ -160,6 +162,7 @@ export const useFormatter = defineStore('formatter', {
         this.dashboard.coingecko[token.denom]?.symbol || token.denom;
       // convert denomation to to symbol
       const exponent =
+        this.dashboard.coingecko[symbol?.toUpperCase()]?.exponent ||
         this.dashboard.coingecko[symbol?.toLowerCase()]?.exponent ||
         this.specialDenom(token.denom);
       // cacualte amount of symbol
