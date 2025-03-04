@@ -1,3 +1,6 @@
+import { LABELING_ADDRESS } from "@/constants";
+import { tokenMap } from "@/libs/amm-v3";
+
 export const shortenTxHash = (txHash: string) => {
   const prefixHash = txHash.slice(0, 6);
   const suffixHash = txHash.slice(-6);
@@ -55,4 +58,11 @@ export function formatNumber(number: string | number) {
     });
   }
   return result.toLocaleString("en-US");
+}
+
+export function labelingForAddress(address: string) {
+  const tokenInfo = tokenMap[address];
+  if (!!tokenInfo) return tokenInfo.coinDenom;
+  if (LABELING_ADDRESS[address]) return LABELING_ADDRESS[address];
+  return;
 }
