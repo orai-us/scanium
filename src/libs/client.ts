@@ -813,7 +813,12 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
       const res = await this.queryClient.distribution.validatorCommission(
         validator_address
       );
-      console.log(res);
+      if (Array.isArray(res?.commission?.commission)) {
+        const commission = res.commission.commission.filter(
+          (item) => item.denom !== 'aorai'
+        );
+        return { commission: { commission } };
+      }
       return res;
     } catch (ex) {
       console.log(ex);
@@ -833,8 +838,8 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
         const res = {
           rewards: {
             rewards:
-              rewards?.rewards?.map((r) => {
-                return r;
+              rewards?.rewards?.filter((r) => {
+                return r.denom !== "aorai";
               }) ?? [],
           },
         };
@@ -844,7 +849,12 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
           await this.queryClient.distribution.validatorOutstandingRewards(
             validator_address
           );
-
+        if (Array.isArray(res?.rewards?.rewards)) {
+          const rewards = res.rewards.rewards.filter(
+            (item) => item.denom !== 'aorai'
+          );
+          return { rewards: { rewards } };
+        }
         return res;
       }
     } catch (ex) {
