@@ -31,9 +31,9 @@ function showType(v: string) {
 }
 
 const statusMap: Record<string, string> = {
-  PROPOSAL_STATUS_VOTING_PERIOD: 'VOTING',
-  PROPOSAL_STATUS_PASSED: 'PASSED',
-  PROPOSAL_STATUS_REJECTED: 'REJECTED',
+  [ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD]: 'VOTING',
+  [ProposalStatus.PROPOSAL_STATUS_PASSED]: 'PASSED',
+  [ProposalStatus.PROPOSAL_STATUS_REJECTED]: 'REJECTED',
 };
 const voterStatusMap: Record<string, string> = {
   VOTE_OPTION_NO_WITH_VETO: '',
@@ -92,9 +92,9 @@ function metaItem(metadata: string | undefined): {
               <div
                 class="flex items-center"
                 :class="
-                  statusMap?.[item?.status] === 'PASSED'
+                  item?.status === ProposalStatus.PROPOSAL_STATUS_PASSED
                     ? 'text-yes'
-                    : statusMap?.[item?.status] === 'REJECTED'
+                    : item?.status === ProposalStatus.PROPOSAL_STATUS_REJECTED
                     ? 'text-no'
                     : 'text-info'
                 "
@@ -102,9 +102,9 @@ function metaItem(metadata: string | undefined): {
                 <div
                   class="w-1 h-1 rounded-full mr-2"
                   :class="
-                    statusMap?.[item?.status] === 'PASSED'
+                    item?.status === ProposalStatus.PROPOSAL_STATUS_PASSED
                       ? 'bg-yes'
-                      : statusMap?.[item?.status] === 'REJECTED'
+                      : item?.status === ProposalStatus.PROPOSAL_STATUS_REJECTED
                       ? 'bg-no'
                       : 'bg-info'
                   "
@@ -121,7 +121,7 @@ function metaItem(metadata: string | undefined): {
             </div>
           </td>
 
-          <td v-if="statusMap?.[ProposalStatus[item?.status]] === 'VOTING'" class="w-40">
+          <td v-if="statusMap?.[item?.status] === 'VOTING'" class="w-40">
             <div class="">
               <label
                 for="vote"
@@ -205,9 +205,9 @@ function metaItem(metadata: string | undefined): {
             <div
               class="flex items-center"
               :class="
-                statusMap?.[item?.status] === 'PASSED'
+                item?.status === ProposalStatus.PROPOSAL_STATUS_PASSED
                   ? 'text-yes'
-                  : statusMap?.[item?.status] === 'REJECTED'
+                  : item?.status === ProposalStatus.PROPOSAL_STATUS_REJECTED
                   ? 'text-no'
                   : 'text-info'
               "
@@ -215,9 +215,9 @@ function metaItem(metadata: string | undefined): {
               <div
                 class="w-1 h-1 rounded-full mr-2"
                 :class="
-                  statusMap?.[item?.status] === 'PASSED'
+                  item?.status === ProposalStatus.PROPOSAL_STATUS_PASSED
                     ? 'bg-yes'
-                    : statusMap?.[item?.status] === 'REJECTED'
+                    : item?.status === ProposalStatus.PROPOSAL_STATUS_REJECTED
                     ? 'bg-no'
                     : 'bg-info'
                 "
