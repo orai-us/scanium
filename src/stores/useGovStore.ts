@@ -53,9 +53,9 @@ export const useGovStore = defineStore('govStore', {
 
       if (status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD) {
         proposals?.proposals?.forEach((item) => {
-          // this.fetchTally(item.proposalId.toString()).then((res) => {
-          //   item.finalTallyResult = res?.tally;
-          // });
+          this.fetchTally(item.proposalId.toString()).then((res) => {
+            item.finalTallyResult = res?.tally;
+          });
           if (this.walletstore.currentAddress) {
             try {
               this.fetchProposalVotesVoter(
