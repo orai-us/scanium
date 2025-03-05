@@ -734,7 +734,7 @@ function mapDelegators(tx: ExtraTxResponse) {
                   <RouterLink :to="`/${props.chain}/tx/${toHex(item.hash)}`">
                     <span class="mr-2">
                       {{ selectedEventType === EventType.Delegate ? '+' : '-' }}
-                      {{ mapAmounts(item).join(', ') }}</span>
+                      {{ mapAmounts(item).map((i) => (i / 10 ** 6).toLocaleString("en-US", {})).join(', ') }}</span>
                   </RouterLink>
                   <Icon v-if="item.result.code === 0" icon="mdi-check" class="text-yes" />
                   <Icon v-else icon="mdi-multiply" class="text-no" />
