@@ -164,8 +164,8 @@ function handleNext() {
           <th>Height</th>
           <th>Fee</th>
           <th>Status</th>
-          <th>Token</th>
           <th>Amount</th>
+          <th>Token</th>
           <th>Time</th>
         </tr>
       </thead>
