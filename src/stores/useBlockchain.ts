@@ -178,6 +178,7 @@ export const useBlockchain = defineStore('blockchain', {
 
     randomSetupEndpoint() {
       const endpoint = this.randomEndpoint(this.chainName);
+      console.log({ 'randomSetupEndpoint1 endpoint': endpoint });
       if (endpoint) this.setRestEndpoint(endpoint);
     },
 
@@ -193,6 +194,7 @@ export const useBlockchain = defineStore('blockchain', {
 
     async setCurrent(name: string) {
       // Ensure chains are loaded due to asynchronous calls.
+      console.log({ "setCurrent1 this.dashboard.length": this.dashboard.length });
       if (this.dashboard.length === 0) {
         await this.dashboard.initial();
       }
@@ -203,6 +205,8 @@ export const useBlockchain = defineStore('blockchain', {
           (x) => x.toLowerCase() === name.toLowerCase()
         ) || name;
 
+      console.log({ "setCurrent2 caseSensitiveName": caseSensitiveName });
+      console.log({ "setCurrent3 this.chainName": this.chainName });
       // Update chainName if needed
       if (caseSensitiveName !== this.chainName) {
         this.chainName = caseSensitiveName;

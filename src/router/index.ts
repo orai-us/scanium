@@ -13,8 +13,10 @@ const router = createRouter({
 //update current blockchain
 router.beforeEach((to) => {
   const { chain } = to.params;
+  console.log({ "beforeEach1 chain": chain });
   if (chain) {
     const blockchain = useBlockchain();
+    console.log({ "beforeEach2 blockchain.chainName": blockchain.chainName });
     if (chain !== blockchain.chainName) {
       blockchain.setCurrent(chain.toString());
     }
