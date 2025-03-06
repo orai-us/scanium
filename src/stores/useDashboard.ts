@@ -305,10 +305,20 @@ export const useDashboard = defineStore('dashboard', {
   },
   actions: {
     async initial() {
-      console.log("Init dashboard")
-      await this.loadingFromLocal();
-      await this.loadingAssetsFromRegistry();
-      await this.loadingAssetsFromOraiSDK();
+      console.log({ assetsBefore: { ...this.chains['osmosis'] } });
+      if (this.status !== LoadingStatus.Loaded) {
+        console.log({ status: this.status });
+        console.log('Init dashboard');
+        await this.loadingFromLocal();
+        console.log('Init dashboard1');
+        console.log({ assetsBefore: { ...this.chains['osmosis'] } });
+        await this.loadingAssetsFromRegistry();
+        console.log('Init dashboard2');
+        console.log({ assetsBefore: { ...this.chains['osmosis'] } });
+        await this.loadingAssetsFromOraiSDK();
+        console.log('Init dashboard3');
+        console.log({ assetsAfter: { ...this.chains['osmosis'] } });
+      }
     },
     loadingPrices() {
       const coinIds = [] as string[];
@@ -342,24 +352,23 @@ export const useDashboard = defineStore('dashboard', {
     async loadingAssetsFromRegistry() {
       if (this.status === LoadingStatus.Empty) {
         this.status = LoadingStatus.Loading;
-        get(this.source).then((res) => {
-          res.chains.forEach((x: DirectoryChain) => {
-            let chainName = x?.chain_name;
-            if (chainName !== 'oraichain') {
-              if (this.chains[chainName]) {
-                const assetsRegistry = assetFromDirectory(x);
-                const assetsOnLocal = this.chains[chainName].assets;
-                const result = assetsRegistry;
-                assetsOnLocal.forEach((x) => {
-                  if (!assetsRegistry.find((item) => item.base === x.base)) {
-                    result.push(x);
-                  }
-                });
-                this.chains[chainName].assets = result;
-              }
+        const res = await get(this.source);
+        res.chains.forEach((x: DirectoryChain) => {
+          let chainName = x?.chain_name;
+          console.log({ chainName });
+          if (chainName !== 'oraichain') {
+            if (this.chains[chainName]) {
+              const assetsRegistry = assetFromDirectory(x);
+              const assetsOnLocal = this.chains[chainName].assets;
+              const result = assetsRegistry;
+              assetsOnLocal.forEach((x) => {
+                if (!assetsRegistry.find((item) => item.base === x.base)) {
+                  result.push(x);
+                }
+              });
+              this.chains[chainName].assets = result;
             }
-          });
-          this.status = LoadingStatus.Loaded;
+          }
         });
       }
     },
@@ -428,6 +437,8 @@ export const useDashboard = defineStore('dashboard', {
           ...assets.filter((item) => item.base !== 'orai'),
         ];
       this.chains['Oraichain'].assets = assetResult;
+      console.log('Loading SDK');
+      this.status = LoadingStatus.Loaded;
     },
     async loadLocalConfig(network: NetworkType) {
       const config: Record<string, ChainConfig> = {};

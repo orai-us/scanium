@@ -13,6 +13,7 @@ import type { Tally } from '@/types';
 import type { Coin } from '@cosmjs/stargate';
 import numeral from 'numeral';
 import { defineStore } from 'pinia';
+import { toRaw } from 'vue';
 
 export function colorMap(color: string) {
   switch (color) {
@@ -79,6 +80,7 @@ export const useIndexModule = defineStore('module-index', {
   getters: {
     blockchain() {
       const chain = useBlockchain();
+      console.log({ ...chain.current });
       return chain.current;
     },
     coingecko() {
@@ -242,8 +244,14 @@ export const useIndexModule = defineStore('module-index', {
     },
     initCoingecko() {
       this.tickerIndex = 0;
-      console.log({listAssets: this.blockchain?.assets})
+      const blockchain = { ...this.blockchain };
+      const assets = blockchain?.assets;
+      console.log({ blockchain, assets });
+      console.log({listAssets: toRaw(this.blockchain)})
+      console.log({assets: toRaw(this.blockchain?.assets)})
+
       const [firstAsset] = this.blockchain?.assets || [];
+      console.log({ firstAsset });
       if (firstAsset && firstAsset.coingecko_id) {
         this.coingecko.getCoinInfo(firstAsset.coingecko_id).then((x) => {
           this.coinInfo = x;

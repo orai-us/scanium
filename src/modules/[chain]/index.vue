@@ -51,6 +51,7 @@ const ticker = computed(() => store.coinInfo.tickers[store.tickerIndex]);
 
 const currName = ref('');
 blockchain.$subscribe((m, s) => {
+  console.log("Subscribe blockchain")
   if (s.chainName !== currName.value) {
     currName.value = s.chainName;
     store.loadDashboard();
