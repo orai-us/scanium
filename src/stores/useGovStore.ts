@@ -44,6 +44,7 @@ export const useGovStore = defineStore('govStore', {
         await this.blockchain.rpc?.getGovProposals(status, pagination)
       );
 
+      console.log({ proposals });
       //filter spam proposals
       if (proposals?.proposals) {
         proposals.proposals = proposals.proposals.filter((item) => {

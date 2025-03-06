@@ -12,31 +12,31 @@ function changeEndpoint(item: Endpoint) {
 }
 let rpcModel = ref('');
 
-async function changeRpc() {
-  const chain = useBlockchain();
-  const base = useBaseStore();
-  chain.initial();
+// async function changeRpc() {
+//   const chain = useBlockchain();
+//   const base = useBaseStore();
+//   chain.initial();
 
-  if (Array.isArray(chainStore.current?.endpoints?.rpc)) {
-    const rpcs = chainStore.current.endpoints.rpc;
-    for (const rpc of rpcs) {
-      chain.setRestEndpoint(rpc);
-      await new Promise<void>((resolve, reject) => {
-        setTimeout(() => {
-          resolve();
-        }, 1000);
-      });
-      if (base.connected) {
-        chainStore.setRestEndpoint(rpc);
-        return;
-      }
-    }
-  }
-}
+//   if (Array.isArray(chainStore.current?.endpoints?.rpc)) {
+//     const rpcs = chainStore.current.endpoints.rpc;
+//     for (const rpc of rpcs) {
+//       chain.setRestEndpoint(rpc);
+//       await new Promise<void>((resolve, reject) => {
+//         setTimeout(() => {
+//           resolve();
+//         }, 1000);
+//       });
+//       if (base.connected) {
+//         chainStore.setRestEndpoint(rpc);
+//         return;
+//       }
+//     }
+//   }
+// }
 
-onMounted(() => {
-  changeRpc()
-})
+// onMounted(() => {
+//   changeRpc()
+// })
 
 </script>
 

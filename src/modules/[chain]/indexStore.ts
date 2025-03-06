@@ -242,6 +242,7 @@ export const useIndexModule = defineStore('module-index', {
     },
     initCoingecko() {
       this.tickerIndex = 0;
+      console.log({listAssets: this.blockchain?.assets})
       const [firstAsset] = this.blockchain?.assets || [];
       if (firstAsset && firstAsset.coingecko_id) {
         this.coingecko.getCoinInfo(firstAsset.coingecko_id).then((x) => {

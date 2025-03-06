@@ -11,7 +11,7 @@ import {
   useStakingStore,
   useParamStore,
 } from '@/stores';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
 import { useIndexModule, colorMap } from './indexStore';
 
 import CardStatisticsVertical from '@/components/CardStatisticsVertical.vue';
@@ -35,7 +35,12 @@ const coinInfo = computed(() => {
   return store.coinInfo;
 });
 
+watchEffect(()=>{
+  console.log({ store })
+})
+
 onMounted(() => {
+  console.log("Store load dashboard")
   store.loadDashboard();
   walletStore.loadMyAsset();
   paramStore.handleAbciInfo();

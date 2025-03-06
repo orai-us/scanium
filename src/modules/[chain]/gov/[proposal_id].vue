@@ -69,6 +69,7 @@ store.fetchProposal(props.proposal_id).then((res) => {
   if (res.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD) {
     // 'PROPOSAL_STATUS_VOTING_PERIOD') {
     store.fetchTally(props.proposal_id).then((tallRes) => {
+      console.log({ chain: toRaw(props.chain) })
       proposal.value = { ...proposal.value, finalTallyResult: tallRes.tally };
     });
   }

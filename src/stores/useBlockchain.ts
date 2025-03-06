@@ -153,6 +153,7 @@ export const useBlockchain = defineStore('blockchain', {
       //     const { global } = useTheme();
       //     global.current
       // }
+      console.log("Init blockchain")
       useWalletStore().$reset();
       await useStakingStore().init();
       useBankStore().initial();

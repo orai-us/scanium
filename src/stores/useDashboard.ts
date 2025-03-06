@@ -305,6 +305,7 @@ export const useDashboard = defineStore('dashboard', {
   },
   actions: {
     async initial() {
+      console.log("Init dashboard")
       await this.loadingFromLocal();
       await this.loadingAssetsFromRegistry();
       await this.loadingAssetsFromOraiSDK();
