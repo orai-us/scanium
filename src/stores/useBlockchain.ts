@@ -164,13 +164,17 @@ export const useBlockchain = defineStore('blockchain', {
 
     randomEndpoint(chainName: string): Endpoint | undefined {
       const end = localStorage.getItem(`endpoint-${chainName}`);
+      debugger;
       if (end) {
+        debugger;
         return JSON.parse(end);
       } else {
         const all = this.current?.endpoints?.rpc;
+        debugger;
         if (all) {
           const rn = Math.random();
           const endpoint = all[Math.floor(rn * all.length)];
+          debugger;
           return endpoint;
         }
       }
@@ -178,6 +182,7 @@ export const useBlockchain = defineStore('blockchain', {
 
     randomSetupEndpoint() {
       const endpoint = this.randomEndpoint(this.chainName);
+      debugger;
       if (endpoint) this.setRestEndpoint(endpoint);
     },
 
@@ -185,6 +190,7 @@ export const useBlockchain = defineStore('blockchain', {
       this.connErr = '';
       this.endpoint = endpoint;
       this.rpc = CosmosRestClient.newStrategy(endpoint.address, this.current);
+      debugger;
       localStorage.setItem(
         `endpoint-${this.chainName}`,
         JSON.stringify(endpoint)
@@ -207,6 +213,7 @@ export const useBlockchain = defineStore('blockchain', {
       if (caseSensitiveName !== this.chainName) {
         this.chainName = caseSensitiveName;
       }
+      debugger;
     },
 
     supportModule(mod: string) {

@@ -459,6 +459,7 @@ export const useDashboard = defineStore('dashboard', {
         }
         this.loadingPrices();
       }
+      debugger;
     },
     setConfigSource(newSource: ConfigSource) {
       this.source = newSource;

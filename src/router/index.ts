@@ -15,7 +15,9 @@ router.beforeEach((to) => {
   const { chain } = to.params;
   if (chain) {
     const blockchain = useBlockchain();
+    debugger;
     if (chain !== blockchain.chainName) {
+      debugger;
       blockchain.setCurrent(chain.toString());
     }
   }

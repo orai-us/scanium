@@ -33,10 +33,12 @@ const current = ref(''); // the current chain
 const temp = ref('');
 blockchain.$subscribe((m, s) => {
   if (current.value === s.chainName && temp.value != s.endpoint.address) {
+    debugger;
     temp.value = s.endpoint.address;
     blockchain.initial();
   }
   if (current.value != s.chainName) {
+    debugger;
     current.value = s.chainName;
     blockchain.randomSetupEndpoint();
   }
