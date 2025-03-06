@@ -19,6 +19,7 @@ async function changeRpc() {
 
   if (Array.isArray(chainStore.current?.endpoints?.rpc)) {
     const rpcs = chainStore.current.endpoints.rpc;
+    console.log({ rpcs })
     for (const rpc of rpcs) {
       chain.setRestEndpoint(rpc);
       await new Promise<void>((resolve, reject) => {
@@ -34,9 +35,9 @@ async function changeRpc() {
   }
 }
 
-onMounted(() => {
-  changeRpc()
-})
+// onMounted(() => {
+//   changeRpc()
+// })
 
 </script>
 
