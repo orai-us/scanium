@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 
 // Components
 import newFooter from '@/layouts/components/NavFooter.vue';
@@ -32,10 +32,13 @@ const wasmStore = useWasmStore();
 const current = ref(''); // the current chain
 const temp = ref('');
 blockchain.$subscribe((m, s) => {
+  console.log({checkInit: current.value === s.chainName && temp.value != s.endpoint.address})
   if (current.value === s.chainName && temp.value != s.endpoint.address) {
     temp.value = s.endpoint.address;
     blockchain.initial();
   }
+  console.log({checkRadDom: current.value != s.chainName})
+
   if (current.value != s.chainName) {
     current.value = s.chainName;
     blockchain.randomSetupEndpoint();
@@ -121,6 +124,10 @@ const handleSearchAccountContract = (type: string, value: string) => {
 const refSearchInput = ref(null);
 const clickOutsideSearch = ref(false);
 onClickOutside(refSearchInput, event => clickOutsideSearch.value=false);
+
+watchEffect(()=>{
+  console.log({ endpoint: blockchain.endpoint })
+})
 
 </script>
 
