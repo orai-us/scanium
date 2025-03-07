@@ -308,6 +308,7 @@ export const useDashboard = defineStore('dashboard', {
       await this.loadingFromLocal();
       await this.loadingAssetsFromRegistry();
       await this.loadingAssetsFromOraiSDK();
+      this.setupDefault();
     },
     loadingPrices() {
       const coinIds = [] as string[];
@@ -375,7 +376,6 @@ export const useDashboard = defineStore('dashboard', {
         this.chains[x.chain_name] = fromLocal(x, x.chain_name);
       });
 
-      this.setupDefault();
       // this.status = LoadingStatus.Loaded;
     },
     async loadingAssetsFromOraiSDK() {
