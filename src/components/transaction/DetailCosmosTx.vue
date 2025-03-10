@@ -252,7 +252,7 @@ const timestamp = computed(() => {
               <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
                 <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
               </div>
-              <div class="collapse-content xl:max-w-full max-w-96" v-else>
+              <div class="collapse-content xl:max-w-full max-w-96 overflow-scroll" v-else>
                 <TransactionMessage :value="msg.decodedValue" :type="msg.typeUrl" :events="txLogs[i]?.events"
                   :chain="chain" />
               </div>
