@@ -1,5 +1,6 @@
 import { useBlockchain } from "@/stores";
 import { formatNumber } from "@/utils";
+import { watchEffect } from "vue";
 
 const chainStore = useBlockchain();
 
@@ -15,7 +16,11 @@ function createTokenMap() {
   return result;
 }
 
-export const tokenMap: any = createTokenMap();
+export let tokenMap: any = createTokenMap();
+
+watchEffect(() => {
+  tokenMap = createTokenMap();
+});
 
 export const contractAddress = 'orai10s0c75gw5y5eftms5ncfknw6lzmx0dyhedn75uz793m8zwz4g8zq4d9x9a';
 
