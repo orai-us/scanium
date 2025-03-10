@@ -3,7 +3,7 @@ import { useFormatter } from '@/stores';
 import { Icon } from '@iconify/vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { computed, ref, toRaw, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 
 const props = defineProps(['hash', 'chain']);
 const format = useFormatter();
@@ -37,10 +37,6 @@ watchEffect(() => {
   if (result.value?.evmTransaction) {
     tx.value = result.value.evmTransaction
   }
-})
-
-watchEffect(() => {
-  console.log({ data: toRaw(tx.value) })
 })
 
 </script>
