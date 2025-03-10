@@ -130,3 +130,18 @@ export const getTxsTokenTransfer = async (
   const res = await api.request(config);
   return res?.data;
 };
+
+const urlTsxEvm = '/v1/evm-transaction/by-account';
+export const getTsxEvmByAccount = async (
+  address: string,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTsxEvm}/${address}`,
+    method: METHODS.GET,
+    params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};

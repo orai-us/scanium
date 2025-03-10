@@ -6,12 +6,14 @@ import TransactionAccountRpc from './TransactionAccountRpc.vue';
 import { CHAIN_INDEXS } from '@/constants';
 import { useRoute, useRouter } from 'vue-router';
 import TransactionTransferIndexs from './TransactionTransferIndexs.vue';
+import TransactionsEvm from './TransactionsEvm.vue';
 
 const props = defineProps(['address', 'chain', 'txs']);
 
 const TRANSACTION_TYPE = {
   ALL: "all",
   TRANSFERS: "transfers",
+  EVM: "evm",
 }
 const route = useRoute();
 const router = useRouter();
@@ -39,6 +41,10 @@ function changeTypeTx(tx: string) {
         v-on:click="changeTypeTx(TRANSACTION_TYPE.TRANSFERS)">
         Token Transfers
       </button>
+      <button :class="{ 'px-2 py-1 bg-base rounded-md text-white': txType === TRANSACTION_TYPE.EVM }"
+        v-on:click="changeTypeTx(TRANSACTION_TYPE.EVM)">
+        Evm Transactions
+      </button>
     </div>
     <div v-show="txType === TRANSACTION_TYPE.ALL">
       <div  v-if="CHAIN_INDEXS.includes(chain)">
@@ -55,6 +61,9 @@ function changeTypeTx(tx: string) {
       <div v-else>
         <TransactionsTransfers :address="address" :chain="chain" />
       </div>
+    </div>
+    <div v-show="txType === TRANSACTION_TYPE.EVM && CHAIN_INDEXS.includes(chain)">
+      <TransactionsEvm :address="address" :chain="chain"/>
     </div>
   </div>
 </template>
