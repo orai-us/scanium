@@ -4,7 +4,7 @@ import DynamicComponent from '../dynamic/DynamicComponent.vue';
 import { decodeBuffer, formatTitle } from '@/libs/utils';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import AmmV3Message from './AmmV3Message.vue';
-import { contractAddress } from '@/libs/amm-v3';
+import { contractAddressAmmv3, contractAddressEnginePosition } from '@/libs/amm-v3';
 import { Icon } from '@iconify/vue';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import ArrayCoinElement from '../dynamic/ArrayCoinElement.vue';
@@ -15,6 +15,7 @@ import { TypeMessage } from '@/libs/swap-msg';
 import { TypeMessageSend } from '@/libs/send-msg';
 import SendMessage from './SendMessage.vue';
 import { labelingForAddress } from '@/utils';
+import FutureMessage from './FutureMessage.vue';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 
@@ -34,7 +35,11 @@ const executeMsgParams = computed(() => {
 });
 
 const isAmmV3ExecuteMessage = computed(() => {
-  return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddress;
+  return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddressAmmv3;
+});
+
+const isFutureMessage = computed(() => {
+  return props.type === MsgExecuteContract.typeUrl && props.value.contract === contractAddressEnginePosition;
 });
 
 const isSwapMessage = computed(() => {
@@ -122,6 +127,7 @@ watchEffect(() => {
           :events="events" />
         <SwapMessage v-else-if="isSwapMessage" :action="executeMsgParams.action" :params="executeMsgParams.params" :events="events" :sender="value.sender"/>
         <SendMessage v-else-if="isSendMessage" :params="executeMsgParams.params" :events="events" :denom="value.contract" :sender="value.sender" :chain="chain"/>
+        <FutureMessage v-else-if="isFutureMessage" :params="executeMsgParams.params" :events="events" :sender="value.sender" :chain="chain" :type="type"/>
         <template v-else>
           <div v-for="(v, k) of executeMsgParams.params" class="mb-4 flex xl:flex-row flex-col xl:gap-10 gap-1">
             <div class="w-40 xl:text-sm text-xs">{{ formatTitle(k) }}:</div>

@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Event, EventAttribute } from 'cosmjs-types/tendermint/abci/types';
 import { formatTitle } from '@/libs/utils';
 import DynamicComponent from '@/components/dynamic/DynamicComponent.vue';
-import { contractAddress, displayFee, displayIncentives, displayListAssets, displayPoolName, displayTickPrice, displayTokenOut } from '@/libs/amm-v3';
+import { contractAddressAmmv3, displayFee, displayIncentives, displayListAssets, displayPoolName, displayTickPrice, displayTokenOut } from '@/libs/amm-v3';
 
 const props = defineProps(['action', 'params', 'events']);
 
@@ -12,7 +12,7 @@ const value = computed(() => {
     (e: Event) => e.type === 'wasm' &&
       e.attributes.some((attr) =>
         attr.key === '_contract_address' &&
-        attr.value === contractAddress
+        attr.value === contractAddressAmmv3
       ) &&
       e.attributes.some((attr) =>
         attr.key === 'action' &&
