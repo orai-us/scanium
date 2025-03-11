@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { getTsxEvmByAccount } from '@/service/transactionsService';
 import { useRoute, useRouter } from 'vue-router';
-import { shortenTxHash } from '@/utils';
+import { formatNumber, shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 
 const props = defineProps(["address", "chain"]);
@@ -58,8 +58,8 @@ function handleNext() {
     <table class="table w-full text-sm" v-if="txsEvm?.length > 0">
       <thead>
         <tr>
-          <th>Tx EVM Hash</th>
-          <th>Tx Cosmos Hash</th>
+          <th>EVM Tx Hash</th>
+          <th>Tx Hash</th>
           <th>Method</th>
           <th>Result</th>
           <th>Height</th>
@@ -105,10 +105,10 @@ function handleNext() {
             </RouterLink>
           </td>
           <td class="py-3">
-            <span>{{ `${v.fee} aorai` }}</span>
+            <span>{{ `${formatNumber(v.fee)} aorai` }}</span>
           </td>
           <td class="py-3">
-            <span>{{ `${v.value} aorai` }}</span>
+            <span>{{ `${formatNumber(v.value)} aorai` }}</span>
           </td>
           <td>
             <button class="btn btn-xs  border rounded-lg " :class="{

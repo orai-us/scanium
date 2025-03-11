@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useFormatter } from '@/stores';
+import { formatNumber } from '@/utils';
 import { Icon } from '@iconify/vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
@@ -8,6 +9,7 @@ import { computed, ref, watchEffect } from 'vue';
 const props = defineProps(['hash', 'chain']);
 const format = useFormatter();
 const tx = ref({} as any);
+let resultCopy = ref();
 
 const query = gql`
       query GetTransactions($id: String!) {
@@ -39,6 +41,25 @@ watchEffect(() => {
   }
 })
 
+const copyWebsite = async (url: string) => {
+  if (!url) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    resultCopy.value = true;
+    setTimeout(() => {
+      resultCopy.value = null;
+    }, 1000);
+  } catch (err) {
+    resultCopy.value = false;
+    setTimeout(() => {
+      resultCopy.value = null;
+    }, 1000);
+  }
+};
+
+
 </script>
 <template>
   <div class="box-content !p-0">
@@ -48,15 +69,26 @@ watchEffect(() => {
         <table class="table text-sm">
           <tbody>
             <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Tx Evm Hash</td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ tx.id }}</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">Evm Tx Hash</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">
+                <div class="flex gap-1 items-center">
+                  <RouterLink :to="`/${chain}/tx/${tx.id}`" class="text-primary dark:text-link">
+                    {{ tx.id }}</RouterLink>
+                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.id"
+                    @click="copyWebsite(tx.id || '')" />
+                </div>
+              </td>
             </tr>
             <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Tx Cosmos Hash</td>
+              <td class="xl:p-4 p-2 xl:text-sm text-xs">Cosmos Tx Hash</td>
               <td class="xl:p-4 p-2">
-                <RouterLink :to="`/${props.chain}/tx/${tx.cosmosTransactionId}`"
-                  class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.cosmosTransactionId}}
-                </RouterLink>
+                <div class="flex gap-1 items-center">
+                  <RouterLink :to="`/${props.chain}/tx/${tx.cosmosTransactionId}`"
+                    class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.cosmosTransactionId }}
+                  </RouterLink>
+                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.cosmosTransactionId"
+                    @click="copyWebsite(tx.cosmosTransactionId || '')" />
+                </div>
               </td>
             </tr>
             <tr>
@@ -96,35 +128,57 @@ watchEffect(() => {
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">Fee</td>
               <td class="xl:p-4 p-2 xl:text-sm text-xs" v-if="tx.fee !== null && tx.fee !== undefined">
-                {{ `${tx.fee} aorai` }}
+                {{ `${formatNumber(tx.fee)} aorai` }}
               </td>
               <td v-else>-</td>
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">Value</td>
               <td class="xl:p-4 p-2 xl:text-sm text-xs" v-if="tx.value !== null && tx.fee !== undefined">
-                {{ `${tx.value} aorai` }}
+                {{ `${formatNumber(tx.value)} aorai` }}
               </td>
               <td v-else>-</td>
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">From</td>
               <td class="truncate py-3">
-                <RouterLink :to="`/${chain}/account/${tx.from}`" class="text-primary dark:text-link">
-                  {{ tx.from }}
-                </RouterLink>
+                <div class="flex gap-1 items-center">
+                  <RouterLink :to="`/${chain}/account/${tx.from}`" class="text-primary dark:text-link">
+                    {{ tx.from }}
+                  </RouterLink>
+                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.from"
+                    @click="copyWebsite(tx.from || '')" />
+                </div>
               </td>
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">To</td>
               <td class="truncate py-3">
-                <RouterLink :to="`/${chain}/account/${tx.to}`" class="text-primary dark:text-link">
-                  {{ tx.to }}
-                </RouterLink>
+                <div class="flex gap-1 items-center">
+                  <RouterLink :to="`/${chain}/account/${tx.to}`" class="text-primary dark:text-link">
+                    {{ tx.to }}
+                  </RouterLink>
+                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.to"
+                    @click="copyWebsite(tx.to || '')" />
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    <div class="toast" v-show="resultCopy === true">
+      <div class="alert alert-success">
+        <div class="text-xs md:!text-sm">
+          <span>Copy Success!</span>
+        </div>
+      </div>
+    </div>
+    <div class="toast" v-show="resultCopy === false">
+      <div class="alert alert-error">
+        <div class="text-xs md:!text-sm">
+          <span>Copy Error!</span>
+        </div>
       </div>
     </div>
   </div>
