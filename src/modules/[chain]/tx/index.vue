@@ -71,9 +71,11 @@ const transactions: any = computed(() => {
   const txs = !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents;
   const data = txs.map((item) => {
     const message = format.messages(item.tx?.body?.messages)?.split("×")[0];
+    console.log({messages: item.tx?.body?.messages})
     return {
       ...item,
-      message: message === "ExecuteContract" ? "-" : formatTitle(format.messages(item.tx?.body?.messages) || "")
+      message: message === "ExecuteContract" ? "-" : formatTitle(message || ""),
+      numberMessageRemain: item.tx?.body?.messages?.length > 1 ?  item.tx?.body?.messages?.length - 1 : 0,
     };
   });
   return data;
@@ -155,7 +157,7 @@ watch(transactions, (newTxs, oldTxs) => {
               </span>
               <span v-else>-</span>
             </td>
-            <td class="!break-normal">
+            <td class="!break-normal flex gap-1 items-center">
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-if="item.subType">
                 {{ formatTitle(item?.subType) }}
               </span>
@@ -164,6 +166,9 @@ watch(transactions, (newTxs, oldTxs) => {
               </span>
               <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]" v-else>
                 {{ item.message }}
+              </span>
+              <span v-if="item.numberMessageRemain">
+                +{{ item.numberMessageRemain }}
               </span>
             </td>
 
