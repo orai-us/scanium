@@ -341,24 +341,22 @@ export const useDashboard = defineStore('dashboard', {
     async loadingAssetsFromRegistry() {
       if (this.status === LoadingStatus.Empty) {
         this.status = LoadingStatus.Loading;
-        get(this.source).then((res) => {
-          res.chains.forEach((x: DirectoryChain) => {
-            let chainName = x?.chain_name;
-            if (chainName !== 'oraichain') {
-              if (this.chains[chainName]) {
-                const assetsRegistry = assetFromDirectory(x);
-                const assetsOnLocal = this.chains[chainName].assets;
-                const result = assetsRegistry;
-                assetsOnLocal.forEach((x) => {
-                  if (!assetsRegistry.find((item) => item.base === x.base)) {
-                    result.push(x);
-                  }
-                });
-                this.chains[chainName].assets = result;
-              }
+        const res = await get(this.source);
+        res.chains.forEach((x: DirectoryChain) => {
+          let chainName = x?.chain_name;
+          if (chainName !== 'oraichain') {
+            if (this.chains[chainName]) {
+              const assetsRegistry = assetFromDirectory(x);
+              const assetsOnLocal = this.chains[chainName].assets;
+              const result = assetsRegistry;
+              assetsOnLocal.forEach((x) => {
+                if (!assetsRegistry.find((item) => item.base === x.base)) {
+                  result.push(x);
+                }
+              });
+              this.chains[chainName].assets = result;
             }
-          });
-          this.status = LoadingStatus.Loaded;
+          }
         });
       }
     },
@@ -427,6 +425,7 @@ export const useDashboard = defineStore('dashboard', {
           ...assets.filter((item) => item.base !== 'orai'),
         ];
       this.chains['Oraichain'].assets = assetResult;
+      this.status = LoadingStatus.Loaded;
     },
     async loadLocalConfig(network: NetworkType) {
       const config: Record<string, ChainConfig> = {};
