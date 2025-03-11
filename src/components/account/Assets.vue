@@ -278,7 +278,7 @@ const tipMsg = computed(() => {
       </div>
       <div class="mt-4 md:!col-span-2 md:!mt-0 md:!ml-4">
         <!-- list-->
-        <div class="">
+        <div class="xl:max-h-80 md:max-h-60 overflow-scroll">
           <!--balances  -->
           <div class="flex items-center px-4 mb-2" v-for="(balanceItem, index) in balancesAssets" :key="index">
             <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
