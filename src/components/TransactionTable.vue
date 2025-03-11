@@ -14,13 +14,13 @@ watchEffect(() => {
   if (!!props?.transactions?.length) {
     if (CHAIN_INDEXS.includes(props.chain)) {
       txs.value = props?.transactions?.map((item: any) => {
-        const message = item.messages?.nodes[0]?.subType || format.messages(item.messages?.nodes.map((item: any) =>
-          ({ "@type": item.type, typeUrl: item.type })
-        ))
+        const firstNodeMessage = item.messages?.nodes[0];
+        const message = firstNodeMessage?.subType || format.messages([{ "@type": firstNodeMessage?.type, typeUrl: firstNodeMessage?.type }])
         return {
           txhash: item?.id,
           result: item.code === 0 ? "Success" : "Failed",
-          message: message ? `${formatTitle(message)} ${(item.messages?.nodes?.length - 1) > 0 ? `(+${item.messages?.nodes?.length - 1})` : ""}` : "-",
+          message: formatTitle(message || ""),
+          numberMessageRemain: item.messages?.nodes.length > 1 ? item.messages?.nodes.length - 1 : 0,
           height: item.blockNumber,
           fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
           timestamp: format.toDay(new Date(Number(item.timestamp)), 'from'),
@@ -68,9 +68,10 @@ watchEffect(() => {
             }`">
             {{ v.result }}
           </td>
-          <td class="py-3 !break-normal">
+          <td class="py-3 !break-normal flex gap-1 items-center">
             <span
               class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.message }}</span>
+              <span v-if="v.numberMessageRemain">+{{ v.numberMessageRemain }}</span>
           </td>
           <td class="text-sm py-3 !break-normal">
             <RouterLink :to="`/${chain}/block/${v.height}`" class="text-primary dark:text-link">{{
