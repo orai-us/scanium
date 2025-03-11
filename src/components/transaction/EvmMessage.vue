@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { formatSmallNumber } from '@/utils';
 import { Icon } from '@iconify/vue';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import { computed, ref, toRaw, watchEffect } from 'vue';
@@ -54,18 +55,18 @@ const copyWebsite = async (url: string) => {
 <template>
   <div class="mt-5">
     <div class="mb-4 flex flex-row gap-10">
-      <div class="w-40">EVM Tx Hash:</div>
+      <div class="w-40 xl:text-sm text-xs">EVM Tx Hash:</div>
       <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/tx/${message.ethereumTxHash}`" class="text-primary dark:text-link">
+        <RouterLink :to="`/${chain}/tx/${message.ethereumTxHash}`" class="text-link xl:text-sm text-[12px]">
           {{ message.ethereumTxHash }}</RouterLink>
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.ethereumTxHash"
           @click="copyWebsite(message.ethereumTxHash || '')" />
       </div>
     </div>
     <div class="mb-4 flex flex-row gap-10">
-      <div class="w-40">Cosmos Sender:</div>
+      <div class="w-40 xl:text-sm text-xs">Cosmos Sender:</div>
       <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/account/${message.senderCosmos}`" class="text-primary dark:text-link">
+        <RouterLink :to="`/${chain}/account/${message.senderCosmos}`" class="text-link xl:text-sm text-[12px]">
           {{ message.senderCosmos }}</RouterLink>
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.senderCosmos"
           @click="copyWebsite(message.senderCosmos || '')" />
@@ -73,26 +74,29 @@ const copyWebsite = async (url: string) => {
 
     </div>
     <div class="mb-4 flex flex-row gap-10">
-      <div class="w-40">EVM Sender:</div>
+      <div class="w-40 xl:text-sm text-xs">EVM Sender:</div>
       <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/account/${message.sender}`" class="text-primary dark:text-link">
+        <RouterLink :to="`/${chain}/account/${message.sender}`" class="text-link xl:text-sm text-[12px]">
           {{ message.sender }}</RouterLink>
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.sender"
           @click="copyWebsite(message.sender || '')" />
       </div>
     </div>
     <div class="mb-4 flex flex-row gap-10">
-      <div class="w-40">Recipient:</div>
+      <div class="w-40 xl:text-sm text-xs">Recipient:</div>
       <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/account/${message.recipient}`" class="text-primary dark:text-link">
+        <RouterLink :to="`/${chain}/account/${message.recipient}`" class="text-link xl:text-sm text-[12px]">
           {{ message.recipient }}</RouterLink>
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.recipient"
           @click="copyWebsite(message.recipient || '')" />
       </div>
     </div>
     <div class="mb-4 flex flex-row gap-10">
-      <div class="w-40">Amount:</div>
-      <div>{{ `${message.amount} aorai` }}</div>
+      <div class="w-40 xl:text-sm text-xs">Amount:</div>
+      <div class="xl:text-sm text-[12px] flex gap-1">
+        <span v-html="formatSmallNumber(Number(message.amount) / 10 ** 12)"></span>
+        <span>ORAI</span>
+      </div>
     </div>
     <div class="toast" v-show="resultCopy === true">
       <div class="alert alert-success">

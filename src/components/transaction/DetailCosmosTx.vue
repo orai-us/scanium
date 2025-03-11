@@ -18,6 +18,7 @@ import gql from 'graphql-tag';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'vue-router';
 import EvmMessage from './EvmMessage.vue';
+import { formatSmallNumber } from '@/utils';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -149,22 +150,17 @@ const timestamp = computed(() => {
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('account.height') }}</td>
               <td class="xl:p-4 p-2">
-                <RouterLink
-                  :to="`/${props.chain}/block/${tx.txResponse.height}`"
-                  class="text-primary dark:text-link xl:text-sm text-xs"
-                  >{{ tx.txResponse.height }}
+                <RouterLink :to="`/${props.chain}/block/${tx.txResponse.height}`"
+                  class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.txResponse.height }}
                 </RouterLink>
               </td>
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">{{ $t('staking.status') }}</td>
               <td class="xl:p-4 p-2">
-                <span
-                  class="truncate relative py-2 w-fit mr-2 rounded inline-flex items-center xl:text-sm text-xs"
-                  :class="`${
-                    tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
-                  }`"
-                >
+                <span class="truncate relative py-2 w-fit mr-2 rounded inline-flex items-center xl:text-sm text-xs"
+                  :class="`${tx.txResponse.code === 0 ? 'text-[#39DD47]' : 'text-error'
+                    }`">
                   <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
                   {{ tx.txResponse.code === 0 ? 'Success' : 'Failed' }}
                 </span>
@@ -193,11 +189,15 @@ const timestamp = computed(() => {
               <td class="xl:p-4 p-2 xl:text-sm text-xs">
                 {{
                   format.formatTokens(
-                    tx.tx?.authInfo?.fee?.amount,
+                    tx.tx?.authInfo?.fee?.amount?.filter(item => item.denom !== "aorai"),
                     true,
                     '0,0.[00]'
                   )
                 }}
+                <span v-for="(token, index) of tx.tx?.authInfo?.fee?.amount?.filter(item => item.denom === 'aorai')" class="flex gap-1">
+                  <span v-html="formatSmallNumber(Number(token.amount) / 10 ** 12)"></span>
+                  <span>ORAI</span>
+                </span>
               </td>
             </tr>
             <tr>
@@ -210,39 +210,23 @@ const timestamp = computed(() => {
     </div>
     <div class="border-t border-b border-base-200">
       <div
-        class="tabs tabs-boxed customTabV2 bg-transparent xl:mb-4 mb-0 p-6 pb-0 border-t border-b border-base-300 !rounded-none"
-      >
-        <a
-          class="tab text-gray-400 capitalize !pb-3 xl:text-sm text-xs"
-          :class="{ 'tab-active': tab === 'msg' }"
-          @click="updateTab('msg')"
-          >Messages ({{ messages.length }})</a
-        >
-        <a
-          class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
-          :class="{ 'tab-active': tab === 'log' }"
-          @click="updateTab('log')"
-          >Logs ({{ txLogs.length }})</a
-        >
-        <a
-          class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs"
-          :class="{ 'tab-active': tab === 'json' }"
-          @click="updateTab('json')"
-          >JSON</a
-        >
+        class="tabs tabs-boxed customTabV2 bg-transparent xl:mb-4 mb-0 p-6 pb-0 border-t border-b border-base-300 !rounded-none">
+        <a class="tab text-gray-400 capitalize !pb-3 xl:text-sm text-xs" :class="{ 'tab-active': tab === 'msg' }"
+          @click="updateTab('msg')">Messages ({{ messages.length }})</a>
+        <a class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs" :class="{ 'tab-active': tab === 'log' }"
+          @click="updateTab('log')">Logs ({{ txLogs.length }})</a>
+        <a class="tab text-gray-400 capitalize !pb-2 xl:text-sm text-xs" :class="{ 'tab-active': tab === 'json' }"
+          @click="updateTab('json')">JSON</a>
       </div>
 
       <div v-if="tab === 'msg'">
-        <div
-          v-if="tx?.txResponse"
-          class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 p-1 rounded mb-4"
-        >
+        <div v-if="tx?.txResponse" class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 p-1 rounded mb-4">
           <!-- <h2 class="card-title truncate mb-2">
             {{ $t('account.messages') }}: ({{ messages.length }})
           </h2> -->
           <div v-for="(msg, i) in messages" :key="i">
             <div class="rounded-lg mt-4 collapse collapse-arrow bg-base-200" :class="{
-              'collapse-open': messageOpens[i], 
+              'collapse-open': messageOpens[i],
               'collapse-close': !messageOpens[i]
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeMsgOpen(i)" />
@@ -250,10 +234,10 @@ const timestamp = computed(() => {
                 :class="{ 'border-b border-solid border-stone-700': messageOpens[i] }">
                 <h5 class="xl:text-lg text-sm font-bold">#{{ i + 1 }}. {{ msg.displayType }}</h5>
               </div>
-              <div class="collapse-content" v-if="msg.typeMsg==='/ibc'">
+              <div class="collapse-content" v-if="msg.typeMsg === '/ibc'">
                 <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
               </div>
-              <div class="collapse-content" v-else-if="msg.typeMsg==='/ethermint'">
+              <div class="collapse-content" v-else-if="msg.typeMsg === '/ethermint'">
                 <EvmMessage :events="txLogs[i]?.events" :chain="chain" />
               </div>
               <div class="collapse-content xl:max-w-full max-w-96 overflow-scroll" v-else>
@@ -267,10 +251,7 @@ const timestamp = computed(() => {
       </div>
 
       <div v-if="tab === 'log'">
-        <div
-          v-if="txLogs"
-          class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 px-1 rounded shadow mb-4"
-        >
+        <div v-if="txLogs" class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 px-1 rounded shadow mb-4">
           <div v-for="(msg, i) in txLogs" :key="i">
             <div class="mt-4 bg-base-200 rounded-lg collapse collapse-arrow" :class="{
               'collapse-open': logOpens[i],
@@ -278,7 +259,7 @@ const timestamp = computed(() => {
             }">
               <input type="checkbox" class="cursor-pointer !h-10 block" @click="changeLogOpen(i)" />
               <div class="flex justify-between xl:p-5 p-4 collapse-title"
-                :class="{ 'border-b border-solid border-stone-700': logOpens[i]}">
+                :class="{ 'border-b border-solid border-stone-700': logOpens[i] }">
                 <h5 class="font-bold xl:text-lg text-sm">#{{ i + 1 }}. {{ messages[i].displayType }}</h5>
               </div>
               <div class="collapse-content">
@@ -291,20 +272,10 @@ const timestamp = computed(() => {
       </div>
 
       <div v-if="tab === 'json'">
-        <div
-          v-if="tx?.txResponse"
-          class="bg-base-100 px-4 pt-3 pb-4 rounded shadow"
-        >
+        <div v-if="tx?.txResponse" class="bg-base-100 px-4 pt-3 pb-4 rounded shadow">
           <!-- <h2 class="card-title truncate mb-2">JSON</h2> -->
-          <JsonViewer
-            :value="wrapBinary(tx)"
-            :theme="baseStore.theme"
-            style="background: transparent; border: none"
-            copyable
-            sort
-            expand-depth="5"
-            boxed
-          />
+          <JsonViewer :value="wrapBinary(tx)" :theme="baseStore.theme" style="background: transparent; border: none"
+            copyable sort expand-depth="5" boxed />
         </div>
       </div>
     </div>

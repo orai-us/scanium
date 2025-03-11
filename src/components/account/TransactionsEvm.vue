@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { getTsxEvmByAccount } from '@/service/transactionsService';
 import { useRoute, useRouter } from 'vue-router';
-import { formatNumber, shortenTxHash } from '@/utils';
+import { formatSmallNumber, shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 
 const props = defineProps(["address", "chain"]);
@@ -66,50 +66,52 @@ function handleNext() {
           <th>From</th>
           <th>To</th>
           <th>Fee</th>
-          <th>Value</th>
+          <!-- <th>Value</th> -->
           <th>Status</th>
           <th>Time</th>
         </tr>
       </thead>
       <tbody class="text-sm">
-        <tr v-for="(v, index) in txsEvm" :key="v.uniqKey">
+        <tr v-for="(v, index) in txsEvm" :key="v.id">
           <td class="truncate py-3">
-            <RouterLink :to="`/${chain}/tx/${v.id}`" class="text-primary dark:text-link">
+            <RouterLink :to="`/${chain}/tx/${v.id}`" class="text-primary dark:text-link" v-if="v.id">
               {{ shortenTxHash(v.id) }}
             </RouterLink>
           </td>
           <td class="truncate py-3" style="max-width: 200px">
-            <RouterLink :to="`/${chain}/tx/${v.cosmosTransactionId}`" class="text-primary dark:text-link">
+            <RouterLink :to="`/${chain}/tx/${v.cosmosTransactionId}`" class="text-primary dark:text-link" v-if="v.cosmosTransactionId">
               {{ shortenTxHash(v.cosmosTransactionId) }}
             </RouterLink>
           </td>
           <td>
             <span
-              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{ v.method }}</span>
+              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{
+              v.method }}</span>
           </td>
           <td class="text-sm py-3" :class="`${v.status ? 'text-[#39DD47]' : 'text-error'}`">
             {{ v.status ? "Success" : "Failed" }}
           </td>
           <td class="text-sm py-3">
-            <RouterLink :to="`/${chain}/block/${v.blockNumber}`" class="text-primary dark:text-link">{{ v.blockNumber }}
+            <RouterLink :to="`/${chain}/block/${v.blockNumber}`" class="text-primary dark:text-link" v-if="v.blockNumber">{{ v.blockNumber }}
             </RouterLink>
           </td>
           <td class="truncate py-3">
-            <RouterLink :to="`/${chain}/account/${v.from}`" class="text-primary dark:text-link">
+            <RouterLink :to="`/${chain}/account/${v.from}`" class="text-primary dark:text-link" v-if="v.from">
               {{ shortenTxHash(v.from) }}
             </RouterLink>
           </td>
           <td class="truncate py-3">
-            <RouterLink :to="`/${chain}/account/${v.to}`" class="text-primary dark:text-link">
+            <RouterLink :to="`/${chain}/account/${v.to}`" class="text-primary dark:text-link" v-if="v.to">
               {{ shortenTxHash(v.to) }}
             </RouterLink>
           </td>
-          <td class="py-3">
-            <span>{{ `${formatNumber(v.fee)} aorai` }}</span>
+          <td class="py-3 flex gap-1">
+            <span v-html="formatSmallNumber(Number(v.fee) / 10 ** 12)"></span>
+            <span>ORAI</span>
           </td>
-          <td class="py-3">
+          <!-- <td class="py-3">
             <span>{{ `${formatNumber(v.value)} aorai` }}</span>
-          </td>
+          </td> -->
           <td>
             <button class="btn btn-xs  border rounded-lg " :class="{
               '!bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)]': v.from !== address,
