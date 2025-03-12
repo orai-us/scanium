@@ -70,7 +70,7 @@ export function labelingForAddress(address: string) {
 
 export function formatSmallNumber(number: number) {
   if (number === 0) return '0';
-  if (number >= 0.001) return number.toFixed(4);
+  if (number >= 0.00001) return number.toFixed(5);
   const str = number.toFixed(10).toString();
   const decimalIndex = str.indexOf('.');
   if (decimalIndex === -1) {
@@ -90,6 +90,7 @@ export function formatSmallNumber(number: number) {
   }
 
   const zeroCount = firstNonZeroIndex - decimalIndex - 2;
+
   const result = '0.0<sub>' + zeroCount + '</sub>' + str.substring(firstNonZeroIndex);
   return result;
 }

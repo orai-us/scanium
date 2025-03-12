@@ -5,6 +5,7 @@ import { Icon } from '@iconify/vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { computed, ref, watchEffect } from 'vue';
+import TokenElement from '../dynamic/TokenElement.vue';
 
 const props = defineProps(['hash', 'chain']);
 const format = useFormatter();
@@ -128,16 +129,14 @@ const copyWebsite = async (url: string) => {
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">Fee</td>
               <td class="xl:p-4 p-2 xl:text-sm text-xs flex gap-1" v-if="tx.fee !== null && tx.fee !== undefined">
-                <span v-html="formatSmallNumber(Number(tx.fee) / 10 ** 12)"></span>
-                <span>ORAI</span>
+                <TokenElement :value="{amount: tx.fee, denom:'aorai'}"/>
               </td>
               <td v-else>-</td>
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">Value</td>
               <td class="xl:p-4 p-2 xl:text-sm text-xs flex gap-1" v-if="tx.value !== null && tx.fee !== undefined">
-                <span v-html="formatSmallNumber(Number(tx.value) / 10 ** 12)"></span>
-                <span>ORAI</span>
+                <TokenElement :value="{amount: tx.value, denom:'aorai'}"/>
               </td>
               <td v-else>-</td>
             </tr>

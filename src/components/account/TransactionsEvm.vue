@@ -4,6 +4,7 @@ import { getTsxEvmByAccount } from '@/service/transactionsService';
 import { useRoute, useRouter } from 'vue-router';
 import { formatSmallNumber, shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
+import TokenElement from '../dynamic/TokenElement.vue';
 
 const props = defineProps(["address", "chain"]);
 
@@ -106,8 +107,7 @@ function handleNext() {
             </RouterLink>
           </td>
           <td class="py-3 flex gap-1">
-            <span v-html="formatSmallNumber(Number(v.fee) / 10 ** 12)"></span>
-            <span>ORAI</span>
+            <TokenElement :value="{amount: v.fee, denom:'aorai'}"/>
           </td>
           <!-- <td class="py-3">
             <span>{{ `${formatNumber(v.value)} aorai` }}</span>

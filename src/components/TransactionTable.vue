@@ -5,6 +5,7 @@ import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import { CHAIN_INDEXS } from '@/constants';
 import { formatTitle } from '@/libs/utils';
+import TokenElement from './dynamic/TokenElement.vue';
 
 const props = defineProps(['transactions', 'chain', 'txTotal', 'limit', 'handlePagination', 'displayStatus', 'page']);
 const format = useFormatter();
@@ -22,7 +23,7 @@ watchEffect(() => {
           message: formatTitle(message || ""),
           numberMessageRemain: item.messages?.nodes.length > 1 ? item.messages?.nodes.length - 1 : 0,
           height: item.blockNumber,
-          fee: `${Number(item.fee[0].amount) / 1e6} ${item?.fee[0].denom?.toUpperCase()}`,
+          fee: item.fee[0],
           timestamp: format.toDay(new Date(Number(item.timestamp)), 'from'),
           state: item.state
         }
@@ -79,7 +80,7 @@ watchEffect(() => {
             </RouterLink>
           </td>
           <td class="py-3 !break-normal">
-            <span>{{ v.fee || "-" }}</span>
+            <TokenElement :value="v.fee"/>
           </td>
           <td v-if="displayStatus">
             <button class="btn btn-xs  border rounded-lg " v-if="v.state"
