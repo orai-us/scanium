@@ -183,14 +183,25 @@ const assets = computed(()=>{
 })
 
 watch([() => assets.value.length, supportedAssets, balancesChain], async () => {
-  const ids = assets.value.map(item => item?.id);
+  const idSet = new Set();
+  assets.value.forEach(item => {
+    idSet.add(item.id)
+  });
+  const ids = Array.from(idSet);
   const result: any = {};
   if (ids?.length > 0) {
-    const res = await getPriceByIds({ ids: ids.join(",") });
-    if (res)
-      for (let item of Object.keys(res)) {
-        result[item] = res[item]?.usd;
-      }
+    const promiseAllInfoToken = [];
+    for (let i = 0; i < ids.length; i += 10) {
+      promiseAllInfoToken.push(getPriceByIds({ ids: ids.slice(i, i + 10).join(",") }))
+    }
+    const infoTokens = await Promise.all(promiseAllInfoToken);
+    if (Array.isArray(infoTokens)) {
+      infoTokens.forEach((info) => {
+        for (let item of Object.keys(info)) {
+          result[item] = info[item]?.usd;
+        }
+      })
+    }
     priceBySymbol.value = result;
 
     let total = 0;
