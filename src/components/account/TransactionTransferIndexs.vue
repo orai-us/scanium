@@ -96,10 +96,12 @@ const transactions = computed(() => {
         const fees = txTransfer.fee;
         let denomTransfer = item.denom;
         let amountTransfer = item.amount;
-        const tokenInfoTransfer = tokenMap[denomTransfer];
-        if (tokenInfoTransfer) {
-          denomTransfer = tokenInfoTransfer.coinDenom;
-          amountTransfer = formatSmallNumber(amountTransfer / 10 ** tokenInfoTransfer.coinDecimals);
+        if (denomTransfer !== "aorai") {
+          const tokenInfoTransfer = tokenMap[denomTransfer];
+          if (tokenInfoTransfer) {
+            denomTransfer = tokenInfoTransfer.coinDenom;
+            amountTransfer = formatSmallNumber(amountTransfer / 10 ** tokenInfoTransfer.coinDecimals);
+          }
         }
         let timestamp: any = "-";
         if (!!txTransfer.timestamp)
