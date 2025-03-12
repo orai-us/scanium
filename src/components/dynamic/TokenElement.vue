@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useBlockchain } from '@/stores';
+import { formatSmallNumber } from '@/utils';
 import { ref, watchEffect } from 'vue';
 
 const props = defineProps(['value']);
@@ -33,7 +34,8 @@ watchEffect(() => {
 
 </script>
 <template>
-  <div class="overflow-auto xl:text-sm text-[12px]">
-    {{ (Number(value["amount"]) / Math.pow(10, exponent)).toLocaleString("en-US", {}) }} {{ symbol }}
+  <div class="flex gap-1 overflow-auto xl:text-sm text-[12px]" >
+    <span v-html="formatSmallNumber(Number(value.amount) / 10 ** exponent)"></span>
+    <span>{{ symbol }}</span>
   </div>
 </template>

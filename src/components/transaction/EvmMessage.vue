@@ -3,6 +3,7 @@ import { formatSmallNumber } from '@/utils';
 import { Icon } from '@iconify/vue';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import { computed, ref, toRaw, watchEffect } from 'vue';
+import TokenElement from '../dynamic/TokenElement.vue';
 
 const props = defineProps(['value', 'type', 'events', 'chain']);
 const message = ref({} as any);
@@ -94,8 +95,7 @@ const copyWebsite = async (url: string) => {
     <div class="mb-4 flex flex-row gap-10">
       <div class="w-40 xl:text-sm text-xs">Amount:</div>
       <div class="xl:text-sm text-[12px] flex gap-1">
-        <span v-html="formatSmallNumber(Number(message.amount) / 10 ** 12)"></span>
-        <span>ORAI</span>
+        <TokenElement :value="{amount: message.amount, denom:'aorai'}"/>
       </div>
     </div>
     <div class="toast" v-show="resultCopy === true">

@@ -19,6 +19,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'vue-router';
 import EvmMessage from './EvmMessage.vue';
 import { formatSmallNumber } from '@/utils';
+import TokenElement from '../dynamic/TokenElement.vue';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -195,8 +196,7 @@ const timestamp = computed(() => {
                   )
                 }}
                 <span v-for="(token, index) of tx.tx?.authInfo?.fee?.amount?.filter(item => item.denom === 'aorai')" class="flex gap-1">
-                  <span v-html="formatSmallNumber(Number(token.amount) / 10 ** 12)"></span>
-                  <span>ORAI</span>
+                  <TokenElement :value="{amount: token.amount, denom:'aorai'}" :key="index"/>
                 </span>
               </td>
             </tr>

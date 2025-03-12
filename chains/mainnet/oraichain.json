@@ -28,6 +28,11 @@
       "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png"
     },
     {
+      "base": "aorai",
+      "symbol": "ORAI",
+      "exponent": "12"
+    },
+    {
       "base": "factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/obtc",
       "symbol": "BTC",
       "exponent": "14",

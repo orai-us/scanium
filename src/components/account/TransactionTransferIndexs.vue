@@ -4,10 +4,11 @@ import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { formatNumber, shortenTxHash } from '@/utils';
+import { formatSmallNumber, shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import { tokenMap } from '@/libs/amm-v3';
 import { formatTitle } from '@/libs/utils';
+import TokenElement from '../dynamic/TokenElement.vue';
 
 const props = defineProps(["address", "chain"])
 const format = useFormatter();
@@ -93,20 +94,12 @@ const transactions = computed(() => {
         const status = txTransfer.code === 0 ? "Success" : "Failed";
         const height = txTransfer.blockNumber;
         const fees = txTransfer.fee;
-        let denomFee = fees[0]?.denom;
-        let amountFee = fees[0]?.amount;
-        const tokenFeeInfo = tokenMap[denomFee];
-        if (tokenFeeInfo) {
-          amountFee = amountFee / 10 ** tokenFeeInfo.coinDecimals;
-          denomFee = tokenFeeInfo.coinDenom;
-        }
-        const fee = `${amountFee} ${denomFee}`;
         let denomTransfer = item.denom;
         let amountTransfer = item.amount;
         const tokenInfoTransfer = tokenMap[denomTransfer];
         if (tokenInfoTransfer) {
           denomTransfer = tokenInfoTransfer.coinDenom;
-          amountTransfer = formatNumber(amountTransfer / 10 ** tokenInfoTransfer.coinDecimals);
+          amountTransfer = formatSmallNumber(amountTransfer / 10 ** tokenInfoTransfer.coinDecimals);
         }
         let timestamp: any = "-";
         if (!!txTransfer.timestamp)
@@ -127,7 +120,7 @@ const transactions = computed(() => {
           result: status,
           message,
           height,
-          fee,
+          fee: fees[0],
           status: state,
           token: denomTransfer,
           amount: amountTransfer,
@@ -192,7 +185,7 @@ function handleNext() {
             </RouterLink>
           </td>
           <td class="py-3">
-            <span>{{ v.fee || "-" }}</span>
+            <TokenElement :value="v.fee"/>
           </td>
           <td class="py-3">
             <div class="flex gap-2">
@@ -205,7 +198,7 @@ function handleNext() {
             </div>
           </td>
           <td class="py-3">
-            <span>{{ v.amount }}</span>
+            <span v-html="v.amount"></span>
           </td>
           <td class="py-3">
             <span>{{ v.token }}</span>
