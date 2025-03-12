@@ -74,35 +74,51 @@ function selected(route: any, nav: NavLink) {
   return b;
 }
 function confirm() {
-  errorMessage.value = '';
-  const key = searchQuery.value.toLowerCase();
-  if (!key) {
-    errorMessage.value = 'Please enter a value!';
-    return;
-  }
-  const height = /^\d+$/;
-  const txhash = /^[a-z\d]{64}$/;
-  const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
-  const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
-
-  const current = blockchain?.current?.chainName || '';
   const routeParams = vueRouters?.currentRoute?.value;
+  const current = blockchain?.current?.chainName || '';
+  if (searchQuery.value.startsWith("0x")) {
+    const txhash = /^[a-z\d]{66}$/;
+    const addr = /^[a-zA-Z\d]{28,56}$/;
+    const key = searchQuery.value;
+    if (!Object.values(routeParams?.params).includes(key)) {
+      if (txhash.test(key)) {
+        vueRouters.push({ path: `/${current}/tx/${key}` });
+      } else if (addr.test(key)) {
+        vueRouters.push({ path: `/${current}/account/${key}` });
+      }
+      else {
+        errorMessage.value = 'The input not recognized';
+      }
+    }
+  }
+  else {
+    errorMessage.value = '';
+    const key = searchQuery.value.toLowerCase();
+    if (!key) {
+      errorMessage.value = 'Please enter a value!';
+      return;
+    }
+    const height = /^\d+$/;
+    const txhash = /^[a-z\d]{64}$/;
+    const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
+    const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
 
-  if (!Object.values(routeParams?.params).includes(key)) {
-    if (height.test(key)) {
-      vueRouters.push({ path: `/${current}/block/${key}` });
-    } else if (txhash.test(key)) {
-      vueRouters.push({ path: `/${current}/tx/${key}` });
+    if (!Object.values(routeParams?.params).includes(key)) {
+      if (height.test(key)) {
+        vueRouters.push({ path: `/${current}/block/${key}` });
+      } else if (txhash.test(key)) {
+        vueRouters.push({ path: `/${current}/tx/${key}` });
 
-      //     this.$router.push({ name: 'transaction', params: { chain: c.chain_name, hash: key } })
-    } else if (addr.test(key)) {
-      vueRouters.push({ path: `/${current}/account/${key}` });
-    } else if (contract.test(key)) {
-      wasmStore.wasmClient.getWasmContractInfo(key).then((x) => {
-        vueRouters.push({ path: `/${current}/cosmwasm/${Number(x?.codeId)}/transactions`, query: { contract: key } });
-      });
-    } else {
-      errorMessage.value = 'The input not recognized';
+        //     this.$router.push({ name: 'transaction', params: { chain: c.chain_name, hash: key } })
+      } else if (addr.test(key)) {
+        vueRouters.push({ path: `/${current}/account/${key}` });
+      } else if (contract.test(key)) {
+        wasmStore.wasmClient.getWasmContractInfo(key).then((x) => {
+          vueRouters.push({ path: `/${current}/cosmwasm/${Number(x?.codeId)}/transactions`, query: { contract: key } });
+        });
+      } else {
+        errorMessage.value = 'The input not recognized';
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ import { LABELING_ADDRESS } from "@/constants";
 import { tokenMap } from "@/libs/amm-v3";
 
 export const shortenTxHash = (txHash: string) => {
+  if (!txHash) return '-';
   const prefixHash = txHash.slice(0, 6);
   const suffixHash = txHash.slice(-6);
   return `${prefixHash} . . . ${suffixHash}`;

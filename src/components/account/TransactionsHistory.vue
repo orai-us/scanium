@@ -6,6 +6,7 @@ import TransactionAccountRpc from './TransactionAccountRpc.vue';
 import { CHAIN_INDEXS } from '@/constants';
 import { useRoute, useRouter } from 'vue-router';
 import TransactionTransferIndexs from './TransactionTransferIndexs.vue';
+import TransactionsEvm from './TransactionsEvm.vue';
 
 const props = defineProps(['address', 'chain', 'txs']);
 
@@ -41,8 +42,9 @@ function changeTypeTx(tx: string) {
       </button>
     </div>
     <div v-show="txType === TRANSACTION_TYPE.ALL">
-      <div  v-if="CHAIN_INDEXS.includes(chain)">
-        <TransactionAccountIndexs :chain="chain" :address="address" />
+      <div v-if="CHAIN_INDEXS.includes(chain)">
+        <TransactionsEvm :address="address" :chain="chain" v-if="address.startsWith('0x')" />
+        <TransactionAccountIndexs :chain="chain" :address="address" v-else />
       </div>
       <div v-else>
         <TransactionAccountRpc :address="address" :chain="chain" :txs="txs" />
