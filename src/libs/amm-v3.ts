@@ -22,7 +22,8 @@ watchEffect(() => {
   tokenMap = createTokenMap();
 });
 
-export const contractAddress = 'orai10s0c75gw5y5eftms5ncfknw6lzmx0dyhedn75uz793m8zwz4g8zq4d9x9a';
+export const contractAddressAmmv3 = 'orai10s0c75gw5y5eftms5ncfknw6lzmx0dyhedn75uz793m8zwz4g8zq4d9x9a';
+export const contractAddressEnginePosition = 'orai1wrkchuss9wtph4mxrzqksfrulj7hsl89z0048hg8l7hcglse5rxqea2qnr';
 
 interface PoolKey {
   token_x: string;
