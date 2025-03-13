@@ -119,7 +119,16 @@ const delegatesAssets = computed(() => {
         resultUnSupported.push({ amount, denom, display });
     }
   }
-  return supportedAssets.value ? resultSupported : resultUnSupported;
+  const resultDelegates = supportedAssets.value ? resultSupported : resultUnSupported;
+  const groupDelegatesByDenom = resultDelegates.reduce((accumulator, currentValue) => {
+    if (accumulator[currentValue.denom]) {
+      accumulator[currentValue.denom].amount += currentValue.amount;
+    } else {
+      accumulator[currentValue.denom] = currentValue;
+    }
+    return accumulator
+  }, {})
+  return Object.values(groupDelegatesByDenom) as any;
 })
 
 const rewardsTotalAssets = computed(() => {
