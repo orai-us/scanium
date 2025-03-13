@@ -3,6 +3,7 @@ import Countdown from '@/components/Countdown.vue';
 import { decodeProto } from '@/components/dynamic';
 import ObjectElement from '@/components/dynamic/ObjectElement.vue';
 import PaginationBar from '@/components/PaginationBar.vue';
+import { tokenMap } from '@/libs/amm-v3';
 import {
   useBaseStore,
   useBlockchain,
@@ -161,11 +162,12 @@ watchEffect(async () => {
           let totalAmount = 0;
           let voter = "";
           const { balance, delegation } = delegationResponse;
-          if (balance.denom === "orai") {
-            totalAmount += Number(balance.amount) / 10 ** 6;
-            voter = delegation.delegatorAddress;
-            
+          const tokenInfo = tokenMap[balance.denom];
+          if(tokenInfo){
+            const { coinDecimals } = tokenInfo
+            totalAmount += Number(balance.amount) / 10 ** coinDecimals;
           }
+          voter = delegation.delegatorAddress
           result[voter] = formatSmallNumber(((totalAmount / (totalPower / 10 ** 24)) / 100)) + "%";
         }
       }
@@ -490,7 +492,7 @@ onMounted(async() => {
       </div>
     </div>
 
-    <div class="section">
+    <div class="section" v-if="proposal.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD">
       <h2 class="card-title text-white">{{ $t('gov.votes') }}</h2>
       <div class="overflow-x-auto">
         <table class="table w-full table-zebra">
