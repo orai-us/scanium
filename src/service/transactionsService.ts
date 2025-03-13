@@ -132,7 +132,7 @@ export const getTxsTokenTransfer = async (
 };
 
 const urlTsxEvm = '/v1/evm-transaction/by-account';
-export const getTsxEvmByAccount = async (
+export const getTxsEvmByAccount = async (
   address: string,
   params: ParamsGetTx
 ) => {
@@ -145,3 +145,13 @@ export const getTsxEvmByAccount = async (
   const res = await api.request(config);
   return res?.data;
 };
+
+export const countTxsEvmByAccount = async (address: string)=>{
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTsxEvm}/${address}/count`,
+    method: METHODS.GET,
+  }
+  const res = await api.request(config);
+  return res?.data;
+}

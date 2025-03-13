@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { getTsxEvmByAccount } from '@/service/transactionsService';
+import { countTxsEvmByAccount, getTxsEvmByAccount } from '@/service/transactionsService';
 import { useRoute, useRouter } from 'vue-router';
-import { formatSmallNumber, shortenTxHash } from '@/utils';
+import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import TokenElement from '../dynamic/TokenElement.vue';
+import Pagination from '../pagination/Pagination.vue';
 
 const props = defineProps(["address", "chain"]);
 
@@ -12,6 +13,7 @@ const route = useRoute();
 const router = useRouter();
 const format = useFormatter();
 const txsEvm = ref([] as Array<any>);
+const totalTx = ref(0);
 
 const pagination = computed(() => {
   const page = route.query.page ? Number(route.query.page) : 1;
@@ -23,7 +25,7 @@ const pagination = computed(() => {
 
 async function fetchTsxEvmByAccount() {
   try {
-    const res = await getTsxEvmByAccount(props.address, pagination.value);
+    const res = await getTxsEvmByAccount(props.address, pagination.value);
     if (Array.isArray(res?.data)) {
       txsEvm.value = res.data;
     }
@@ -32,24 +34,30 @@ async function fetchTsxEvmByAccount() {
   }
 }
 
+async function fetchTotalTx() {
+  try {
+    const res = await countTxsEvmByAccount(props.address);
+    if (res.data) {
+      totalTx.value = Number(res.data)
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+}
+
 onMounted(()=>{
   fetchTsxEvmByAccount()
+  fetchTotalTx()
 })
 
 
 watch([() => props.address, () => pagination.value.page], () => {
   fetchTsxEvmByAccount()
+  fetchTotalTx()
 })
 
-function handlePrevious() {
-  const page = pagination.value.page;
-  if (page === 1) return
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page: page - 1 } });
-}
-
-function handleNext() {
-  const page = pagination.value.page;
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page: page + 1 } });
+function handlePagination(page: number) {
+  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page } });
 }
 
 </script>
@@ -130,11 +138,8 @@ function handleNext() {
     <div v-else class="flex items-center justify-center w-full h-full">
       <td>No Transactions</td>
     </div>
-    <div class="flex items-center justify-center w-full mt-5">
-      <button class="flex justify-center items-center px-4 py-2 bg-base rounded-s-lg w-20 border-r-2 border-[#383B40]"
-        v-on:click="handlePrevious">Previous</button>
-      <button class="flex justify-center items-center px-4 py-2 bg-base rounded-e-lg w-20"
-        v-on:click="handleNext">Next</button>
+    <div class="mt-4 text-center" v-if="totalTx">
+      <Pagination :totalItems="totalTx" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
     </div>
   </div>
 </template>
