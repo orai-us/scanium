@@ -29,7 +29,9 @@ const value = computed(() => {
       messages.push(result);
     }
   }
-  return displayMessageSwap(props.action, messages, props.params, props.sender)
+  if (messages.length)
+    return displayMessageSwap(props.action, messages, props.params, props.sender)
+  return;
 });
 
 </script>
