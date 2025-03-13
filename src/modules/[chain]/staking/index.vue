@@ -518,7 +518,8 @@ function groupAndShuffle(array: Array<any>, groupSize: number) {
 const listRandom = ref([] as Array<any>);
 
 watch([sortDes], () => {
-  listRandom.value = handleSortList(list.value, sortDes)
+  const data = handleSortList(list.value, sortDes);
+  listRandom.value = [...data];
 })
 
 watch([() => list.value.length], () => {
