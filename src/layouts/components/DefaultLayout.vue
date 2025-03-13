@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 // Components
 import newFooter from '@/layouts/components/NavFooter.vue';
@@ -47,7 +47,18 @@ const sidebarShow = ref(false);
 const sidebarOpen = ref(true);
 let searchQuery = ref('');
 let errorMessage = ref('');
-const searchFor = ref("ACCOUNT");
+const isTx = computed(() => {
+  if (searchQuery.value.startsWith("0x")) {
+    const txhash = /^[a-z\d]{66}$/;
+    const key = searchQuery.value;
+    if (txhash.test(key)) return true
+  } else {
+    const txhash = /^[a-z\d]{64}$/;
+    const key = searchQuery.value.toLowerCase();
+    if (txhash.test(key)) return true
+  }
+  return false
+})
 
 const changeOpen = (index: Number) => {
   if (index === 0) {
@@ -136,7 +147,7 @@ const handleSearchAccountContract = (type: string, value: string) => {
 
 const refSearchInput = ref(null);
 const clickOutsideSearch = ref(false);
-onClickOutside(refSearchInput, event => clickOutsideSearch.value=false);
+onClickOutside(refSearchInput, event => clickOutsideSearch.value = false);
 
 </script>
 
@@ -329,7 +340,7 @@ onClickOutside(refSearchInput, event => clickOutsideSearch.value=false);
             v-model="searchQuery" placeholder="Search by Height, Address, Contracts, and TxHash"
             v-on:keyup.enter="confirm" />
           <div class="absolute mt-2 text-sm bg-base flex flex-col w-full rounded-md shadow-sm shadow-gray-500"
-            v-show="searchQuery.length > 37 && clickOutsideSearch">
+            v-show="searchQuery.length > 37 && clickOutsideSearch && !isTx">
             <div class="hover:cursor-pointer hover:bg-[#47474B] w-full px-4 py-2 rounded-t-md"
               @click="handleSearchAccountContract('ACCOUNT', searchQuery)"><span class="flex gap-2">Search
                 For <p class="text-white font-bold">Account</p></span></div>
