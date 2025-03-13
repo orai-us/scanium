@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { useBlockchain, useFormatter, useStakingStore } from '@/stores';
+import { useBlockchain, useStakingStore } from '@/stores';
 import { computed, onMounted, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
-import { getCw20Balances, getPriceByIds } from '@/service/assetsService';
-import numeral from 'numeral';
+import { getCw20Balances, getPriceByIds, getPricePoolTokens } from '@/service/assetsService';
 import { formatNumber, shortenDenom } from '@/utils';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -22,8 +21,8 @@ const blockchain = useBlockchain();
 const totalValue = ref(0);
 const totalAmountByCategory = ref([] as Array<any>);
 const balancesChain = ref([] as Array<any>);
-
 const priceBySymbol = ref({} as any);
+const pricePoolTokensOraidex = ref({} as any);
 
 const labels = ['Balance', 'Delegation', 'Reward', 'Unbonding'];
 
@@ -58,12 +57,23 @@ async function fetchBalancesCw20() {
   }
 }
 
+async function fetchPricePoolTokens() {
+  try {
+    const res = await getPricePoolTokens();
+    pricePoolTokensOraidex.value = res;
+  } catch (error) {
+    console.log({ error })
+  }
+}
+
 onMounted(async () => {
   fetchBalancesCw20()
+  fetchPricePoolTokens()
 })
 
 watch([() => props.address], () => {
   fetchBalancesCw20()
+  fetchPricePoolTokens()
 })
 
 const balancesAssets = computed(() => {
@@ -199,6 +209,11 @@ watch([() => assets.value.length, supportedAssets, balancesChain], async () => {
   const ids = Array.from(idSet);
   const result: any = {};
   if (ids?.length > 0) {
+    assets.value.forEach((item) => {
+      if (pricePoolTokensOraidex.value[item.denom]) {
+        result[item.id] = pricePoolTokensOraidex.value[item.denom]
+      }
+    })
     const promiseAllInfoToken = [];
     for (let i = 0; i < ids.length; i += 10) {
       promiseAllInfoToken.push(getPriceByIds({ ids: ids.slice(i, i + 10).join(",") }))
