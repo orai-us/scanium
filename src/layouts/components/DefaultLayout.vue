@@ -103,6 +103,11 @@ function confirm() {
     const contract = /^[a-z\d]+1[a-z\d]{49,69}$/;
     const addr = /^[a-z\d]+1[a-z\d]{38,48}$/;
 
+    if(key.includes("valoper")){
+      vueRouters.push({ path: `/${current}/staking/${key}` });
+      return
+    }
+
     if (!Object.values(routeParams?.params).includes(key)) {
       if (height.test(key)) {
         vueRouters.push({ path: `/${current}/block/${key}` });
