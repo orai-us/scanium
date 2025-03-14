@@ -186,3 +186,34 @@ export const countTxsEvmTokenTransfers = async (contractAddress: string)=>{
   const res = await api.request(config);
   return res?.data;
 }
+
+const urlEvmContract = '/v1/evm-contract';
+export const getListEvmContract = async (
+  address: string,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlEvmContract}`,
+    method: METHODS.GET,
+    params: {
+      address,
+      ...params,
+    },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countEvmContract = async (address: string) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlEvmContract}/count`,
+    method: METHODS.GET,
+    params: {
+      address,
+    },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
