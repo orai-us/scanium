@@ -25,7 +25,6 @@ const pagination = computed(() => {
 async function fetchTsxEvmByAccount() {
   try {
     const res = await getTxsEvmTokenTransfers(props.address, pagination.value);
-    console.log({ res })
     if (Array.isArray(res?.data)) {
       txsEvm.value = res.data.map((item: any) => {
         const id = item.id;
