@@ -131,16 +131,88 @@ export const getTxsTokenTransfer = async (
   return res?.data;
 };
 
-const urlTsxEvm = '/v1/evm-transaction/by-account';
-export const getTsxEvmByAccount = async (
+const urlTxsEvmByAccount = '/v1/evm-transaction/by-account';
+export const getTxsEvmByAccount = async (
   address: string,
   params: ParamsGetTx
 ) => {
   const config = {
     baseURL: baseUrlOptimalQueriesScanium,
-    url: `${urlTsxEvm}/${address}`,
+    url: `${urlTxsEvmByAccount}/${address}`,
     method: METHODS.GET,
     params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countTxsEvmByAccount = async (address: string)=>{
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsEvmByAccount}/${address}/count`,
+    method: METHODS.GET,
+  }
+  const res = await api.request(config);
+  return res?.data;
+}
+
+const urlTxsEvmTokenTransfer = "/v1/evm-token-transfer";
+export const getTxsEvmTokenTransfers = async (
+  contractAddress: string,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsEvmTokenTransfer}`,
+    method: METHODS.GET,
+    params: {
+      contractAddress,
+      ...params
+    }
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countTxsEvmTokenTransfers = async (contractAddress: string)=>{
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsEvmTokenTransfer}/count`,
+    method: METHODS.GET,
+    params: {
+      contractAddress
+    }
+  }
+  const res = await api.request(config);
+  return res?.data;
+}
+
+const urlEvmContract = '/v1/evm-contract';
+export const getListEvmContract = async (
+  address: string,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlEvmContract}`,
+    method: METHODS.GET,
+    params: {
+      address,
+      ...params,
+    },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const countEvmContract = async (address: string) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlEvmContract}/count`,
+    method: METHODS.GET,
+    params: {
+      address,
+    },
   };
   const res = await api.request(config);
   return res?.data;

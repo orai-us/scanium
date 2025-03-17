@@ -7,6 +7,7 @@ import { CHAIN_INDEXS } from '@/constants';
 import { useRoute, useRouter } from 'vue-router';
 import TransactionTransferIndexs from './TransactionTransferIndexs.vue';
 import TransactionsEvm from './TransactionsEvm.vue';
+import TransactionsTransfersEvm from './TransactionsTransfersEvm.vue';
 
 const props = defineProps(['address', 'chain', 'txs']);
 
@@ -52,7 +53,8 @@ function changeTypeTx(tx: string) {
     </div>
     <div v-show="txType === TRANSACTION_TYPE.TRANSFERS">
       <div v-if="CHAIN_INDEXS.includes(chain)">
-        <TransactionTransferIndexs :address="address" :chain="chain" />
+        <TransactionsTransfersEvm :address="address" :chain="chain" v-if="address.startsWith('0x')" />
+        <TransactionTransferIndexs :address="address" :chain="chain"  v-else />
       </div>
       <div v-else>
         <TransactionsTransfers :address="address" :chain="chain" />
