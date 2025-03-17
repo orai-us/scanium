@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 // Components
 import newFooter from '@/layouts/components/NavFooter.vue';
@@ -22,6 +22,7 @@ import type {
   VerticalNavItems,
 } from '../types';
 import { useWasmStore } from '@/modules/[chain]/cosmwasm/WasmStore';
+import web3Service from '@/service/web3Service';
 
 const dashboard = useDashboard();
 dashboard.initial();
@@ -84,7 +85,7 @@ function selected(route: any, nav: NavLink) {
 
   return b;
 }
-function confirm() {
+async function confirm() {
   const routeParams = vueRouters?.currentRoute?.value;
   const current = blockchain?.current?.chainName || '';
   if (searchQuery.value.startsWith("0x")) {
@@ -95,7 +96,12 @@ function confirm() {
       if (txhash.test(key)) {
         vueRouters.push({ path: `/${current}/tx/${key}` });
       } else if (addr.test(key)) {
-        vueRouters.push({ path: `/${current}/account/${key}` });
+        const code = await web3Service.web3.eth.getCode(key);
+        if(code === "0x"){
+          vueRouters.push({ path: `/${current}/account/${key}` });
+        }else {
+          vueRouters.push({ path: `/${current}/contracts-evm/${key}` });
+        }
       }
       else {
         errorMessage.value = 'The input not recognized';
