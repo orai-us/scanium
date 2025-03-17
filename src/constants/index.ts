@@ -22,3 +22,5 @@ export const LABELING_ADDRESS: any = {
   orai1qvk2fwr3g5uaj86cjvncr2u5r4pfm92dj4lkz50sgrax45hmeurqy9tuyu: 'Oraichain: BTC Bridge Light Client',
   orai10s0c75gw5y5eftms5ncfknw6lzmx0dyhedn75uz793m8zwz4g8zq4d9x9a: 'Oraidex: AMM v3'
 }
+
+export const contractEvmERC20 = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";

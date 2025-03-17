@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue';
 import { computed, ref } from 'vue';
-import { Web3 } from 'web3'
 
 // Components
 import newFooter from '@/layouts/components/NavFooter.vue';
@@ -23,13 +22,13 @@ import type {
   VerticalNavItems,
 } from '../types';
 import { useWasmStore } from '@/modules/[chain]/cosmwasm/WasmStore';
+import web3Service from '@/service/web3Service';
 
 const dashboard = useDashboard();
 dashboard.initial();
 const blockchain = useBlockchain();
 blockchain.randomSetupEndpoint();
 const wasmStore = useWasmStore();
-let web3 = new Web3(Web3.givenProvider);
 
 const current = ref(''); // the current chain
 const temp = ref('');
@@ -97,7 +96,7 @@ async function confirm() {
       if (txhash.test(key)) {
         vueRouters.push({ path: `/${current}/tx/${key}` });
       } else if (addr.test(key)) {
-        const code = await web3.eth.getCode(key);
+        const code = await web3Service.web3.eth.getCode(key);
         if(code === "0x"){
           vueRouters.push({ path: `/${current}/account/${key}` });
         }else {

@@ -1,16 +1,38 @@
 <script lang="ts" setup>
 import { useFormatter } from '@/stores';
-import { formatNumber, formatSmallNumber } from '@/utils';
 import { Icon } from '@iconify/vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import TokenElement from '../dynamic/TokenElement.vue';
+import { contractEvmERC20 } from '@/constants';
+import { formatNumber } from '@/utils';
+import web3Service from '@/service/web3Service';
 
 const props = defineProps(['hash', 'chain']);
 const format = useFormatter();
 const tx = ref({} as any);
 let resultCopy = ref();
+const logsERC20 = ref([] as Array<any>);
+const addressTokens = ref([] as Array<any>);
+const tokens = ref({} as any);
+
+const minABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", type: "uint8" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "symbol",
+    outputs: [{ name: "", type: "string" }],
+    type: "function",
+  },
+]
 
 const query = gql`
       query GetTransactions($id: String!) {
@@ -42,6 +64,61 @@ watchEffect(() => {
   }
 })
 
+async function getLogsTx() {
+  try {
+    const res = await web3Service.web3.eth.getTransactionReceipt(props.hash);
+    if (Array.isArray(res.logs)) {
+      const logs = res.logs.filter(log => {
+        const topics = log.topics;
+        if (Array.isArray(topics)) return topics[0] === contractEvmERC20
+        return false;
+      }).map((item) => {
+        const data = item.data;
+        const topics = item.topics;
+        let from = "", to = "", amount = BigInt(0);
+        if (data) {
+          amount = BigInt(data)
+        }
+        if (Array.isArray(topics)) {
+          from = topics[1]?.replace("000000000000000000000000", "");
+          to = topics[2]?.replace("000000000000000000000000", "");
+        }
+        return {
+          token: item.address,
+          amount,
+          from,
+          to
+        }
+      })
+      logsERC20.value = logs;
+
+      const setTokens = new Set();
+      logs.forEach((item) => setTokens.add(item.token));
+      addressTokens.value = Array.from(setTokens);
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+
+}
+
+watch(() => addressTokens.value, async () => {
+  const infoTokens: any = {};
+  if (Array.isArray(addressTokens.value)) {
+    for (let address of addressTokens.value) {
+      const contract = new web3Service.web3.eth.Contract(minABI, address);
+      const resSymbol = await contract.methods.symbol().call();
+      const resDecimals = await contract.methods.decimals().call();
+      infoTokens[address] = { symbol: resSymbol, decimals: Number(resDecimals) };
+    }
+  }
+  tokens.value = infoTokens
+})
+
+watchEffect(() => {
+  getLogsTx()
+})
+
 const copyWebsite = async (url: string) => {
   if (!url) {
     return;
@@ -59,7 +136,6 @@ const copyWebsite = async (url: string) => {
     }, 1000);
   }
 };
-
 
 </script>
 <template>
@@ -129,14 +205,14 @@ const copyWebsite = async (url: string) => {
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">Fee</td>
               <td class="xl:p-4 p-2 xl:text-sm text-xs flex gap-1" v-if="tx.fee !== null && tx.fee !== undefined">
-                <TokenElement :value="{amount: tx.fee, denom:'aorai'}"/>
+                <TokenElement :value="{ amount: tx.fee, denom: 'aorai' }" />
               </td>
               <td v-else>-</td>
             </tr>
             <tr>
               <td class="xl:p-4 p-2 xl:text-sm text-xs">Value</td>
               <td class="xl:p-4 p-2 xl:text-sm text-xs flex gap-1" v-if="tx.value !== null && tx.fee !== undefined">
-                <TokenElement :value="{amount: tx.value, denom:'aorai'}"/>
+                <TokenElement :value="{ amount: tx.value, denom: 'aorai' }" />
               </td>
               <td v-else>-</td>
             </tr>
@@ -161,6 +237,27 @@ const copyWebsite = async (url: string) => {
                   </RouterLink>
                   <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.to"
                     @click="copyWebsite(tx.to || '')" />
+                </div>
+              </td>
+            </tr>
+            <tr v-if="!!logsERC20.length">
+              <td class="xl:p-4 p-2 xl:text-sm text-xs items-start">ERC-20 Token Transferred</td>
+              <td
+                class="truncate max-h-[300px] !overflow-scroll flex flex-col gap-1 rounded-lg border-base-400 border px-5 py-3">
+                <div v-for="(log, index) of logsERC20" class="flex gap-1" :key="index">
+                  <span class="text-white font-semibold">From</span>
+                  <div class="flex">
+                    <RouterLink :to="`/${chain}/account/${log.from}`" class="text-link">
+                      {{ log.from }}</RouterLink>
+                  </div>
+                  <span class="text-white font-semibold">to</span>
+                  <div class="flex">
+                    <RouterLink :to="`/${chain}/account/${log.to}`" class="text-link">
+                      {{ log.to }}</RouterLink>
+                  </div>
+                  <span class="text-white font-semibold">For</span>
+                  <span>{{ formatNumber(Number(log.amount) / 10 ** (tokens[log.token]?.decimals || 6)) }}</span>
+                  <span class="text-white font-semibold">{{ tokens[log.token]?.symbol }}</span>
                 </div>
               </td>
             </tr>
