@@ -42,9 +42,10 @@ export const useBaseStore = defineStore('baseStore', {
           const diff = dayjs(this.latest.block?.header?.time.toString()).diff(
             this.earlest.block?.header?.time.toString()
           );
-          const blocks =
-            Number(this.latest.block.header.height) -
-            Number(this.earlest.block.header.height);
+          const latestHeight = Number(this.latest.block?.header?.height);
+          const earlestHeight = Number(this.earlest.block?.header?.height);
+          if(isNaN(latestHeight) || isNaN(earlestHeight)) return 6000;
+          const blocks = latestHeight - earlestHeight;
           return diff / blocks;
         }
       }
