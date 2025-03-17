@@ -187,13 +187,13 @@ function getNameValidator(validatorAddress: string) {
     </div>
 
     <!-- Assets -->
-    <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded">
+    <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded && !address.startsWith('0x')">
       <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
         :unbondingTotal="unbondingTotal" :address="address" :chain="chain" />
     </div>
 
     <!-- Delegations -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
+    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]" v-if="!address.startsWith('0x')">
       <div class="flex justify-between">
         <h2 class="card-title mb-4 text-white">
           {{ $t('account.delegations') }}
@@ -315,7 +315,7 @@ function getNameValidator(validatorAddress: string) {
 
     <!-- Unbonding Delegations -->
     <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]"
-      v-if="unbonding && unbonding.length > 0">
+      v-if="unbonding && unbonding.length > 0 && !address.startsWith('0x')">
       <h2 class="card-title mb-4 text-white">
         {{ $t('account.unbonding_delegations') }}
       </h2>
