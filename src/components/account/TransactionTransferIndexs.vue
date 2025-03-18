@@ -103,6 +103,9 @@ const transactions = computed(() => {
             amountTransfer = formatSmallNumber(amountTransfer / 10 ** tokenInfoTransfer.coinDecimals);
           }
         }
+        if(denomTransfer === "aorai"){
+          amountTransfer = formatSmallNumber(amountTransfer / 10 ** 18, 18);
+        }
         let timestamp: any = "-";
         if (!!txTransfer.timestamp)
           timestamp = format.toDay(new Date(Number(txTransfer.timestamp)), 'from')

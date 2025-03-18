@@ -68,10 +68,10 @@ export function labelingForAddress(address: string) {
   return;
 }
 
-export function formatSmallNumber(number: number) {
+export function formatSmallNumber(number: number, decimalPrecision?: number) {
   if (number === 0) return '0';
   if (number >= 0.00001) return number.toFixed(5);
-  const str = number.toFixed(10).toString();
+  const str = number.toFixed(decimalPrecision || 10).toString();
   const decimalIndex = str.indexOf('.');
   if (decimalIndex === -1) {
     return str;
