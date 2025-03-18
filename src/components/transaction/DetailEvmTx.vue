@@ -37,7 +37,7 @@ const minABI = [
 const query = gql`
       query GetTransactions($id: String!) {
         evmTransaction(id: $id) {
-          results: 
+          results:
             blockNumber
             cosmosTransactionId
             fee
@@ -142,127 +142,126 @@ const copyWebsite = async (url: string) => {
   <div class="box-content !p-0">
     <div class="p-4 md:p-6">
       <h2 class="card-title truncate mb-2 text-white xl:text-lg text-sm">{{ $t('tx.title') }}</h2>
-      <div class="overflow-auto-x">
-        <table class="table text-sm">
-          <tbody>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Evm Tx Hash</td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">
-                <div class="flex gap-1 items-center">
-                  <RouterLink :to="`/${chain}/tx/${tx.id}`" class="text-primary dark:text-link">
-                    {{ tx.id }}</RouterLink>
-                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.id"
-                    @click="copyWebsite(tx.id || '')" />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Cosmos Tx Hash</td>
-              <td class="xl:p-4 p-2">
-                <div class="flex gap-1 items-center">
-                  <RouterLink :to="`/${props.chain}/tx/${tx.cosmosTransactionId}`"
-                    class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.cosmosTransactionId }}
-                  </RouterLink>
-                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.cosmosTransactionId"
-                    @click="copyWebsite(tx.cosmosTransactionId || '')" />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Height</td>
-              <td class="xl:p-4 p-2">
-                <RouterLink :to="`/${props.chain}/block/${tx.results}`"
-                  class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.results }}
+      <div class="overflow-auto-x xl:mt-4 mt-2 xl:p-4 p-2">
+        <div class="flex flex-col xl:gap-8 gap-4">
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Evm Tx Hash</div>
+            <div>
+              <div class="flex gap-1 items-center">
+                <RouterLink :to="`/${chain}/tx/${tx.id}`" class="text-primary dark:text-link xl:text-sm text-xs truncate break-words">
+                  {{ tx.id }}</RouterLink>
+                <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.id"
+                  @click="copyWebsite(tx.id || '')" />
+              </div>
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Cosmos Tx Hash</div>
+            <div>
+              <div class="flex gap-1 items-center">
+                <RouterLink :to="`/${props.chain}/tx/${tx.cosmosTransactionId}`"
+                  class="text-primary dark:text-link xl:text-sm text-xs truncate break-words">{{ tx.cosmosTransactionId }}
                 </RouterLink>
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Method</td>
-              <td class="xl:p-4 p-2">
-                {{ tx.method }}
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Status</td>
-              <td class="xl:p-4 p-2" v-if="tx.status">
-                <span class="truncate relative py-2 w-fit mr-2 rounded inline-flex items-center xl:text-sm text-xs"
-                  :class="`${tx.status ? 'text-[#39DD47]' : 'text-error'
-                    }`">
-                  <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
-                  {{ tx.status ? 'Success' : 'Failed' }}
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Time</td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs" v-if="tx.timestamp">
-                {{ format.timestampFrom(Number(tx.timestamp)) }}
-              </td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs" v-else>
-                -
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Fee</td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs flex gap-1" v-if="tx.fee !== null && tx.fee !== undefined">
-                <TokenElement :value="{ amount: tx.fee, denom: 'aorai' }" />
-              </td>
-              <td v-else>-</td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">Value</td>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs flex gap-1" v-if="tx.value !== null && tx.fee !== undefined">
-                <TokenElement :value="{ amount: tx.value, denom: 'aorai' }" />
-              </td>
-              <td v-else>-</td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">From</td>
-              <td class="truncate py-3">
-                <div class="flex gap-1 items-center">
-                  <RouterLink :to="`/${chain}/account/${tx.from}`" class="text-primary dark:text-link">
-                    {{ tx.from }}
-                  </RouterLink>
-                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.from"
-                    @click="copyWebsite(tx.from || '')" />
+                <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.cosmosTransactionId"
+                  @click="copyWebsite(tx.cosmosTransactionId || '')" />
+              </div>
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Height</div>
+            <div class="">
+              <RouterLink :to="`/${props.chain}/block/${tx.results}`"
+                class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.results }}
+              </RouterLink>
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Method</div>
+            <div class="xl:text-sm text-xs">
+              {{ tx.method }}
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Status</div>
+            <div class="" v-if="tx.status">
+              <span class="truncate relative py-2 w-fit mr-2 rounded inline-flex items-center xl:text-sm text-xs"
+                :class="`${tx.status ? 'text-[#39DD47]' : 'text-error'
+                  }`">
+                <Icon icon="mdi:check" width="20" height="20" />&nbsp;&nbsp;
+                {{ tx.status ? 'Success' : 'Failed' }}
+              </span>
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Time</div>
+            <div class="xl:text-sm text-xs" v-if="tx.timestamp">
+              {{ format.timestampFrom(Number(tx.timestamp)) }}
+            </div>
+            <div class="xl:text-sm text-xs" v-else>
+              -
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Fee</div>
+            <div class="xl:text-sm text-xs flex gap-1" v-if="tx.fee !== null && tx.fee !== undefined">
+              <TokenElement :value="{ amount: tx.fee, denom: 'aorai' }" />
+            </div>
+            <div v-else>-</div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">Value</div>
+            <div class="xl:text-sm text-xs flex gap-1" v-if="tx.value !== null && tx.fee !== undefined">
+              <TokenElement :value="{ amount: tx.value, denom: 'aorai' }" />
+            </div>
+            <div v-else>-</div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">From</div>
+            <div>
+              <div class="flex gap-1 items-center">
+                <RouterLink :to="`/${chain}/account/${tx.from}`"
+                  class="text-primary dark:text-link xl:text-sm text-xs truncate break-words">
+                  {{ tx.from }}
+                </RouterLink>
+                <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-2.5" v-show="tx.from"
+                  @click="copyWebsite(tx.from || '')" />
+              </div>
+            </div>
+          </div>
+          <div class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60">To</div>
+            <div>
+              <div class="flex gap-1 items-center">
+                <RouterLink :to="`/${chain}/account/${tx.to}`" class="text-primary dark:text-link xl:text-sm text-xs truncate break-words">
+                  {{ tx.to }}
+                </RouterLink>
+                <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer xl:w-5 w-2.5" v-show="tx.to"
+                  @click="copyWebsite(tx.to || '')" />
+              </div>
+            </div>
+          </div>
+          <div v-if="!!logsERC20.length" class="flex xl:flex-row flex-col gap-1">
+            <div class="xl:text-sm text-xs w-60 items-start">ERC-20 Token Transferred</div>
+            <div
+              class="truncate max-h-[300px] !overflow-scroll flex flex-col gap-1 rounded-lg border-base-400 border xl:px-5 px-2 xl:py-3 py-1 max-w-full">
+              <div v-for="(log, index) of logsERC20" class="flex gap-1" :key="index">
+                <span class="text-white font-semibold xl:text-sm text-xs">From</span>
+                <div class="flex">
+                  <RouterLink :to="`/${chain}/account/${log.from}`" class="text-link xl:text-sm text-xs">
+                    {{ log.from }}</RouterLink>
                 </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="xl:p-4 p-2 xl:text-sm text-xs">To</td>
-              <td class="truncate py-3">
-                <div class="flex gap-1 items-center">
-                  <RouterLink :to="`/${chain}/account/${tx.to}`" class="text-primary dark:text-link">
-                    {{ tx.to }}
-                  </RouterLink>
-                  <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="tx.to"
-                    @click="copyWebsite(tx.to || '')" />
+                <span class="text-white font-semibold xl:text-sm text-xs">to</span>
+                <div class="flex">
+                  <RouterLink :to="`/${chain}/account/${log.to}`" class="text-link xl:text-sm text-xs">
+                    {{ log.to }}</RouterLink>
                 </div>
-              </td>
-            </tr>
-            <tr v-if="!!logsERC20.length">
-              <td class="xl:p-4 p-2 xl:text-sm text-xs items-start">ERC-20 Token Transferred</td>
-              <td
-                class="truncate max-h-[300px] !overflow-scroll flex flex-col gap-1 rounded-lg border-base-400 border px-5 py-3">
-                <div v-for="(log, index) of logsERC20" class="flex gap-1" :key="index">
-                  <span class="text-white font-semibold">From</span>
-                  <div class="flex">
-                    <RouterLink :to="`/${chain}/account/${log.from}`" class="text-link">
-                      {{ log.from }}</RouterLink>
-                  </div>
-                  <span class="text-white font-semibold">to</span>
-                  <div class="flex">
-                    <RouterLink :to="`/${chain}/account/${log.to}`" class="text-link">
-                      {{ log.to }}</RouterLink>
-                  </div>
-                  <span class="text-white font-semibold">For</span>
-                  <span>{{ formatNumber(Number(log.amount) / 10 ** (tokens[log.token]?.decimals || 6)) }}</span>
-                  <span class="text-white font-semibold">{{ tokens[log.token]?.symbol }}</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <span class="text-white font-semibold xl:text-sm text-xs">For</span>
+                <span class="xl:text-sm text-xs">{{ formatNumber(Number(log.amount) / 10 ** (tokens[log.token]?.decimals || 6)) }}</span>
+                <span class="text-white font-semibold xl:text-sm text-xs">{{ tokens[log.token]?.symbol }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="toast" v-show="resultCopy === true">
