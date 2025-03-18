@@ -16,6 +16,15 @@ class Web3Service {
     }
     return Web3Service.singletonInstance;
   }
+
+  public async isAccountEVM(address: string) {
+    try {
+      const code = await this.web3.eth.getCode(address);
+      return code === '0x';
+    } catch (error) {
+      return false
+    }
+  }
 }
 
 const web3Service = new Web3Service();

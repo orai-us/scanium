@@ -6,6 +6,7 @@ import { shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import TokenElement from '../dynamic/TokenElement.vue';
 import Pagination from '../pagination/Pagination.vue';
+import web3Service from '@/service/web3Service';
 
 const props = defineProps(["address", "chain"]);
 
@@ -60,6 +61,14 @@ function handlePagination(page: number) {
   router.push({ path: `${route.fullPath}`, query: { ...route.query, page } });
 }
 
+async function handleRedirect(address: string) {
+  const isAccount = await web3Service.isAccountEVM(address);
+  if (isAccount)
+    router.push({ path: `/${props.chain}/account/${address}` })
+  else
+    router.push({ path: `/${props.chain}/contracts-evm/${address}` })
+}
+
 </script>
 
 <template>
@@ -105,14 +114,14 @@ function handlePagination(page: number) {
             </RouterLink>
           </td>
           <td class="truncate py-3">
-            <RouterLink :to="`/${chain}/account/${v.from}`" class="text-primary dark:text-link" v-if="v.from">
+            <span class="text-primary dark:text-link cursor-pointer" v-if="v.from" v-on:click="handleRedirect(v.from)">
               {{ shortenTxHash(v.from) }}
-            </RouterLink>
+            </span>
           </td>
           <td class="truncate py-3">
-            <RouterLink :to="`/${chain}/account/${v.to}`" class="text-primary dark:text-link" v-if="v.to">
+            <span class="text-primary dark:text-link cursor-pointer" v-if="v.to" v-on:click="handleRedirect(v.to)">
               {{ shortenTxHash(v.to) }}
-            </RouterLink>
+            </span>
           </td>
           <td class="py-3 flex gap-1">
             <TokenElement :value="{amount: v.fee, denom:'aorai'}"/>
