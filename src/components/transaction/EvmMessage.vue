@@ -54,45 +54,45 @@ const copyWebsite = async (url: string) => {
 </script>
 
 <template>
-  <div class="mt-5">
-    <div class="mb-4 flex flex-row gap-10">
+  <div class="mt-5 xl:w-full w-[65%]">
+    <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
       <div class="w-40 xl:text-sm text-xs">EVM Tx Hash:</div>
-      <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/tx/${message.ethereumTxHash}`" class="text-link xl:text-sm text-[12px]">
+      <div class="flex gap-2 items-center">
+        <RouterLink :to="`/${chain}/tx/${message.ethereumTxHash}`" class="text-link xl:text-sm text-[12px] truncate break-words w-full">
           {{ message.ethereumTxHash }}</RouterLink>
-        <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.ethereumTxHash"
+        <Icon icon="mdi:content-copy" class="cursor-pointer xl:w-5 w-3" v-show="message.ethereumTxHash"
           @click="copyWebsite(message.ethereumTxHash || '')" />
       </div>
     </div>
-    <div class="mb-4 flex flex-row gap-10">
+    <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
       <div class="w-40 xl:text-sm text-xs">Cosmos Sender:</div>
-      <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/account/${message.senderCosmos}`" class="text-link xl:text-sm text-[12px]">
+      <div class="flex gap-2 items-center">
+        <RouterLink :to="`/${chain}/account/${message.senderCosmos}`" class="text-link xl:text-sm text-[12px] truncate break-words">
           {{ message.senderCosmos }}</RouterLink>
-        <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.senderCosmos"
+        <Icon icon="mdi:content-copy" class="cursor-pointer xl:w-5 w-3" v-show="message.senderCosmos"
           @click="copyWebsite(message.senderCosmos || '')" />
       </div>
 
     </div>
-    <div class="mb-4 flex flex-row gap-10">
+    <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
       <div class="w-40 xl:text-sm text-xs">EVM Sender:</div>
-      <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/account/${message.sender}`" class="text-link xl:text-sm text-[12px]">
+      <div class="flex gap-2 items-center">
+        <RouterLink :to="`/${chain}/account/${message.sender}`" class="text-link xl:text-sm text-[12px] truncate break-words">
           {{ message.sender }}</RouterLink>
-        <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.sender"
+        <Icon icon="mdi:content-copy" class="cursor-pointer xl:w-5 w-3" v-show="message.sender"
           @click="copyWebsite(message.sender || '')" />
       </div>
     </div>
-    <div class="mb-4 flex flex-row gap-10">
+    <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
       <div class="w-40 xl:text-sm text-xs">Recipient:</div>
-      <div class="flex gap-1 justify-center items-center">
-        <RouterLink :to="`/${chain}/account/${message.recipient}`" class="text-link xl:text-sm text-[12px]">
+      <div class="flex gap-2 items-center">
+        <RouterLink :to="`/${chain}/account/${message.recipient}`" class="text-link xl:text-sm text-[12px] truncate break-words">
           {{ message.recipient }}</RouterLink>
-        <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="message.recipient"
+        <Icon icon="mdi:content-copy" class="cursor-pointer xl:w-5 w-3" v-show="message.recipient"
           @click="copyWebsite(message.recipient || '')" />
       </div>
     </div>
-    <div class="mb-4 flex flex-row gap-10">
+    <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
       <div class="w-40 xl:text-sm text-xs">Amount:</div>
       <div class="xl:text-sm text-[12px] flex gap-1">
         <TokenElement :value="{amount: message.amount, denom:'aorai'}"/>
