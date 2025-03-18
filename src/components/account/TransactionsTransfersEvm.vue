@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { countTxsEvmTokenTransfers, getTxsEvmTokenTransfers } from '@/service/transactionsService';
 import { useRoute, useRouter } from 'vue-router';
 import { formatNumber, shortenTxHash } from '@/utils';
-import { useFormatter } from '@/stores';
 import Pagination from '../pagination/Pagination.vue';
 import web3Service from '@/service/web3Service';
 
@@ -11,9 +10,27 @@ const props = defineProps(["address", "chain"]);
 
 const route = useRoute();
 const router = useRouter();
-const format = useFormatter();
 const txsEvm = ref([] as Array<any>);
 const totalTx = ref(0);
+const contractAddresses = ref([] as Array<string>);
+const tokens = ref({} as any);
+
+const minABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "", type: "uint8" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "symbol",
+    outputs: [{ name: "", type: "string" }],
+    type: "function",
+  },
+]
 
 const pagination = computed(() => {
   const page = route.query.page ? Number(route.query.page) : 1;
@@ -37,6 +54,11 @@ async function fetchTsxEvmByAccount() {
           linkTxEvm
         }
       });
+      const setContractAddresses: Set<string> = new Set();
+      res.data.forEach((item: any) => {
+        setContractAddresses.add(item.contractAddress)
+      })
+      contractAddresses.value = Array.from(setContractAddresses)
     }
   } catch (error) {
     console.log({ error })
@@ -59,7 +81,6 @@ onMounted(() => {
   fetchTotalTx()
 })
 
-
 watch([() => props.address, () => pagination.value.page], () => {
   fetchTsxEvmByAccount()
   fetchTotalTx()
@@ -77,6 +98,18 @@ async function handleRedirect(address: string) {
     router.push({ path: `/${props.chain}/contracts-evm/${address}` })
 }
 
+watch(() => contractAddresses.value, async () => {
+  const infoTokens: any = {};
+  if (Array.isArray(contractAddresses.value)) {
+    for (let address of contractAddresses.value) {
+      const contract = web3Service.contractMethod(minABI, address);
+      const [resSymbol, resDecimals] = await Promise.all([contract.methods.symbol().call(), contract.methods.decimals().call()]);
+      infoTokens[address] = { symbol: resSymbol, decimals: Number(resDecimals) };
+    }
+  }
+  tokens.value = infoTokens;
+})
+
 </script>
 
 <template>
@@ -90,13 +123,14 @@ async function handleRedirect(address: string) {
           <th>From</th>
           <th>To</th>
           <th>Amount</th>
+          <th>Token</th>
         </tr>
       </thead>
       <tbody class="text-sm">
         <tr v-for="(v, index) in txsEvm" :key="v.id">
           <td class="truncate py-3">
             <RouterLink :to="`/${chain}/tx/${v.linkTxEvm}`" class="text-primary dark:text-link" v-if="v.id">
-              {{ shortenTxHash(v.id) }}
+              {{ shortenTxHash(v.linkTxEvm) }}
             </RouterLink>
           </td>
           <td class="truncate py-3">
@@ -120,7 +154,10 @@ async function handleRedirect(address: string) {
             </span>
           </td>
           <td class="text-sm py-3">
-            {{ formatNumber(Number(v.amount) / 10 ** 18) }} AORAI
+            {{ formatNumber(Number(v.amount) / 10 ** (tokens[v.contractAddress].decimals || 0)) }}
+          </td>
+          <td>
+            {{ tokens[v.contractAddress]?.symbol  }}
           </td>
         </tr>
       </tbody>

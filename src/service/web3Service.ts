@@ -22,8 +22,12 @@ class Web3Service {
       const code = await this.web3.eth.getCode(address);
       return code === '0x';
     } catch (error) {
-      return false
+      return false;
     }
+  }
+
+  public contractMethod(minABI: any, address: string) {
+    return new this.web3.eth.Contract(minABI, address);
   }
 }
 
