@@ -16,7 +16,8 @@ const onClickHandler = (page: number) => {
 </script>
 <template>
   <vue-awesome-paginate :total-items="totalItems" v-model="currentPage" :items-per-page="limit" :max-pages-shown="5"
-    :show-breakpoint-buttons="false" :show-jump-buttons="true" @click="onClickHandler"/>
+    :show-breakpoint-buttons="false" :show-ending-buttons="true" first-page-content="<<" last-page-content=">>"
+    @click="onClickHandler" />
 </template>
 
 <style>
