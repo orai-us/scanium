@@ -1,6 +1,6 @@
 {
-    "chain_name": "Oraichain-Fork",
-    "registry_name": "oraichain-fork",
+    "chain_name": "Oraichain",
+    "registry_name": "oraichain",
     "api": [
       {
         "provider": "Oraichain" ,
@@ -14,7 +14,7 @@
       }
     ],
     "cosmwasm_enabled": true,
-    "sdk_version": "0.45.16",
+    "sdk_version": "0.50.9",
     "coin_type": "118",
     "min_tx_fee": "800",
     "addr_prefix": "orai",
@@ -29,4 +29,3 @@
       }
     ]
   }
-  

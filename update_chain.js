@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const chainsPath = path.join(__dirname, 'chains', 'mainnet');
+const chainsPath = path.join(__dirname, 'chains', 'testnet');
 const chainNameMap = {
   lum: 'lumnetwork',
   nym: 'nyx',

@@ -15,11 +15,11 @@ const conf = ref('');
 const dashboard = useDashboard();
 const selected = ref({} as ChainConfig);
 const wallet = ref('keplr');
-const network = ref(NetworkType.Mainnet);
+const network = ref(NetworkType.Testnet);
 const mainnet = ref([] as ChainConfig[]);
 const testnet = ref([] as ChainConfig[]);
 const chains = computed(() => {
-  return network.value === NetworkType.Mainnet ? mainnet.value : testnet.value;
+  return network.value === NetworkType.Testnet ? mainnet.value : testnet.value;
 });
 
 onMounted(() => {
@@ -27,7 +27,7 @@ onMounted(() => {
   selected.value = chainStore.current || Object.values(dashboard.chains)[0];
   initParamsForKeplr();
 
-  dashboard.loadLocalConfig(NetworkType.Mainnet).then((res) => {
+  dashboard.loadLocalConfig(NetworkType.Testnet).then((res) => {
     mainnet.value = Object.values<ChainConfig>(res);
   });
   dashboard.loadLocalConfig(NetworkType.Testnet).then((res) => {
@@ -170,7 +170,7 @@ function suggest() {
     <div class="bg-base-100 p-4 rounded text-center">
       <div class="flex text-center items-center">
         <select v-model="network" class="select select-bordered">
-          <option :value="NetworkType.Mainnet">Mainnet</option>
+          <option :value="NetworkType.Testnet">Testnet</option>
           <option :value="NetworkType.Testnet">Testnet</option>
         </select>
         <select

@@ -288,7 +288,7 @@ export const useDashboard = defineStore('dashboard', {
     return {
       status: LoadingStatus.Empty,
       source: ConfigSource.MainnetCosmosDirectory,
-      networkType: NetworkType.Mainnet,
+      networkType: NetworkType.Testnet,
       favoriteMap: favMap as Record<string, boolean>,
       chains: {} as Record<string, ChainConfig>,
       prices: {} as Record<string, any>,
@@ -366,8 +366,8 @@ export const useDashboard = defineStore('dashboard', {
       }
       // const assetOfOraichain = await getListAssetOfOraichain();
       const source: Record<string, LocalConfig> =
-        this.networkType === NetworkType.Mainnet
-          ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
+        this.networkType === NetworkType.Testnet
+          ? import.meta.glob('../../chains/testnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
       Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
         this.chains[x.chain_name] = fromLocal(x, x.chain_name);
@@ -430,7 +430,7 @@ export const useDashboard = defineStore('dashboard', {
     async loadLocalConfig(network: NetworkType) {
       const config: Record<string, ChainConfig> = {};
       const source: Record<string, LocalConfig> =
-        network === NetworkType.Mainnet
+        network === NetworkType.Testnet
           ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
       Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
