@@ -193,9 +193,9 @@ export const useBlockchain = defineStore('blockchain', {
 
     async setCurrent(name: string) {
       // Ensure chains are loaded due to asynchronous calls.
-      if (this.dashboard.length === 0) {
-        await this.dashboard.initial();
-      }
+      // if (this.dashboard.length === 0) {
+      //   await this.dashboard.initial();
+      // }
 
       // Find the case-sensitive name for the chainName, else simply use the parameter-value.
       const caseSensitiveName =
