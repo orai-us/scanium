@@ -19,7 +19,6 @@ const attributes = computed(() => {
       }
       e.attributes.forEach((item) => result.push(item))
     })
-  console.log({ result })
   return result
 });
 
@@ -54,8 +53,8 @@ const copyWebsite = async (url: string) => {
 </script>
 
 <template>
-  <div class="mt-5 xl:w-full w-[65%]">
-    <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
+  <div class="mt-5" v-if="props.events?.length">
+    <div class="mb-4 flex flex-row gap-10">
       <div class="w-40 xl:text-sm text-xs">EVM Tx Hash:</div>
       <div class="flex gap-2 items-center">
         <RouterLink :to="`/${chain}/tx/${message.ethereumTxHash}`" class="text-link xl:text-sm text-[12px] truncate break-words w-full">
@@ -95,7 +94,7 @@ const copyWebsite = async (url: string) => {
     <div class="mb-4 flex xl:gap-10 gap-2 xl:flex-row flex-col">
       <div class="w-40 xl:text-sm text-xs">Amount:</div>
       <div class="xl:text-sm text-[12px] flex gap-1">
-        <TokenElement :value="{amount: message.amount, denom:'aorai'}"/>
+        <TokenElement :value="{amount: message.amount, denom:'aorai'}" />
       </div>
     </div>
     <div class="toast" v-show="resultCopy === true">

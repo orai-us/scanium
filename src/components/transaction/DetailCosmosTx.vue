@@ -237,7 +237,7 @@ const timestamp = computed(() => {
               <div class="collapse-content" v-if="msg.typeMsg === '/ibc'">
                 <IBCMessage :value="msg.decodedValue" :type="msg.displayType" />
               </div>
-              <div class="collapse-content" v-else-if="msg.typeMsg === '/ethermint'">
+              <div class="collapse-content" v-else-if="msg.typeMsg === '/ethermint' && txLogs[i]?.events">
                 <EvmMessage :events="txLogs[i]?.events" :chain="chain" />
               </div>
               <div class="collapse-content xl:max-w-full max-w-96 overflow-scroll" v-else>
