@@ -101,10 +101,10 @@ async function handleRedirect(address: string) {
               {{ shortenTxHash(v.cosmosTransactionId) }}
             </RouterLink>
           </td>
-          <td>
-            <span
-              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] h-full w-fit flex justify-center items-center">{{
-              v.method }}</span>
+          <td class="truncate">
+            <div
+              class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-2 h-full flex justify-center items-center">{{
+              v.method }}</div>
           </td>
           <td class="text-sm py-3" :class="`${v.status ? 'text-[#39DD47]' : 'text-error'}`">
             {{ v.status ? "Success" : "Failed" }}
@@ -123,7 +123,7 @@ async function handleRedirect(address: string) {
               {{ shortenTxHash(v.to) }}
             </span>
           </td>
-          <td class="py-3 flex gap-1">
+          <td class="truncate py-3">
             <TokenElement :value="{amount: v.fee, denom:'aorai'}"/>
           </td>
           <!-- <td class="py-3">
@@ -137,7 +137,7 @@ async function handleRedirect(address: string) {
               {{ v.from === address ? "OUT" : "IN" }}
             </button>
           </td>
-          <td class="!break-normal">
+          <td class="!break-normal truncate">
             <span v-if="v.timestamp">{{ format.toDay(new Date(Number(v.timestamp)), 'from')}}</span>
             <span v-else>-</span>
           </td>
@@ -147,8 +147,8 @@ async function handleRedirect(address: string) {
     <div v-else class="flex items-center justify-center w-full h-full">
       <td>No Transactions</td>
     </div>
-    <div class="mt-4 text-center" v-if="totalTx">
-      <Pagination :totalItems="totalTx" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
-    </div>
+  </div>
+  <div class="mt-4 text-center" v-if="totalTx">
+    <Pagination :totalItems="totalTx" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
   </div>
 </template>
