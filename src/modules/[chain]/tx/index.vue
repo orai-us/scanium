@@ -9,12 +9,22 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import { toBase64 } from '@cosmjs/encoding';
 import { decodeProto } from '@/components/dynamic';
+import { useRoute, useRouter } from 'vue-router';
 const props = defineProps(['chain']);
 
+const TRANSACTION_TYPE = {
+  ALL: "all",
+  EVM: "evm",
+}
+const route = useRoute();
+const router = useRouter();
 const base = useBaseStore();
 const format = useFormatter();
 const blockchain = useBlockchain();
 const detailTxs = ref({} as any);
+const txType = computed(() => {
+  return route.query.type || TRANSACTION_TYPE.ALL;
+})
 
 const query = gql`
       query GetTransactions($orderBy: [TransactionsOrderBy!], $first: Int!, $offset: Int!) {
@@ -71,13 +81,14 @@ const transactions: any = computed(() => {
   const txs = !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents;
   const data = txs.map((item) => {
     const message = format.messages(item.tx?.body?.messages)?.split("×")[0];
-    console.log({messages: item.tx?.body?.messages})
     return {
       ...item,
       message: message === "ExecuteContract" ? "-" : formatTitle(message || ""),
-      numberMessageRemain: item.tx?.body?.messages?.length > 1 ?  item.tx?.body?.messages?.length - 1 : 0,
+      numberMessageRemain: item.tx?.body?.messages?.length > 1 ? item.tx?.body?.messages?.length - 1 : 0,
     };
   });
+  if (txType.value === TRANSACTION_TYPE.ALL) return data;
+  if (txType.value === TRANSACTION_TYPE.EVM) return data.filter((item) => item.message === "Ethereum Tx")
   return data;
 })
 
@@ -111,11 +122,25 @@ watch(transactions, (newTxs, oldTxs) => {
   getDetailTxs(txs);
 })
 
+function changeTypeTx(tx: string) {
+  router.push({ path: `${route.fullPath}`, query: { ...route.query, type: tx } });
+}
+
 </script>
 
 <template>
   <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl">
-    <div class="bg-base-100 overflow-x-auto rounded-2xl px-5 pt-5">
+    <div class="flex gap-2 mb-4 mt-4 ml-4">
+      <button :class="{ 'px-2 py-1 bg-base rounded-md text-white': txType === TRANSACTION_TYPE.ALL }"
+        v-on:click="changeTypeTx(TRANSACTION_TYPE.ALL)">
+        All Transaction
+      </button>
+      <button :class="{ 'px-2 py-1 bg-base rounded-md text-white': txType === TRANSACTION_TYPE.EVM }"
+        v-on:click="changeTypeTx(TRANSACTION_TYPE.EVM)">
+        Transaction EVM
+      </button>
+    </div>
+    <div class="bg-base-100 overflow-x-auto rounded-2xl px-5">
       <table class="table w-full table-compact">
         <thead class="border border-base-200">
           <tr>
