@@ -19,7 +19,7 @@ const cache = new InMemoryCache();
 const sentryDns = import.meta.env.VITE_SENTRY_DNS;
 
 const httpLink = createHttpLink({
-  uri: 'https://indexer.scanium.io/',
+  uri: 'https://indexer-testnet.scanium.io/'
 })
 
 export const apolloClient = new ApolloClient({
@@ -52,7 +52,8 @@ Sentry.init({
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
   tracePropagationTargets: [
     'https://scanium.io',
-    'https://indexer.scanium.io',
+    'https://indexer-testnet.scanium.io'
+    // 'https://indexer.scanium.io',
     // /^https:\/\/rpc\.orai\.io$/,
     // /^https:\/\/api\.scan\.orai\.io$/,
   ],
