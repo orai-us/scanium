@@ -1,6 +1,6 @@
 import { Web3 } from 'web3';
 
-export const givenProvider = 'https://evm.orai.io';
+export const givenProvider = 'https://testnet-v2.evm.orai.io';
 
 class Web3Service {
   web3: Web3;
