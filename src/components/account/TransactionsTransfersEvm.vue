@@ -157,7 +157,7 @@ watch(() => contractAddresses.value, async () => {
             {{ formatNumber(Number(v.amount) / 10 ** (tokens[v.contractAddress].decimals || 0)) }}
           </td>
           <td>
-            {{ tokens[v.contractAddress]?.symbol  }}
+            <div class="truncate px-2 py-2">{{ tokens[v.contractAddress]?.symbol  }}</div>
           </td>
         </tr>
       </tbody>
@@ -165,9 +165,9 @@ watch(() => contractAddresses.value, async () => {
     <div v-else class="flex items-center justify-center w-full h-full">
       <td>No Transactions</td>
     </div>
-    <div class="mt-4 text-center" v-if="totalTx">
-      <Pagination :totalItems="totalTx" :limit="pagination.limit" :onPagination="handlePagination"
-        :page="pagination.page" />
-    </div>
+  </div>
+  <div class="mt-4 text-center" v-if="totalTx">
+    <Pagination :totalItems="totalTx" :limit="pagination.limit" :onPagination="handlePagination"
+      :page="pagination.page" />
   </div>
 </template>
