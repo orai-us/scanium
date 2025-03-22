@@ -1,7 +1,7 @@
 import { api, METHODS } from './api';
 
 const baseUrlOraidex = 'https://tx-history-backend.oraidex.io';
-const baseUrlOptimalQueriesScanium = 'https://api-optimal-queries.scanium.io';
+const baseUrlOptimalQueriesScanium = 'https://api-optimal-queries-testnet.scanium.io';
 
 export interface ParamsGetHistoryTxs {
   addrByNetworks: string;
