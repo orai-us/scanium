@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watchEffect } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 
 import TransactionTable from "../TransactionTable.vue";
 import { labelInOutTxs } from "@/utils";
-import { countTxsByAccount, getTxsByAccount, ParamsGetTx } from "@/service/transactionsService";
+import { countTxsByAccount, getListTxByTxHashes, getTxsByAccount, ParamsGetTx } from "@/service/transactionsService";
 import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['txs', 'chain', 'address']);
@@ -13,6 +11,8 @@ const props = defineProps(['txs', 'chain', 'address']);
 const route = useRoute();
 const router = useRouter();
 const transactions = ref([]);
+const txByTxHashes = ref([] as Array<any>);
+const txsMerge = ref([] as Array<any>);
 const totalCount = ref();
 const pagination = computed(() => {
   const page = route.query.page ? Number(route.query.page) : 1;
@@ -61,58 +61,39 @@ const txHashes = computed(() => {
   return transactions.value?.map((tx: any) => tx.id);
 });
 
-const query = gql`
-      query GetTransactions($filter: TransactionFilter!) {
-        transactions(filter: $filter) {
-          results: nodes {
-            id
-            messages {
-              nodes {
-                type
-                subType
-              }
-            }
-            tokenTransfers {
-              nodes {
-                denom
-                from
-                to
-                amount
-                type
-              }
-            }
-          }
-        }
-      }
-    `;
 
-const variables = computed(() => {
-  return {
-    filter: {
-      id: { in: txHashes.value }
-    },
-  };
-});
+async function fetchListTxByTxHashes (txHashes: Array<any>){
+  try {
+    const res = await getListTxByTxHashes(txHashes);
+    if (Array.isArray(res?.data)) {
+      txByTxHashes.value = res.data;
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+}
 
-const { result } = useQuery(query, variables);
+watch(() => txHashes.value, () => {
+  if (Array.isArray(txHashes.value))
+    fetchListTxByTxHashes(txHashes.value)
+})
 
-const txsMerge = computed(() => {
-  const txsOptimal = transactions.value;
-  const txsIndexer = result.value?.transactions?.results;
+watch([() => transactions.value, () => txByTxHashes.value], () => {
+  if (Array.isArray(transactions.value) && Array.isArray(txByTxHashes.value)) {
+    const data = transactions.value.map((txOptimal: any) => {
+      const searchTx = txByTxHashes.value.find((txIndexer: any) => txIndexer.id === txOptimal.id);
+      const nodes = searchTx?.transactionMessages?.map((item: any) => ({ subType: item.subType, type: item.type }));
+      const messages = { nodes }
+      const tokenTransfers = searchTx?.tokenTransfers;
 
-  const data = txsOptimal?.map((txOptimal: any) => {
-    const searchTx = txsIndexer?.find((txIndexer: any) => txIndexer.id === txOptimal.id);
-    const messages = searchTx?.messages;
-    const tokenTransfers = searchTx?.tokenTransfers;
-
-    return {
-      ...txOptimal,
-      messages,
-      tokenTransfers
-    };
-  });
-
-  return labelInOutTxs(data, props.address);
+        return {
+          ...txOptimal,
+          messages,
+          tokenTransfers
+        };
+      });
+      txsMerge.value = labelInOutTxs(data, props.address)
+  }
 })
 
 </script>

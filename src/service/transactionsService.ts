@@ -217,3 +217,15 @@ export const countEvmContract = async (address: string) => {
   const res = await api.request(config);
   return res?.data;
 };
+
+export const urlListTxByTxHashes = '/v1/transaction/by-hashes';
+export const getListTxByTxHashes = async (txHashes: Array<string>) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: urlListTxByTxHashes,
+    method: METHODS.POST,
+    data: { txHashes },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
