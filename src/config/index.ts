@@ -9,3 +9,4 @@ export const BASE_URL_OPTIMAL_QUERIES_SCANIUM = import.meta.env.VITE_BASE_URL_OP
 export const BASE_URL_EVM = import.meta.env.VITE_BASE_URL_EVM || "https://testnet-v2.evm.orai.io";
 export const BASE_URL_INDEXER = import.meta.env.VITE_BASE_URL_INDEXER || "https://indexer-testnet.scanium.io";
 export const DOMAIN_SCANIUM = import.meta.env.VITE_DOMAIN_SCANIUM || "https://scanium.io";
+export const NETWORK_TYPE = import.meta.env.VITE_NETWORK_TYPE || 1;

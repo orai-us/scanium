@@ -9,13 +9,14 @@ import {
 } from '@/stores';
 import { CosmosRestClient } from '@/libs/client';
 import { onMounted } from 'vue';
+import { NETWORK_TYPE } from '@/config';
 
 const error = ref('');
 const conf = ref('');
 const dashboard = useDashboard();
 const selected = ref({} as ChainConfig);
 const wallet = ref('keplr');
-const network = ref(NetworkType.Mainnet);
+const network = ref(NETWORK_TYPE);
 const mainnet = ref([] as ChainConfig[]);
 const testnet = ref([] as ChainConfig[]);
 const chains = computed(() => {

@@ -3,6 +3,7 @@ import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
 import { getListAssetOfOraichain } from '@/service/assetsService';
+import { NETWORK_TYPE } from '@/config';
 
 export enum EndpointType {
   rpc,
@@ -288,7 +289,7 @@ export const useDashboard = defineStore('dashboard', {
     return {
       status: LoadingStatus.Empty,
       source: ConfigSource.MainnetCosmosDirectory,
-      networkType: NetworkType.Mainnet,
+      networkType: NETWORK_TYPE,
       favoriteMap: favMap as Record<string, boolean>,
       chains: {} as Record<string, ChainConfig>,
       prices: {} as Record<string, any>,
