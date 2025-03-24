@@ -9,13 +9,14 @@ import {
 } from '@/stores';
 import { CosmosRestClient } from '@/libs/client';
 import { onMounted } from 'vue';
+import { NETWORK_TYPE } from '@/config';
 
 const error = ref('');
 const conf = ref('');
 const dashboard = useDashboard();
 const selected = ref({} as ChainConfig);
 const wallet = ref('keplr');
-const network = ref(NetworkType.Testnet);
+const network = ref(NETWORK_TYPE);
 const mainnet = ref([] as ChainConfig[]);
 const testnet = ref([] as ChainConfig[]);
 const chains = computed(() => {
@@ -27,7 +28,7 @@ onMounted(() => {
   selected.value = chainStore.current || Object.values(dashboard.chains)[0];
   initParamsForKeplr();
 
-  dashboard.loadLocalConfig(NetworkType.Testnet).then((res) => {
+  dashboard.loadLocalConfig(NetworkType.Mainnet).then((res) => {
     mainnet.value = Object.values<ChainConfig>(res);
   });
   dashboard.loadLocalConfig(NetworkType.Testnet).then((res) => {
@@ -170,7 +171,7 @@ function suggest() {
     <div class="bg-base-100 p-4 rounded text-center">
       <div class="flex text-center items-center">
         <select v-model="network" class="select select-bordered">
-          <option :value="NetworkType.Testnet">Testnet</option>
+          <option :value="NetworkType.Mainnet">Mainnet</option>
           <option :value="NetworkType.Testnet">Testnet</option>
         </select>
         <select

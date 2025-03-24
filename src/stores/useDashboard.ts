@@ -3,6 +3,7 @@ import { get } from '../libs/http';
 import type { Chain, Asset } from '@ping-pub/chain-registry-client/dist/types';
 import { useBlockchain } from './useBlockchain';
 import { getListAssetOfOraichain } from '@/service/assetsService';
+import { NETWORK_TYPE } from '@/config';
 
 export enum EndpointType {
   rpc,
@@ -288,7 +289,7 @@ export const useDashboard = defineStore('dashboard', {
     return {
       status: LoadingStatus.Empty,
       source: ConfigSource.MainnetCosmosDirectory,
-      networkType: NetworkType.Testnet,
+      networkType: NETWORK_TYPE,
       favoriteMap: favMap as Record<string, boolean>,
       chains: {} as Record<string, ChainConfig>,
       prices: {} as Record<string, any>,
@@ -366,8 +367,8 @@ export const useDashboard = defineStore('dashboard', {
       }
       // const assetOfOraichain = await getListAssetOfOraichain();
       const source: Record<string, LocalConfig> =
-        this.networkType === NetworkType.Testnet
-          ? import.meta.glob('../../chains/testnet/*.json', { eager: true })
+        this.networkType === NetworkType.Mainnet
+          ? import.meta.glob('../../chains/mainnet/*.json', { eager: true })
           : import.meta.glob('../../chains/testnet/*.json', { eager: true });
       Object.values<LocalConfig>(source).forEach((x: LocalConfig) => {
         this.chains[x.chain_name] = fromLocal(x, x.chain_name);
