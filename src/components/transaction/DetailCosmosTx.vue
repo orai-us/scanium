@@ -114,8 +114,8 @@ async function fetchBlockByHeight(height: string | number) {
 }
 
 watchEffect(() => {
-  const height = Number(tx.value?.txResponse?.height).toString();
-  if (height)
+  const height = Number(tx.value?.txResponse?.height);
+  if (!isNaN(height))
     fetchBlockByHeight(height)
 })
 
