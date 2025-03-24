@@ -33,28 +33,34 @@ function changeStatusSupported(supported: boolean) {
 async function fetchBalancesCw20() {
   const assets = blockchain.current?.assets;
 
-  if (Array.isArray(assets)) {
-    const assetCw20s = assets.filter((item: any) => item?.type_asset === "cw20");
-    if (!assetCw20s) return;
-    const contractAddresses = [];
-    for (const asset of assetCw20s) {
-      if (!!asset) contractAddresses.push(asset.base);
-    }
+  try {
+    if (Array.isArray(assets)) {
+      const assetCw20s = assets.filter((item: any) => item?.type_asset === "cw20");
+      if (!assetCw20s) return;
+      const contractAddresses = [];
+      for (const asset of assetCw20s) {
+        if (!!asset) contractAddresses.push(asset.base);
+      }
 
-    const multiplyContract = await getCw20Balances(props.address, contractAddresses);
-    if (!!multiplyContract && multiplyContract.data) {
-      const returnData = multiplyContract.data.return_data;
-      if (!!returnData) {
-        const returnDataBalance = returnData.map((rs: any) => JSON.parse(atob(rs.data)).balance);
-        const balances = returnDataBalance?.map((item: string, index: number) => ({
-          denom: assetCw20s[index].denom_units[1].denom,
-          amount: (Number(item)).toString()
-        })).filter((balance: any) => balance?.amount != '0');
-        if (!balances) return;
-        balancesChain.value = balances;
+      const multiplyContract = await getCw20Balances(props.address, contractAddresses);
+      if (!!multiplyContract && multiplyContract.data) {
+        const returnData = multiplyContract.data.return_data;
+        if (!!returnData) {
+          const returnDataBalance = returnData.map((rs: any) => JSON.parse(atob(rs.data)).balance);
+          const balances = returnDataBalance?.map((item: string, index: number) => ({
+            denom: assetCw20s[index].denom_units[1].denom,
+            amount: (Number(item)).toString()
+          })).filter((balance: any) => balance?.amount != '0');
+          if (!balances) return;
+          balancesChain.value = balances;
+        }
       }
     }
+  } catch (error) {
+    balancesChain.value = []
+    console.log({error})
   }
+
 }
 
 async function fetchPricePoolTokens() {
@@ -325,7 +331,7 @@ const tipMsg = computed(() => {
                 {{ formatNumber(balanceItem?.amount) }} {{ balanceItem?.display?.toUpperCase() }}
               </div>
               <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
-                {{ formatNumber(balanceItem?.amount) }} 
+                {{ formatNumber(balanceItem?.amount) }}
                 <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(balanceItem?.denom?.toUpperCase() || '')" >
                   <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(balanceItem?.denom?.toUpperCase()) }}</span>
                   <Icon icon="mdi:content-copy" class="cursor-pointer w-3" />
@@ -350,7 +356,7 @@ const tipMsg = computed(() => {
                 {{ formatNumber(delegationItem?.amount) }} {{ delegationItem?.denom?.toUpperCase() }}
               </div>
               <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
-                {{ formatNumber(delegationItem?.amount) }} 
+                {{ formatNumber(delegationItem?.amount) }}
                 <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(delegationItem?.denom?.toUpperCase() || '')" >
                   <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(delegationItem?.denom?.toUpperCase()) }}</span>
                   <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
@@ -375,7 +381,7 @@ const tipMsg = computed(() => {
                 {{ formatNumber(rewardItem?.amount) }} {{ rewardItem?.denom?.toUpperCase() }}
               </div>
               <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
-                {{ formatNumber(rewardItem?.amount) }} 
+                {{ formatNumber(rewardItem?.amount) }}
                 <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(rewardItem?.denom?.toUpperCase() || '')" >
                   <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(rewardItem?.denom?.toUpperCase()) }}</span>
                   <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
@@ -400,7 +406,7 @@ const tipMsg = computed(() => {
                 {{ formatNumber(unbondingAssets[0]?.amount) }} {{ unbondingAssets[0]?.denom?.toUpperCase() }}
               </div>
               <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
-                {{ formatNumber(unbondingAssets[0]?.amount) }} 
+                {{ formatNumber(unbondingAssets[0]?.amount) }}
                 <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(unbondingAssets[0]?.denom?.toUpperCase() || '')" >
                   <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(unbondingAssets[0]?.denom?.toUpperCase()) }}</span>
                   <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
