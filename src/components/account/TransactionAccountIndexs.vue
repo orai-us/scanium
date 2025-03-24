@@ -61,7 +61,6 @@ const txHashes = computed(() => {
   return transactions.value?.map((tx: any) => tx.id);
 });
 
-
 async function fetchListTxByTxHashes (txHashes: Array<any>){
   try {
     const res = await getListTxByTxHashes(txHashes);
