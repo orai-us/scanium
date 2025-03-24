@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { getTxsTokenTransfer } from '@/service/transactionsService';
+import { getListTxByTxHashes, getTxsTokenTransfer } from '@/service/transactionsService';
 import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { formatSmallNumber, shortenTxHash } from '@/utils';
@@ -15,6 +14,7 @@ const format = useFormatter();
 const route = useRoute();
 const router = useRouter();
 const tokenTransfers = ref([]);
+const txByTxHashes = ref([] as Array<any>);
 
 const pagination = computed(() => {
   const page = route.query.page ? Number(route.query.page) : 1;
@@ -47,41 +47,24 @@ const txHashes = computed(() => {
   return tokenTransfers.value?.map((tx: any) => tx.transactionId);
 });
 
-const query = gql`
-     query GetTransactions($filter: TransactionFilter!) {
-      transactions(filter: $filter) {
-          results: nodes {
-            id
-            blockNumber
-            gasUsed
-            timestamp
-            sender
-            code
-            fee
-            messages {
-              nodes {
-                type
-                subType
-              }
-            }
-          }
-          totalCount
-        }
-      }
-    `;
+async function fetchListTxByTxHashes (txHashes: Array<any>){
+  try {
+    const res = await getListTxByTxHashes(txHashes);
+    if (Array.isArray(res?.data)) {
+      txByTxHashes.value = res.data;
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+}
 
-const variables = computed(() => {
-  return {
-    filter: {
-      id: { in: txHashes.value }
-    },
-  };
-});
-
-const { result } = useQuery(query, variables);
+watch(() => txHashes.value, () => {
+  if (Array.isArray(txHashes.value))
+    fetchListTxByTxHashes(txHashes.value)
+})
 
 const transactions = computed(() => {
-  const txsIndexer = result.value?.transactions?.results;
+  const txsIndexer = txByTxHashes.value;
   if (Array.isArray(txsIndexer) && Array.isArray(tokenTransfers.value) && tokenMap) {
     const result: any[] | undefined = [];
     tokenTransfers.value.forEach((item: any) => {
@@ -110,7 +93,7 @@ const transactions = computed(() => {
         if (!!txTransfer.timestamp)
           timestamp = format.toDay(new Date(Number(txTransfer.timestamp)), 'from')
 
-        const nodeMessages = txTransfer.messages?.nodes;
+        const nodeMessages = txTransfer.transactionMessages;
         let numberMessageRemain = 0;
         let message: any = "";
         if (Array.isArray(nodeMessages)) {
