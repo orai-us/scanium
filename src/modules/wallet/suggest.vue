@@ -20,7 +20,7 @@ const network = ref(NETWORK_TYPE);
 const mainnet = ref([] as ChainConfig[]);
 const testnet = ref([] as ChainConfig[]);
 const chains = computed(() => {
-  return network.value === NetworkType.Testnet ? mainnet.value : testnet.value;
+  return network.value === NetworkType.Mainnet ? mainnet.value : testnet.value;
 });
 
 onMounted(() => {
