@@ -5,14 +5,13 @@ import {
   QueryDenomOwnersRequest,
   QueryDenomOwnersResponse,
 } from 'cosmjs-types/cosmos/bank/v1beta1/query';
-import { BASE_URL_COINGECKO, BASE_URL_LCD_COSMOS_BANK, BASE_URL_LCD_COSMWASM, BASE_URL_MARKET_ORAI, BASE_URL_ORAIDEX, BASE_URL_SCANIUM } from '@/config';
+import { BASE_URL_COINGECKO, BASE_URL_LCD_COSMOS_BANK, BASE_URL_LCD_COSMWASM, BASE_URL_MARKET_ORAI, BASE_URL_ORAIDEX, BASE_URL_SCANIUM, MULTICALL_ADDRESS } from '@/config';
 
 const baseMarketOrai = BASE_URL_MARKET_ORAI;
 const baseCoingecko = BASE_URL_COINGECKO;
 const baseLcdOraiBank = BASE_URL_LCD_COSMOS_BANK;
 const baseCosmwasm = BASE_URL_LCD_COSMWASM;
-const multiCallContractAddress =
-  'orai1q7x644gmf7h8u8y6y8t9z9nnwl8djkmspypr6mxavsk9ual7dj0sxpmgwd';
+const multiCallContractAddress = MULTICALL_ADDRESS;
 const baseURLScanium = BASE_URL_SCANIUM;
 const baseURLOraidex = BASE_URL_ORAIDEX;
 const urlBalancesCw20 = 'v1/balance';
@@ -90,28 +89,24 @@ export const getCw20Balances = async (
   address: string,
   denoms: Array<string>
 ) => {
-  try {
-    const multiCallUrl = `${urlSmartContract}/${multiCallContractAddress}/smart/`;
-    const msgJson = {
-      aggregate: {
-        queries: denoms.map((denom) => ({
-          address: denom,
-          data: btoa(JSON.stringify({ balance: { address } })),
-        })),
-      },
-    };
-    const url = multiCallUrl + btoa(JSON.stringify(msgJson));
-    const config = {
-      baseURL: baseCosmwasm,
-      url,
-      method: METHODS.GET,
-    };
+  const multiCallUrl = `${urlSmartContract}/${multiCallContractAddress}/smart/`;
+  const msgJson = {
+    aggregate: {
+      queries: denoms.map((denom) => ({
+        address: denom,
+        data: btoa(JSON.stringify({ balance: { address } })),
+      })),
+    },
+  };
+  const url = multiCallUrl + btoa(JSON.stringify(msgJson));
+  const config = {
+    baseURL: baseCosmwasm,
+    url,
+    method: METHODS.GET,
+  };
 
-    const res = await api.request(config);
-    return res?.data;
-  } catch (error) {
-    console.log({ error });
-  }
+  const res = await api.request(config);
+  return res?.data;
 };
 
 const LIST_ASSETS_DISABLE = [
