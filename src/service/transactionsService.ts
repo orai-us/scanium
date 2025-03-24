@@ -231,3 +231,14 @@ export const getListTxByTxHashes = async (txHashes: Array<string>) => {
   const res = await api.request(config);
   return res?.data;
 };
+
+export const urlEvmByHash = '/v1/evm-transaction';
+export const getEvmByHash = async (txHash: string)=>{
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlEvmByHash}/${txHash}`,
+    method: METHODS.GET,
+  }
+  const res = await api.request(config);
+  return res?.data;
+}
