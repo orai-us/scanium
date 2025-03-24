@@ -7,3 +7,5 @@ export const BASE_URL_ORAIDEX = import.meta.env.VITE_BASE_URL_ORAIDEX || "https:
 export const BASE_URL_HISTORY_ORAIDEX = import.meta.env.VITE_BASE_URL_HISTORY_ORAIDEX || "https://tx-history-backend.oraidex.io";
 export const BASE_URL_OPTIMAL_QUERIES_SCANIUM = import.meta.env.VITE_BASE_URL_OPTIMAL_QUERIES_SCANIUM || "https://api-optimal-queries-testnet.scanium.io";
 export const BASE_URL_EVM = import.meta.env.VITE_BASE_URL_EVM || "https://testnet-v2.evm.orai.io";
+export const BASE_URL_INDEXER = import.meta.env.VITE_BASE_URL_INDEXER || "https://indexer-testnet.scanium.io";
+export const DOMAIN_SCANIUM = import.meta.env.VITE_DOMAIN_SCANIUM || "https://scanium.io";
