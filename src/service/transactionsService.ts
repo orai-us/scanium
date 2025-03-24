@@ -108,10 +108,12 @@ export const mergeTxsOptimalAndIndexer = (
     const searchTx = txsIndexer?.find(
       (txIndexer: any) => txIndexer.id === txOptimal.id
     );
-    const messages = searchTx?.messages;
+    const transactionMessages = searchTx?.transactionMessages;
     return {
       ...txOptimal,
-      messages,
+      messages: {
+        nodes: transactionMessages
+      },
     };
   });
 };

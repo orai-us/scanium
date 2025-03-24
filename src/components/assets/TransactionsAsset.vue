@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 
 import TransactionTable from "../TransactionTable.vue";
 import { formatNumber } from '@/utils';
 import { useRoute, useRouter } from 'vue-router';
-import { countTxsByDenom, getTxsByDenom, mergeTxsOptimalAndIndexer, ParamsGetTx } from '@/service/transactionsService';
+import { countTxsByDenom, getListTxByTxHashes, getTxsByDenom, mergeTxsOptimalAndIndexer, ParamsGetTx } from '@/service/transactionsService';
 
 const props = defineProps(['denom', 'chain']);
 
@@ -14,6 +14,7 @@ const route = useRoute();
 const router = useRouter();
 const transactions = ref();
 const totalCount = ref(0);
+const txByTxHashes = ref([] as Array<any>);
 const pagination = computed(() => {
   const page = route.query.page ? Number(route.query.page) : 1;
   return {
@@ -71,35 +72,25 @@ const txHashes = computed(() => {
   return transactions.value?.map((tx: any) => tx.id);
 });
 
-const query = gql`
-      query GetTransactions($filter: TransactionFilter!) {
-        transactions(filter: $filter) {
-          results: nodes {
-            id
-            messages {
-              nodes {
-                type
-                subType
-              }
-            }
-          }
-        }
-      }
-    `;
+async function fetchListTxByTxHashes (txHashes: Array<any>){
+  try {
+    const res = await getListTxByTxHashes(txHashes);
+    if (Array.isArray(res?.data)) {
+      txByTxHashes.value = res.data;
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+}
 
-const variables = computed(() => {
-  return {
-    filter: {
-      id: { in: txHashes.value }
-    },
-  };
-});
-
-const { result } = useQuery(query, variables);
+watch(() => txHashes.value, () => {
+  if (Array.isArray(txHashes.value))
+    fetchListTxByTxHashes(txHashes.value)
+})
 
 const txsMerge = computed(() => {
   const txsOptimal = transactions.value;
-  const txsIndexer = result.value?.transactions?.results;
+  const txsIndexer = txByTxHashes.value;
 
   return mergeTxsOptimalAndIndexer(txsOptimal, txsIndexer);
 })
