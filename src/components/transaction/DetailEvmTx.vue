@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { useFormatter } from '@/stores';
 import { Icon } from '@iconify/vue';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
-import { computed, ref, watch, watchEffect } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import TokenElement from '../dynamic/TokenElement.vue';
 import { contractEvmERC20 } from '@/constants';
 import { formatNumber } from '@/utils';
 import web3Service from '@/service/web3Service';
+import { getEvmByHash } from '@/service/transactionsService';
 
 const props = defineProps(['hash', 'chain']);
 const format = useFormatter();
@@ -34,34 +33,19 @@ const minABI = [
   },
 ]
 
-const query = gql`
-      query GetTransactions($id: String!) {
-        evmTransaction(id: $id) {
-          results:
-            blockNumber
-            cosmosTransactionId
-            fee
-            from
-            id
-            method
-            status
-            timestamp
-            to
-            value
-        }
-      }
-    `;
-
-const variables = computed(() => {
-  return { id: props.hash }
-});
-
-const { result } = useQuery(query, variables);
+async function fetchEvmByHash(hash: string){
+  try {
+    const res = await getEvmByHash(hash)
+    if(res.data){
+      tx.value = res.data
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+}
 
 watchEffect(() => {
-  if (result.value?.evmTransaction) {
-    tx.value = result.value.evmTransaction
-  }
+  if (props.hash) fetchEvmByHash(props.hash)
 })
 
 async function getLogsTx() {
@@ -170,8 +154,8 @@ const copyWebsite = async (url: string) => {
           <div class="flex xl:flex-row flex-col gap-1">
             <div class="xl:text-sm text-xs w-60">Height</div>
             <div class="">
-              <RouterLink :to="`/${props.chain}/block/${tx.results}`"
-                class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.results }}
+              <RouterLink :to="`/${props.chain}/block/${tx.blockNumber}`"
+                class="text-primary dark:text-link xl:text-sm text-xs">{{ tx.blockNumber }}
               </RouterLink>
             </div>
           </div>
