@@ -5,15 +5,16 @@ import {
   QueryDenomOwnersRequest,
   QueryDenomOwnersResponse,
 } from 'cosmjs-types/cosmos/bank/v1beta1/query';
+import { BASE_URL_COINGECKO, BASE_URL_LCD_COSMOS_BANK, BASE_URL_LCD_COSMWASM, BASE_URL_MARKET_ORAI, BASE_URL_ORAIDEX, BASE_URL_SCANIUM } from '@/config';
 
-const baseMarketOrai = 'https://price.market.orai.io';
-const baseCoingecko = 'https://api.coingecko.com/api/v3';
-const baseLcdOraiBank = 'https://lcd.orai.io/cosmos/bank';
-const baseCosmwasm = 'https://lcd.orai.io/cosmwasm/wasm';
+const baseMarketOrai = BASE_URL_MARKET_ORAI;
+const baseCoingecko = BASE_URL_COINGECKO;
+const baseLcdOraiBank = BASE_URL_LCD_COSMOS_BANK;
+const baseCosmwasm = BASE_URL_LCD_COSMWASM;
 const multiCallContractAddress =
   'orai1q7x644gmf7h8u8y6y8t9z9nnwl8djkmspypr6mxavsk9ual7dj0sxpmgwd';
-const baseURLScanium = 'https://api-services.scanium.io';
-const baseURLOraidex = 'https://api.oraidex.io'
+const baseURLScanium = BASE_URL_SCANIUM;
+const baseURLOraidex = BASE_URL_ORAIDEX;
 const urlBalancesCw20 = 'v1/balance';
 export interface ParamsSimplePrice {
   ids: string;
