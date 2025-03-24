@@ -13,13 +13,14 @@ import { useBaseStore } from './stores/useBaseStore';
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
 import { DefaultApolloClient } from '@vue/apollo-composable';
 import * as Sentry from "@sentry/vue";
+import { BASE_URL_INDEXER, DOMAIN_SCANIUM } from './config';
 
 // apollo
 const cache = new InMemoryCache();
 const sentryDns = import.meta.env.VITE_SENTRY_DNS;
 
 const httpLink = createHttpLink({
-  uri: 'https://indexer.scanium.io/',
+  uri: BASE_URL_INDEXER
 })
 
 export const apolloClient = new ApolloClient({
@@ -51,8 +52,9 @@ Sentry.init({
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
   tracePropagationTargets: [
-    'https://scanium.io',
-    'https://indexer.scanium.io',
+    DOMAIN_SCANIUM,
+    BASE_URL_INDEXER
+    // 'https://indexer.scanium.io',
     // /^https:\/\/rpc\.orai\.io$/,
     // /^https:\/\/api\.scan\.orai\.io$/,
   ],
