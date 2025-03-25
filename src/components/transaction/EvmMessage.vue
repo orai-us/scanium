@@ -19,7 +19,6 @@ const attributes = computed(() => {
       }
       e.attributes.forEach((item) => result.push(item))
     })
-  console.log({ result })
   return result
 });
 

@@ -43,6 +43,7 @@ const pagination = computed(() => {
 async function fetchTsxEvmByAccount() {
   try {
     const res = await getTxsEvmTokenTransfers(props.address, pagination.value);
+    console.log
     if (Array.isArray(res?.data)) {
       txsEvm.value = res.data.map((item: any) => {
         const id = item.id;
@@ -154,7 +155,7 @@ watch(() => contractAddresses.value, async () => {
             </span>
           </td>
           <td class="text-sm py-3">
-            {{ formatNumber(Number(v.amount) / 10 ** (tokens[v.contractAddress].decimals || 0)) }}
+            {{ formatNumber(Number(v.amount) / 10 ** (tokens[v.contractAddress]?.decimals || 0)) }}
           </td>
           <td>
             <div class="truncate px-2 py-2">{{ tokens[v.contractAddress]?.symbol  }}</div>

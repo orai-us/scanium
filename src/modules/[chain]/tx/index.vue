@@ -71,7 +71,6 @@ const transactions: any = computed(() => {
   const txs = !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents;
   const data = txs.map((item) => {
     const message = format.messages(item.tx?.body?.messages)?.split("×")[0];
-    console.log({messages: item.tx?.body?.messages})
     return {
       ...item,
       message: message === "ExecuteContract" ? "-" : formatTitle(message || ""),
