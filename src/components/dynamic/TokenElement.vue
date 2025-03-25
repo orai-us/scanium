@@ -34,8 +34,8 @@ watchEffect(() => {
 
 </script>
 <template>
-  <div class="flex gap-1 items-center" >
-    <span v-html="formatSmallNumber(Number(value.amount) / 10 ** exponent)" class="xl:text-sm text-xs"></span>
-    <span class="xl:text-sm text-xs">{{ symbol }}</span>
+  <div class="flex gap-1 xl:text-sm text-[12px]" >
+    <span v-html="formatSmallNumber(Number(value.amount) / 10 ** exponent)"></span>
+    <span>{{ symbol }}</span>
   </div>
 </template>

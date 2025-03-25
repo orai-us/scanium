@@ -1,8 +1,9 @@
 import { CHAIN_INDEXS } from '@/constants';
 import { useBaseStore } from '@/stores';
 import { api, METHODS } from './api';
+import { BASE_URL_OPTIMAL_QUERIES_SCANIUM } from '@/config';
 
-const baseUrlOptimalQueriesScanium = 'https://api-optimal-queries.scanium.io';
+const baseUrlOptimalQueriesScanium = BASE_URL_OPTIMAL_QUERIES_SCANIUM;
 const urlInfoBlock = '/v1/block';
 export const getBlockByHeight = async (height?: number | string) => {
   const config = {

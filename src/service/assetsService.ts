@@ -89,24 +89,28 @@ export const getCw20Balances = async (
   address: string,
   denoms: Array<string>
 ) => {
-  const multiCallUrl = `${urlSmartContract}/${multiCallContractAddress}/smart/`;
-  const msgJson = {
-    aggregate: {
-      queries: denoms.map((denom) => ({
-        address: denom,
-        data: btoa(JSON.stringify({ balance: { address } })),
-      })),
-    },
-  };
-  const url = multiCallUrl + btoa(JSON.stringify(msgJson));
-  const config = {
-    baseURL: baseCosmwasm,
-    url,
-    method: METHODS.GET,
-  };
+  try {
+    const multiCallUrl = `${urlSmartContract}/${multiCallContractAddress}/smart/`;
+    const msgJson = {
+      aggregate: {
+        queries: denoms.map((denom) => ({
+          address: denom,
+          data: btoa(JSON.stringify({ balance: { address } })),
+        })),
+      },
+    };
+    const url = multiCallUrl + btoa(JSON.stringify(msgJson));
+    const config = {
+      baseURL: baseCosmwasm,
+      url,
+      method: METHODS.GET,
+    };
 
-  const res = await api.request(config);
-  return res?.data;
+    const res = await api.request(config);
+    return res?.data;
+  } catch (error) {
+    console.log({ error });
+  }
 };
 
 const LIST_ASSETS_DISABLE = [
