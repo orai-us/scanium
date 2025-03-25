@@ -141,15 +141,30 @@ async function confirm() {
   }
 }
 
-const handleSearchAccountContract = (type: string, value: string) => {
+enum TYPE_SEARCH {
+  ACCOUNT,
+  CONTRACT,
+  VALIDATOR
+}
+
+const handleSearchAccountContract = (type: TYPE_SEARCH, value: string) => {
   const current = blockchain?.current?.chainName || '';
-  if (type === "ACCOUNT") {
-    vueRouters.push({ path: `/${current}/account/${value}` });
-  } else {
-    wasmStore.wasmClient.getWasmContractInfo(value).then((x) => {
-      vueRouters.push({ path: `/${current}/cosmwasm/${Number(x?.codeId)}/transactions`, query: { contract: value } });
-    });
+  switch (type) {
+    case TYPE_SEARCH.ACCOUNT:
+      vueRouters.push({ path: `/${current}/account/${value}` });
+      return;
+    case TYPE_SEARCH.CONTRACT:
+      wasmStore.wasmClient.getWasmContractInfo(value).then((x) => {
+        vueRouters.push({ path: `/${current}/cosmwasm/${Number(x?.codeId)}/transactions`, query: { contract: value } });
+      });
+      return;
+    case TYPE_SEARCH.VALIDATOR:
+      vueRouters.push({ path: `/${current}/staking/${value}` });
+      return
+    default:
+      break;
   }
+
 }
 
 const refSearchInput = ref(null);
@@ -347,14 +362,17 @@ onClickOutside(refSearchInput, event => clickOutsideSearch.value = false);
             v-model="searchQuery" placeholder="Search by Height, Address, Contracts, and TxHash"
             v-on:keyup.enter="confirm" />
           <div class="absolute mt-2 text-sm bg-base flex flex-col w-full rounded-md shadow-sm shadow-gray-500"
-            v-show="searchQuery.length > 37 && clickOutsideSearch && !isTx && !isValidator && !searchQuery.includes('0x')">
+            v-show="searchQuery.length > 37 && clickOutsideSearch && !isTx && !searchQuery.includes('0x')">
             <div class="hover:cursor-pointer hover:bg-[#47474B] w-full px-4 py-2 rounded-t-md"
-              @click="handleSearchAccountContract('ACCOUNT', searchQuery)"><span class="flex gap-2">Search
+              @click="handleSearchAccountContract(TYPE_SEARCH.ACCOUNT, searchQuery)" v-if="!isValidator"><span class="flex gap-2">Search
                 For <p class="text-white font-bold">Account</p></span></div>
             <div class="w-full bg-stone-700 h-[1px]"></div>
             <div class="hover:cursor-pointer hover:bg-[#47474B] w-full px-4 py-2 rounded-b-md"
-              @click="handleSearchAccountContract('CONTRACT', searchQuery)"><span class="flex gap-2">Search For <p
+              @click="handleSearchAccountContract(TYPE_SEARCH.CONTRACT, searchQuery)" v-if="!isValidator"><span class="flex gap-2">Search For <p
                   class="text-white font-bold">Smart Contract</p></span></div>
+            <div class="hover:cursor-pointer hover:bg-[#47474B] w-full px-4 py-2 rounded-t-md"
+              @click="handleSearchAccountContract(TYPE_SEARCH.VALIDATOR, searchQuery)" v-if="isValidator"><span class="flex gap-2">Search
+                For <p class="text-white font-bold">Validator</p></span></div>
           </div>
         </div>
         <!-- <NavBarI18n class="hidden md:!inline-block" /> -->
