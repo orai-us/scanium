@@ -7,7 +7,7 @@ import {
   useStakingStore,
   useTxDialog,
 } from '@/stores';
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue';
 import { Icon } from '@iconify/vue';
 import type { Key, SigningInfo } from '@/types';
 import { formatSeconds } from '@/libs/utils';
@@ -15,7 +15,7 @@ import type { Validator } from 'cosmjs-types/cosmos/staking/v1beta1/staking';
 import type { Params } from 'cosmjs-types/cosmos/slashing/v1beta1/slashing';
 import { toBase64 } from '@cosmjs/encoding';
 import type { Any } from 'cosmjs-types/google/protobuf/any';
-import { consensusPubkeyToHexAddress, decodeKey, valconsToBase64 } from '@/libs';
+import { consensusPubkeyToHexAddress, decodeKey, operatorAddressToAccount, valconsToBase64 } from '@/libs';
 import { Commit } from '@cosmjs/tendermint-rpc';
 import UptimeBar from '@/components/UptimeBar.vue';
 import axios from 'axios';
@@ -47,6 +47,7 @@ const sortDes = reactive({
   field: "voting_power",
   type: SORT_TYPE.DESC
 });
+const selfBonded = ref({} as any);
 
 onMounted(async () => {
   try {
@@ -551,6 +552,41 @@ const promoteOwallet = computed(()=>{
   return list.value.filter(item=> item.v.description?.moniker === "OWALLET")
 })
 
+//Self Bonded
+watchEffect(async () => {
+  const validators = staking.validators;
+  const resultSelfBonded: any = {};
+  const selfBondedPromiseAll = [];
+  if (Array.isArray(validators)) {
+    for (let validator of validators) {
+      if (!!validator) {
+        const operatorAddress = validator.operatorAddress;
+        const addressAccount = operatorAddressToAccount(operatorAddress);
+        if (!!operatorAddress && !!addressAccount) {
+          const validatorDelegation = staking.fetchValidatorDelegation(operatorAddress, addressAccount)
+          selfBondedPromiseAll.push(validatorDelegation)
+        }
+      }
+    }
+    const resPromiseAll = await Promise.all(selfBondedPromiseAll);
+    if (Array.isArray(resPromiseAll)) {
+      for (let res of resPromiseAll) {
+        if (!!res) {
+          const delegationResponse = res.delegationResponse;
+          if (!!delegationResponse) {
+            const balance = delegationResponse.balance;
+            const operatorAddress = delegationResponse.delegation?.validatorAddress;
+            if (!!balance && !!operatorAddress) {
+              resultSelfBonded[operatorAddress] = balance;
+            }
+          }
+        }
+      }
+    }
+  }
+  selfBonded.value = resultSelfBonded;
+})
+
 </script>
 <template>
   <div>
@@ -649,6 +685,9 @@ const promoteOwallet = computed(()=>{
                 {{ $t('staking.voting_power') }}
               </th>
               <th scope="col" class="text-right uppercase">
+                Self Bonded
+              </th>
+              <th scope="col" class="text-right uppercase">
                 Uptime
               </th>
               <th scope="col" class="text-right uppercase">
@@ -724,6 +763,16 @@ const promoteOwallet = computed(()=>{
                     }}</span>
                 </div>
               </td>
+
+              <!-- 👉 Self Bonded -->
+              <td class="text-right">
+                <div class="ml-3 flex flex-col justify-center" v-if="!!selfBonded[v.operatorAddress]">
+                  <h6 class="text-sm font-weight-medium whitespace-nowrap">
+                    {{ format.formatToken(selfBonded[v.operatorAddress]) }}
+                  </h6>
+                </div>
+              </td>
+
               <!-- 👉 Uptime  -->
               <td class="text-[#39DD47] text-right text-xs">
                 <span :class="uptime && uptime > 0.95 ? 'text-green-500' : 'text-red-500'
@@ -802,6 +851,9 @@ const promoteOwallet = computed(()=>{
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('voting_power')">
                   {{ $t('staking.voting_power') }}
+                </th>
+                <th scope="col" class="text-right uppercase">
+                  Self Bonded
                 </th>
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('uptime')">
@@ -889,6 +941,16 @@ const promoteOwallet = computed(()=>{
                       }}</span>
                   </div>
                 </td>
+
+                <!-- 👉 Self Bonded -->
+                <td class="text-right">
+                  <div class="ml-3 flex flex-col justify-center" v-if="!!selfBonded[v.operatorAddress]">
+                    <h6 class="text-sm font-weight-medium whitespace-nowrap">
+                      {{ format.formatToken(selfBonded[v.operatorAddress]) }}
+                    </h6>
+                  </div>
+                </td>
+
                 <!-- 👉 Uptime  -->
                 <td class="text-[#39DD47] text-right text-xs">
                   <span :class="Number(getUpTimeValidator(v)) && Number(getUpTimeValidator(v)) > 0.95 ? 'text-green-500' : 'text-red-500'
@@ -899,10 +961,10 @@ const promoteOwallet = computed(()=>{
                   </span>
                 </td>
                 <!-- 👉 APR  -->
-                 <td class="text-right text-xs">
+                <td class="text-right text-xs">
                   <span v-if="aprs[v.operatorAddress]">{{ aprs[v.operatorAddress]?.toLocaleString("en-US",{}) }}%</span>
                   <span v-else>-</span>
-                 </td>
+                </td>
                 <!-- 👉 24h Changes -->
                 <td class="text-right text-xs" :class="change24Color(v.consensusPubkey)">
                   {{ change24Text(v.consensusPubkey) }}
