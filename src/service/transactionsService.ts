@@ -243,3 +243,15 @@ export const getEvmByHash = async (txHash: string)=>{
   const res = await api.request(config);
   return res?.data;
 }
+
+export const urlLatestTxs = 'v1/transaction/latest';
+export const getListLatestTxs = async (params: ParamsGetTx) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: urlLatestTxs,
+    method: METHODS.GET,
+    params,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
