@@ -14,12 +14,10 @@ import { formatTitle, wrapBinary } from '@/libs/utils';
 import { Event } from 'cosmjs-types/tendermint/abci/types';
 import TransactionEvent from '@/components/transaction/TransactionEvent.vue';
 import IBCMessage from '@/components/transaction/IBCMessage.vue';
-import gql from 'graphql-tag';
-import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'vue-router';
 import EvmMessage from './EvmMessage.vue';
-import { formatSmallNumber } from '@/utils';
 import TokenElement from '../dynamic/TokenElement.vue';
+import { getBlockByHeight } from '@/service/blocksService';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -29,6 +27,7 @@ const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
 const messageOpens = ref([true] as Array<boolean>);
 const logOpens = ref([true] as Array<boolean>);
+const timestampByHeight = ref();
 const route = useRoute();
 const router = useRouter();
 const tab = computed(() => {
@@ -105,34 +104,27 @@ const updateTab = (tab: string) => {
   router.push({ path: `/${props.chain}/tx/${props.hash}`, query: { ...route.query, tab } });
 }
 
-const query = gql`
-      query GetBlocks($filter: BlockFilter!) {
-        blocks(filter: $filter) {
-          results: nodes {
-            time
-          }
-        }
-      }
-    `;
+async function fetchBlockByHeight(height: string | number) {
+  try {
+    const res = await getBlockByHeight(height);
+    if (res?.data?.time) timestampByHeight.value = res.data.time;
+  } catch (error) {
+    console.log({ error })
+  }
+}
 
-const variables = computed(() => {
-  return {
-    filter: {
-      height: { equalTo: Number(tx.value?.txResponse?.height).toString() }
-    },
-  };
-});
+watchEffect(() => {
+  const height = Number(tx.value?.txResponse?.height).toString();
+  if (height)
+    fetchBlockByHeight(height)
+})
 
 const timestamp = computed(() => {
   const txResponse = tx.value?.txResponse;
   if (!txResponse) return;
   const result = txResponse.timestamp;
   if (result && result.length) return result;
-  const { result: blocks } = useQuery(query, variables);
-  const nodes = blocks.value?.blocks?.results;
-  if (Array.isArray(nodes)) {
-    if (nodes[0]?.time) return Number(nodes[0]?.time);
-  }
+  if(timestampByHeight.value) return Number(timestampByHeight.value);
   return;
 })
 
