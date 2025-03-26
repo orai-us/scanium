@@ -31,8 +31,8 @@ import {
 import { fromTimestamp } from 'cosmjs-types/helpers';
 import { computed, onMounted, ref } from 'vue';
 import TransactionStakingRpc from '@/components/staking/TransactionStakingRpc.vue';
-import TransactionStakingIndexs from '@/components/staking/TransactionStakingIndexs.vue';
 import { CHAIN_INDEXS } from '@/constants';
+import TransactionAccountIndexs from '@/components/account/TransactionAccountIndexs.vue';
 
 const props = defineProps({
   validator: {
@@ -693,7 +693,7 @@ function mapDelegators(tx: ExtraTxResponse) {
         </table>
       </div> -->
       <div v-if="CHAIN_INDEXS.includes(chain || '')">
-        <TransactionStakingIndexs :chain="chain" :account="addresses.account" />
+        <TransactionAccountIndexs :chain="chain" :address="addresses.account" />
       </div>
       <div v-else>
         <TransactionStakingRpc :txs="txs" :chain="chain" />

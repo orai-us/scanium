@@ -53,7 +53,7 @@ watchEffect(() => {
 });
 
 async function handlePagination(page: number) {
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page } });
+  router.push({ path: route.fullPath, query: { ...route.query, page } });
 }
 
 // parse massage txs
