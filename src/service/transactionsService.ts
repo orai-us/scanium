@@ -1,7 +1,8 @@
+import { BASE_URL_HISTORY_ORAIDEX, BASE_URL_OPTIMAL_QUERIES_SCANIUM } from '@/config';
 import { api, METHODS } from './api';
 
-const baseUrlOraidex = 'https://tx-history-backend.oraidex.io';
-const baseUrlOptimalQueriesScanium = 'https://api-optimal-queries.scanium.io';
+const baseUrlOraidex = BASE_URL_HISTORY_ORAIDEX;
+const baseUrlOptimalQueriesScanium = BASE_URL_OPTIMAL_QUERIES_SCANIUM;
 
 export interface ParamsGetHistoryTxs {
   addrByNetworks: string;
@@ -108,10 +109,12 @@ export const mergeTxsOptimalAndIndexer = (
     const searchTx = txsIndexer?.find(
       (txIndexer: any) => txIndexer.id === txOptimal.id
     );
-    const messages = searchTx?.messages;
+    const transactionMessages = searchTx?.transactionMessages;
     return {
       ...txOptimal,
-      messages,
+      messages: {
+        nodes: transactionMessages
+      },
     };
   });
 };

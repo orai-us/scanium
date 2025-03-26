@@ -1,6 +1,7 @@
+import { BASE_URL_EVM } from '@/config';
 import { Web3 } from 'web3';
 
-export const givenProvider = 'https://evm.orai.io';
+export const givenProvider = BASE_URL_EVM;
 
 class Web3Service {
   web3: Web3;
