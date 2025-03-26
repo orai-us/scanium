@@ -2,67 +2,52 @@
 import { CHAIN_INDEXS } from '@/constants';
 import { useBaseStore, useBlockchain, useFormatter } from '@/stores';
 import { shortenTxHash } from '@/utils';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
-import { formatTitle, parseJSONRecursive, wrapBinary } from '@/libs/utils';
-import { computed, onMounted, ref, watch } from 'vue';
+import { formatTitle, parseJSONRecursive } from '@/libs/utils';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { fromBinary } from '@cosmjs/cosmwasm-stargate';
 import { toBase64 } from '@cosmjs/encoding';
 import { decodeProto } from '@/components/dynamic';
+import { getListLatestTxs } from '@/service/transactionsService';
 const props = defineProps(['chain']);
 
 const base = useBaseStore();
 const format = useFormatter();
 const blockchain = useBlockchain();
 const detailTxs = ref({} as any);
+const pagination = reactive({
+  page: 1,
+  limit: 5
+})
+const latestTxs = ref([] as Array<any>);
 
-const query = gql`
-      query GetTransactions($orderBy: [TransactionsOrderBy!], $first: Int!, $offset: Int!) {
-        transactions(orderBy: $orderBy, first: $first, offset:$offset) {
-          results: nodes {
-            id
-            blockNumber
-            gasUsed
-            timestamp
-            sender
-            fee
-            code
-            messages {
-              nodes {
-                type
-                subType
-              }
-            }
-          }
-          totalCount
-        }
-      }
-`;
-
-const variables = computed(() => {
-  return {
-    orderBy: "BLOCK_NUMBER_DESC",
-    first: 5,
-    offset: 0
+async function fetchLatestTxs() {
+  try {
+    const res = await getListLatestTxs(pagination);
+    if(Array.isArray(res.data)){
+      latestTxs.value = res.data;
+    }
+  } catch (error) {
+    console.log({ error })
   }
+}
+
+onMounted(()=>{
+  fetchLatestTxs()
 })
 
-const { result } = useQuery(query, variables);
-
 const transactions: any = computed(() => {
-  let initTxs: never[] = [];
-  if (result.value && CHAIN_INDEXS.includes(props.chain)) {
-    initTxs = result.value.transactions?.results?.map((item: any) => ({
+  let initTxs: any[] = [];
+  if (Array.isArray(latestTxs.value) && CHAIN_INDEXS.includes(props.chain)) {
+    initTxs = latestTxs.value.map((item: any) => ({
       hash: item.id,
       code: item.code,
       timestamp: item.timestamp,
       tx: {
         body: {
-          messages: item.messages?.nodes?.map((item: any) =>
-            ({ "@type": item.type, typeUrl: item.type }))
+          messages: item.transactionMessages
         }
       },
-      subType: item.messages?.nodes[0]?.subType,
+      subType: item.transactionMessages[0]?.subType,
       height: item.blockNumber,
       fee: item.fee[0] && `${item.fee[0].amount / 1e6} ${item.fee[0].denom?.toUpperCase()}`
     }));
@@ -71,7 +56,6 @@ const transactions: any = computed(() => {
   const txs = !!initTxs ? [...base.txsInRecents, ...initTxs] : base.txsInRecents;
   const data = txs.map((item) => {
     const message = format.messages(item.tx?.body?.messages)?.split("×")[0];
-    console.log({messages: item.tx?.body?.messages})
     return {
       ...item,
       message: message === "ExecuteContract" ? "-" : formatTitle(message || ""),
