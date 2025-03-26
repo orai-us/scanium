@@ -255,3 +255,18 @@ export const getListLatestTxs = async (params: ParamsGetTx) => {
   const res = await api.request(config);
   return res?.data;
 };
+
+export const urlTxsByBlock = '/v1/transaction/by-block'
+export const getTxsByBlock = async (
+  blockNumber: number,
+  params: ParamsGetTx
+) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsByBlock}/${blockNumber}`,
+    method: METHODS.GET,
+    params,
+  }
+  const res = await api.request(config);
+  return res?.data;
+}

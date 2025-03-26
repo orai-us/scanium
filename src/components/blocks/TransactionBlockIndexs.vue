@@ -1,69 +1,63 @@
 <script lang="ts" setup>
 import { computed, ref, watchEffect } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
-import { reactive } from "vue";
 import TransactionTable from "../TransactionTable.vue";
+import { getTxsByBlock } from '@/service/transactionsService';
+import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps(['chain', 'height'])
 
 // Transaction in contract
+const route = useRoute();
+const router = useRouter();
 const transactions = ref();
 const totalCount = ref();
-const pagination = reactive({
-  limit: 10,
-  offset: 0
-})
-
-const query = gql`
-      query GetTransactions($filter: TransactionFilter!, $orderBy: [TransactionsOrderBy!], $first: Int!, $offset: Int!) {
-        transactions(filter: $filter, orderBy: $orderBy, first: $first, offset:$offset) {
-          results: nodes {
-            id
-            blockNumber
-            gasUsed
-            timestamp
-            sender
-            code
-            fee
-            messages {
-              nodes {
-                type
-                subType
-              }
-            }
-          }
-          totalCount
-        }
-      }
-    `;
-
-const variables = computed(() => {
+const pagination = computed(() => {
+  const page = route.query.page ? Number(route.query.page) : 1;
   return {
-    filter: { blockNumber: { equalTo: props.height } },
-    orderBy: "BLOCK_NUMBER_ASC",
-    first: pagination.limit,
-    offset: pagination.offset
+    page,
+    limit: 10,
+  };
+});
+
+async function fetchTxsByBlock() {
+  try {
+    const res = await getTxsByBlock(props.height, pagination.value);
+    if (Array.isArray(res?.data)) {
+      transactions.value = res.data.map((tx: any) => ({
+        ...tx,
+        messages: {
+          nodes: tx.transactionMessages
+        }
+      }))
+    }
+  } catch (error) {
+    console.log({ error })
   }
+}
+
+watchEffect(()=>{
+  fetchTxsByBlock()
 })
 
-const { result, refetch } = useQuery(query, variables);
+function handlePrevious() {
+  const page = pagination.value.page;
+  if (page === 1) return
+  router.push({ path: route.fullPath, query: { ...route.query, page: page - 1 } });
+}
 
-watchEffect(() => {
-  if (result.value) {
-    transactions.value  = result.value.transactions.results;
-    totalCount.value = result.value.transactions.totalCount;
-  }
-})
-
-function handlePagination(page: number) {
-  pagination.offset = (page - 1) * pagination.limit
-  refetch()
+function handleNext() {
+  const page = pagination.value.page;
+  router.push({ path: route.fullPath, query: { ...route.query, page: page + 1 } });
 }
 
 </script>
 
 <template>
-  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :limit="pagination.limit"
-    :handlePagination="handlePagination" />
+  <TransactionTable :transactions="transactions" :chain="chain" :txTotal="totalCount" :limit="pagination.limit" />
+  <div class="flex items-center justify-center w-full mt-5">
+    <button class="flex justify-center items-center px-4 py-2 bg-base rounded-s-lg w-20 border-r-2 border-[#383B40]"
+      v-on:click="handlePrevious">Previous</button>
+    <button class="flex justify-center items-center px-4 py-2 bg-base rounded-e-lg w-20"
+      v-on:click="handleNext">Next</button>
+  </div>
 </template>
