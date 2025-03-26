@@ -134,6 +134,16 @@ export const getTxsTokenTransfer = async (
   return res?.data;
 };
 
+export const countTxsTokenTransfer = async (address: string) => {
+  const config = {
+    baseURL: baseUrlOptimalQueriesScanium,
+    url: `${urlTxsTokenTransfer}/${address}/count`,
+    method: METHODS.GET,
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
 const urlTxsEvmByAccount = '/v1/evm-transaction/by-account';
 export const getTxsEvmByAccount = async (
   address: string,
