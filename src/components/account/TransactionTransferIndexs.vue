@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { getListTxByTxHashes, getTxsTokenTransfer } from '@/service/transactionsService';
+import { countTxsTokenTransfer, getListTxByTxHashes, getTxsTokenTransfer } from '@/service/transactionsService';
 import { useQuery } from '@vue/apollo-composable';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { formatSmallNumber, shortenTxHash } from '@/utils';
 import { useFormatter } from '@/stores';
 import { tokenMap } from '@/libs/amm-v3';
 import { formatTitle } from '@/libs/utils';
 import TokenElement from '../dynamic/TokenElement.vue';
+import Pagination from '../pagination/Pagination.vue';
 
 const props = defineProps(["address", "chain"])
 const format = useFormatter();
@@ -15,7 +16,7 @@ const route = useRoute();
 const router = useRouter();
 const tokenTransfers = ref([]);
 const txByTxHashes = ref([] as Array<any>);
-
+const totalTxs = ref(0);
 const pagination = computed(() => {
   const page = route.query.page ? Number(route.query.page) : 1;
   return {
@@ -35,8 +36,24 @@ async function fetchTxsTokenTransfer() {
   }
 }
 
+async function fetchCountTxs(){
+  try {
+    const res = await countTxsTokenTransfer(props.address);
+    if (res?.data) {
+      totalTxs.value = Number(res.data);
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+}
+
 onMounted(() => {
   fetchTxsTokenTransfer()
+})
+
+watchEffect(() => {
+  if (props.address)
+    fetchCountTxs()
 })
 
 watch([() => props.address, () => pagination.value.page], () => {
@@ -125,12 +142,16 @@ const transactions = computed(() => {
 function handlePrevious() {
   const page = pagination.value.page;
   if (page === 1) return
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page: page - 1 } });
+  router.push({ path: `${route.fullPath}`, query: { ...route.query, page: page - 1 } });
 }
 
 function handleNext() {
   const page = pagination.value.page;
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, page: page + 1 } });
+  router.push({ path: `${route.fullPath}`, query: { ...route.query, page: page + 1 } });
+}
+
+function handlePagination(page: number) {
+  router.push({ path: `${route.fullPath}`, query: { ...route.query, page } });
 }
 
 </script>
@@ -201,11 +222,16 @@ function handleNext() {
     <div v-else class="flex items-center justify-center w-full h-full">
       <td>No Transactions</td>
     </div>
-    <div class="flex items-center justify-center w-full mt-5">
-      <button class="flex justify-center items-center px-4 py-2 bg-base rounded-s-lg w-20 border-r-2 border-[#383B40]"
-        v-on:click="handlePrevious">Previous</button>
-      <button class="flex justify-center items-center px-4 py-2 bg-base rounded-e-lg w-20"
-        v-on:click="handleNext">Next</button>
+    <div>
+      <div class="mt-4 text-center" v-if="totalTxs">
+        <Pagination :totalItems="totalTxs" :limit="pagination.limit" :onPagination="handlePagination" :page="pagination.page" />
+      </div>
+      <div class="flex items-center justify-center w-full mt-5" v-else>
+        <button class="flex justify-center items-center px-4 py-2 bg-base rounded-s-lg w-20 border-r-2 border-[#383B40]"
+          v-on:click="handlePrevious">Previous</button>
+        <button class="flex justify-center items-center px-4 py-2 bg-base rounded-e-lg w-20"
+          v-on:click="handleNext">Next</button>
+      </div>
     </div>
   </div>
 </template>
