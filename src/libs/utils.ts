@@ -8,7 +8,7 @@ export const formatTitle = (title: string) => {
     .replace(/_(\w)/g, (m, g1) => ' ' + g1.toUpperCase())
     .replace(/([A-Z])/g, ' $1')
     .trim();
-  return upperCaseTitle[0].toUpperCase() + upperCaseTitle.slice(1);
+  return upperCaseTitle[0]?.toUpperCase() + upperCaseTitle.slice(1);
 };
 
 export function getLocalObject(name: string) {

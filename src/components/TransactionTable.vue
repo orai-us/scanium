@@ -15,13 +15,21 @@ watchEffect(() => {
   if (!!props?.transactions?.length) {
     if (CHAIN_INDEXS.includes(props.chain)) {
       txs.value = props?.transactions?.map((item: any) => {
-        const firstNodeMessage = item.messages?.nodes[0];
-        const message = firstNodeMessage?.subType || format.messages([{ "@type": firstNodeMessage?.type, typeUrl: firstNodeMessage?.type }])
+        const nodes = item.messages?.nodes;
+        let firstNodeMessage, message;
+        let numberMessageRemain = 0;
+        if (Array.isArray(nodes)) {
+          firstNodeMessage = nodes[0];
+          message = firstNodeMessage?.subType || format.messages([{ "@type": firstNodeMessage?.type, typeUrl: firstNodeMessage?.type }])
+          if(nodes.length > 1){
+            numberMessageRemain = nodes.length - 1;
+          }
+        }
         return {
           txhash: item?.id,
           result: item.code === 0 ? "Success" : "Failed",
           message: formatTitle(message || ""),
-          numberMessageRemain: item.messages?.nodes.length > 1 ? item.messages?.nodes.length - 1 : 0,
+          numberMessageRemain,
           height: item.blockNumber,
           fee: item.fee[0],
           timestamp: format.toDay(new Date(Number(item.timestamp)), 'from'),
@@ -84,7 +92,7 @@ watchEffect(() => {
           </td>
           <td v-if="displayStatus">
             <button class="btn btn-xs  border rounded-lg " v-if="v.state"
-            :class="{'!bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)]': v.state ==='IN', 
+            :class="{'!bg-[rgba(39,120,77,0.20)] !text-[#39DD47] border-[rgba(39,120,77,0.20)]': v.state ==='IN',
                      '!bg-[rgba(255,82,82,0.20)] !text-[#FF5252] border-[rgba(255,82,82,0.20)]': v.state ==='OUT'}">
              {{ v.state }}
            </button>
