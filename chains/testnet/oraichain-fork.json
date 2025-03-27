@@ -1,6 +1,6 @@
 {
-    "chain_name": "Oraichain-Fork",
-    "registry_name": "oraichain-fork",
+    "chain_name": "Oraichain",
+    "registry_name": "oraichain",
     "api": [
       {
         "provider": "Oraichain" ,
@@ -14,7 +14,7 @@
       }
     ],
     "cosmwasm_enabled": true,
-    "sdk_version": "0.45.16",
+    "sdk_version": "0.50.9",
     "coin_type": "118",
     "min_tx_fee": "800",
     "addr_prefix": "orai",
@@ -31,7 +31,13 @@
         "base": "aorai",
         "symbol": "ORAI",
         "exponent": "12"
+      },
+      {
+        "base": "factory/orai1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjqtsu49d/max",
+        "symbol": "MAX",
+        "exponent": "6",
+        "coingecko_id": "max-2",
+        "logo": "https://assets.coingecko.com/coins/images/52378/standard/btc.png?1733257730"
       }
     ]
   }
-  
