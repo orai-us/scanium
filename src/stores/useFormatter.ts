@@ -231,9 +231,9 @@ export const useFormatter = defineStore('formatter', {
         let conf =
           mode === 'local'
             ? this.blockchain.current?.assets?.find(
-                // @ts-ignore
-                (x) => x.base === token.denom || x.base.denom === token.denom
-              )
+              // @ts-ignore
+              (x) => x.base === token.denom || x.base.denom === token.denom
+            )
             : this.findGlobalAssetConfig(token.denom);
 
         if (denom && denom.startsWith('ibc/')) {
@@ -279,9 +279,9 @@ export const useFormatter = defineStore('formatter', {
         let conf =
           mode === 'local'
             ? this.blockchain.current?.assets?.find(
-                // @ts-ignore
-                (x) => x.base === token.denom || x.base.denom === token.denom
-              )
+              // @ts-ignore
+              (x) => x.base === token.denom || x.base.denom === token.denom
+            )
             : this.findGlobalAssetConfig(token.denom);
 
         if (denom && denom.startsWith('ibc/')) {
@@ -310,9 +310,8 @@ export const useFormatter = defineStore('formatter', {
         if (amount < 0.01) {
           fmt = '0.[000000]';
         }
-        return `${numeral(amount).format(fmt)} ${
-          withDenom ? denom.substring(0, 10) : ''
-        }`;
+        return `${numeral(amount).format(fmt)} ${withDenom ? denom.substring(0, 10) : ''
+          }`;
       }
       return '-';
     },
@@ -336,9 +335,9 @@ export const useFormatter = defineStore('formatter', {
         let conf =
           mode === 'local'
             ? this.blockchain.current?.assets?.find(
-                // @ts-ignore
-                (x) => x.base === token.denom || x.base.denom === token.denom
-              )
+              // @ts-ignore
+              (x) => x.base === token.denom || x.base.denom === token.denom
+            )
             : this.findGlobalAssetConfig(token.denom);
 
         if (denom && denom.startsWith('ibc/')) {
@@ -497,6 +496,32 @@ export const useFormatter = defineStore('formatter', {
         return dayjs(timeValue).toNow();
       }
       return dayjs(timeValue).format('YYYY-MM-DD HH:mm:ss');
+    },
+    getRelativeTimeString(dateString: string) {
+      const date: any = new Date(dateString);
+      const now: any = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      if (diffInSeconds < 60) {
+        return `${diffInSeconds === 0 ? 1 : diffInSeconds}s ago`;
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes}m ago`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours}h ago`;
+      } else if (diffInSeconds < 604800) {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days}d ago`;
+      } else if (diffInSeconds < 2592000) {
+        const weeks = Math.floor(diffInSeconds / 604800);
+        return `${weeks}w ago`;
+      } else if (diffInSeconds < 31536000) {
+        const months = Math.floor(diffInSeconds / 2592000);
+        return `${months}mo ago`;
+      } else {
+        const years = Math.floor(diffInSeconds / 31536000);
+        return `${years}y ago`;
+      }
     },
     timestampFrom(time?: string | number | Date | Timestamp) {
       return `${this.toDay(time, "from")} (${this.toLocaleDate(time)})`;

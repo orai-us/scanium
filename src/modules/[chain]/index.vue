@@ -18,12 +18,11 @@ import CardStatisticsVertical from '@/components/CardStatisticsVertical.vue';
 import CopyAddress from '@/layouts/components/CopyAddress.vue';
 import ProposalListItem from '@/components/ProposalListItem.vue';
 import ArrayObjectElement from '@/components/dynamic/ArrayObjectElement.vue';
-
+import BlockSocket from '@/components/blocks/BlockSocket.vue';
 import sendImg from '../../assets/images/svg/send.svg';
 import delegateImg from '../../assets/images/svg/delegate.svg';
 
 const props = defineProps(['chain']);
-
 const blockchain = useBlockchain();
 const store = useIndexModule();
 const walletStore = useWalletStore();
@@ -321,7 +320,7 @@ const amount = computed({
         </div>
       </div>
     </div>
-
+    <BlockSocket v-if="props.chain.toLowerCase() === 'oraichain'" />
     <div v-if="blockchain.supportModule('governance')" class="border-t border-base-300">
       <div class="px-4 pt-4 pb-2 text-lg font-semibold text-main">
         {{ $t('index.active_proposals') }}

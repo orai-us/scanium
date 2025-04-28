@@ -11,3 +11,4 @@ export const BASE_URL_INDEXER = import.meta.env.VITE_BASE_URL_INDEXER || "https:
 export const DOMAIN_SCANIUM = import.meta.env.VITE_DOMAIN_SCANIUM || "https://scanium.io";
 export const NETWORK_TYPE = Number(import.meta.env.VITE_NETWORK_TYPE || 0);
 export const MULTICALL_ADDRESS = import.meta.env.VITE_MULTICALL_CONTRACT_ADDRESS || "orai1q7x644gmf7h8u8y6y8t9z9nnwl8djkmspypr6mxavsk9ual7dj0sxpmgwd";
+export const WS_URL = import.meta.env.VITE_WS_URL || "ws://api-services.scanium.io/ws";

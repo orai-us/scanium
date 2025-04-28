@@ -252,6 +252,7 @@
     "gas": "Gas",
     "fee": "Fee",
     "memo": "Memo",
+    "txs":"Recent Transaction",
     "no_messages": "No messages",
     "no_logs": "No logs"
   },
