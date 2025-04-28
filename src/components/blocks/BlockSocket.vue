@@ -165,7 +165,7 @@ function updateTarget() {
                 </td>
                 <td class="text-sm">
                   <div class="mt-2 font-semibold">
-                    <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px]">
+                    <span class="bg-[rgba(180,183,187,0.10)] rounded px-2 py-[1px] single-line">
                       {{ format.messages([{
                         "@type": item?.message,
                       }]) }}

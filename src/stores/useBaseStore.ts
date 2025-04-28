@@ -155,7 +155,7 @@ export const useBaseStore = defineStore('baseStore', {
         
           if(topic.type === 'REDPANDA_TOPIC_TXS') {
             if (this.txs.length >= 10) {
-              this.txs.pop();
+              this.txs.shift();
             }
             this.txs.push(topic.payload);
           }
