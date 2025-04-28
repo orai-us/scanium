@@ -212,7 +212,7 @@ function getNameValidator(validatorAddress: string) {
           <div v-if="!walletStore.currentAddress">
             <label
               class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm"
-              :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''">Connect wallet</label>
+              :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''">{{ $t('wallet.wallet_connect') }}</label>
           </div>
         </div>
 
@@ -301,8 +301,7 @@ function getNameValidator(validatorAddress: string) {
                   </div>
                   <div v-if="!walletStore.currentAddress">
                     <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
-                      class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Connect
-                      wallet</label>
+                      class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">{{ $t('wallet.wallet_connect') }}</label>
                   </div>
                 </div>
 
@@ -450,3 +449,5 @@ function getNameValidator(validatorAddress: string) {
   </div>
   <div v-else class="text-no text-sm">{{ $t('account.error') }}</div>
 </template>
+
+

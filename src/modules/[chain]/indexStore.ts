@@ -13,7 +13,7 @@ import type { Tally } from '@/types';
 import type { Coin } from '@cosmjs/stargate';
 import numeral from 'numeral';
 import { defineStore } from 'pinia';
-
+import { useI18n } from 'vue-i18n';
 export function colorMap(color: string) {
   switch (color) {
     case 'yellow':
@@ -148,17 +148,17 @@ export const useIndexModule = defineStore('module-index', {
       const staking = useStakingStore();
       const mintStore = useMintStore();
       const formatter = useFormatter();
-
+      const { t } = useI18n();
       return [
         {
-          title: 'Height',
+          title: t('account.height'),
           color: 'primary',
           icon: 'mdi-pound',
           stats: String(base?.latest?.block?.header?.height || 0),
           change: 0,
         },
         {
-          title: 'Validators',
+          title: t('uptime.validators'),
           color: 'error',
           icon: 'mdi-human-queue',
           stats: String(
@@ -167,14 +167,14 @@ export const useIndexModule = defineStore('module-index', {
           change: 0,
         },
         {
-          title: 'Supply',
+          title: t('module.supply'),
           color: 'success',
           icon: 'mdi-currency-usd',
           stats: formatter.formatToken(bank.supply!),
           change: 0,
         },
         {
-          title: 'Bonded Tokens',
+          title: t('staking.total_bonded'),
           color: 'warning',
           icon: 'mdi-lock',
           stats: formatter.formatToken({
@@ -185,14 +185,14 @@ export const useIndexModule = defineStore('module-index', {
           change: 0,
         },
         {
-          title: 'Inflation',
+          title: t('staking.inflation'),
           color: 'success',
           icon: 'mdi-chart-multiple',
           stats: formatter.formatDecimalToPercent(mintStore.inflation),
           change: 0,
         },
         {
-          title: 'Community Pool',
+          title: t('staking.community_pool'),
           color: 'primary',
           icon: 'mdi-bank',
           stats: formatter.formatToken(

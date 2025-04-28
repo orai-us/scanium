@@ -359,7 +359,7 @@ onClickOutside(refSearchInput, event => clickOutsideSearch.value = false);
           @click="clickOutsideSearch = true">
           <input
             class="input flex-1 w-full !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
-            v-model="searchQuery" placeholder="Search by Height, Address, Contracts, and TxHash"
+            v-model="searchQuery" :placeholder="$t('assets.search_by_height_address_contracts_txhash')"
             v-on:keyup.enter="confirm" />
           <div class="absolute mt-2 text-sm bg-base flex flex-col w-full rounded-md shadow-sm shadow-gray-500"
             v-show="searchQuery.length > 37 && clickOutsideSearch && !isTx && !searchQuery.includes('0x')">
@@ -375,7 +375,7 @@ onClickOutside(refSearchInput, event => clickOutsideSearch.value = false);
                 For <p class="text-white font-bold">Validator</p></span></div>
           </div>
         </div>
-        <!-- <NavBarI18n class="hidden md:!inline-block" /> -->
+        <NavBarI18n class="hidden md:!inline-block" />
         <NavbarThemeSwitcher class="!inline-block" />
         <NavbarSearch class="!inline-block" />
         <NavBarWallet />

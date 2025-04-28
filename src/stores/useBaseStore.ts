@@ -2,11 +2,10 @@ import { defineStore } from 'pinia';
 import { useBlockchain } from '@/stores';
 import { decodeTxRaw, type DecodedTxRaw } from '@cosmjs/proto-signing';
 import dayjs from 'dayjs';
-import type { Block } from '@/types';
 import { hashTx } from '@/libs';
-import { fromBase64, toBase64 } from '@cosmjs/encoding';
-import { useRouter } from 'vue-router';
+import { toBase64 } from '@cosmjs/encoding';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
+import { WS_URL } from '@/config';
 
 const compareHashEqual = (
   firstHash: Uint8Array,
@@ -26,6 +25,9 @@ export const useBaseStore = defineStore('baseStore', {
       earlest: {} as BlockResponse,
       latest: {} as BlockResponse,
       recents: [] as BlockResponse[],
+      blocks: [] as any[],
+      txs: [] as any[],
+      socket: null as WebSocket | null,
       theme: (window.localStorage.getItem('theme') || 'dark') as
         | 'light'
         | 'dark',
@@ -134,6 +136,47 @@ export const useBaseStore = defineStore('baseStore', {
     },
     async fetchAbciInfo() {
       return this.blockchain.rpc.getBaseNodeInfo();
+    },
+    async listenToBlocks() {
+      try {
+        const socket = new WebSocket(WS_URL);
+        this.socket = socket;
+        socket.onopen = () => {
+          console.log('WebSocket connection established');
+        };
+        socket.onmessage = (event) => {
+          const topic = JSON.parse(event.data); 
+          if(topic.type === 'REDPANDA_TOPIC_BLOCK') {
+            if (this.blocks.length >= 10) {
+              this.blocks.pop();
+            }
+            this.blocks.push(topic.payload);
+          }
+        
+          if(topic.type === 'REDPANDA_TOPIC_TXS') {
+            if (this.txs.length >= 10) {
+              this.txs.shift();
+            }
+            this.txs.push(topic.payload);
+          }
+        };
+
+        socket.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+
+        socket.onclose = () => {
+          console.log('WebSocket connection closed');
+        };
+      } catch (error) {
+        console.error('Error listening to blocks:', error);
+      }
+    },
+    disconnectWebSocket() {
+      if (this.socket) {
+        this.socket.close();
+        console.log('WebSocket connection closed');
+      }
     },
     // async fetchNodeInfo() {
     //     return this.blockchain.rpc.no()

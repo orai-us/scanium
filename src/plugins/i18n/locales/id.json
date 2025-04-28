@@ -68,6 +68,12 @@
     "error": "Akun tidak ada di dalam rantai"
   },
   "block": {
+    "block_proposer": "Proposer Blok",
+    "txs_count": "Jumlah Transaksi",
+    "created_time": "Waktu Dibuat",
+    "block_summary": "Rangkuman Blok",
+    "block_height": "Ketinggian Blok",
+    "block_time": "Waktu Blok",
     "estimated_time": "Estimasi Waktu",
     "countdown_for_block": "Hitung Mundur Untuk Blok",
     "countdown_for_block_input": "Masukkan Nomor Blok Ke Target Baru",
@@ -78,6 +84,9 @@
     "block_header": "Blok Teratas",
     "last_commit": "Komit Terakhir",
     "recent": "Terkini",
+    "recent_tx": "Transaksi",
+    "block_hash": "Hash Blok",
+    "block": "Blok",
     "future": "Masa Depan",
     "fees": "Biaya",
     "only_tx": "Hanya menampilkan txs di blok terbaru"
@@ -94,6 +103,7 @@
     "updated_at": "Diperbarui pada",
     "proposer_sign": "Proposer Ditandatangani",
     "proposer_not_sign": "Proposer Tidak Ditandatangani",
+    "proposer": "Proposer",
     "sign": "Ditandatangani",
     "not_sign": "Tidak Ditandatangani",
     "tips": "Tips",
@@ -101,6 +111,10 @@
     "tips_description_2": "Jika Anda ingin mengubah titik akhir rpc bawaan. pastikan bahwa `https` dan `CORS` diaktifkan pada server Anda."
   },
   "cosmwasm": {
+    "instantiate": "Instansiasi",
+    "creator_address": "Alamat Pencipta",
+    "action": "Tindakan",
+    "contracts": "Kontrak",
     "title": "Cosmos Wasm Smart Contracts",
     "code_id": "Kode Id",
     "code_hash": "Kode Hash",
@@ -124,6 +138,7 @@
     "tips_description_1": "This feature is available when deploying contracts via WELLDONE Code. For more information, please check the document at the link below."
   },
   "gov": {
+    "create_proposal": "Buat Proposal",
     "voting": "Voting",
     "passed": "Disetujui",
     "rejected": "Ditolak",
@@ -180,8 +195,11 @@
     "btn_in": "Masuk"
   },
   "staking": {
+    "apr": "Laba",
+    "sponsor": "Sponsor",
     "inflation": "Inflasi",
     "unbonding_time": "Waktu Pembatalan Tautan",
+    "community_pool": "Pool Komunitas",
     "double_sign_slashing": "Pemotongan Ganda Tanda Tangan",
     "downtime_slashing": "Pemotongan Downtime",
     "popular": "Populer",
@@ -234,6 +252,7 @@
     "text_title_3": "Untuk membuat state sync berfungsi, kita dapat mengaktifkan snapshot di $DAEMON_HOME/config/app.toml"
   },
   "tx": {
+    "result": "Hasil",
     "title": "Rangkuman",
     "tx_hash": "Tx Hash",
     "gas": "Bahan bakar",
@@ -256,6 +275,7 @@
     "signed_blocks": "Blok Tersign",
     "missing_blocks": "Blok yang Hilang",
     "add_validators": "Tambahkan Validator",
+    "validators": "Validator",
     "add": "Tambahkan"
   },
   "widget": {
@@ -269,10 +289,14 @@
   "index": {
     "rank": "Peringkat",
     "price_calculator": "Kalkulator Harga",
+    "price": "Harga",
+    "volume": "Volume",
     "close": "Tutup",
     "buy": "Beli",
     "active_proposals": "Proposal Aktif",
     "metric": "Metrics",
+    "about": "Tentang Kami",
+    "no_information": "Tidak ada informasi",
     "no_active_proposals": "Tidak ada proposal aktif",
     "more": "Selengkapnya",
     "reward": "Hadiah",
@@ -283,5 +307,32 @@
     "receive": "Terima",
     "app_versions": "Versi Aplikasi",
     "node_info": "Informasi Node"
+  },
+  "assets": {
+    "assets_dashboard": "Dasbor Aset",
+    "total_assets": "Ada",
+    "assets": "Aset",
+    "search_by_name_denom": "Cari berdasarkan Nama, Denom",
+    "search_by_height_address_contracts_txhash": "Cari berdasarkan Ketinggian, Alamat, Kontrak, dan Hash Transaksi",
+    "name": "Nama",
+    "denom": "Denom",
+    "price": "Harga"
+  },
+  "wallet": {
+    "wallet": "Dompet",
+    "my_wallet": "Dompet Saya",
+    "wallet_connect": "Hubungkan Dompet",
+    "wallet_not_connect": "Tidak Terhubung",  
+    "add": "Tambahkan",
+    "add_chain_to_keplr": " ke Dompet Keplr",
+    "keplr_description": "Jika rantai tidak resmi didukung di Keplr, Anda dapat mengirim parameter ini untuk mengaktifkan Keplr."
+  },
+  "footer": {
+    "license": "Lisensi",
+    "github": "Github"
+  },
+  "pagination": {
+    "next": "Selanjutnya",
+    "prev": "Sebelumnya"
   }
 }

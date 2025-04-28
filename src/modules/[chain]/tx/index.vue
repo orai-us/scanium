@@ -104,10 +104,10 @@ watch(transactions, (newTxs, oldTxs) => {
         <thead class="border border-base-200">
           <tr>
             <th class="text-white text-xs font-bold" style="position: relative; z-index: 2">
-              Tx Hash
+              {{ $t('tx.tx_hash') }}
             </th>
             <th class="text-white text-xs font-bold" style="position: relative; z-index: 2">
-              Result
+              {{ $t('tx.result') }}
             </th>
             <th class="text-white text-xs font-bold">
               {{ $t('account.messages') }}
@@ -118,7 +118,7 @@ watch(transactions, (newTxs, oldTxs) => {
               {{ $t('account.height') }}
             </th>
             <th class="text-white text-xs font-bold" style="position: relative; z-index: 2">
-              Time
+              {{ $t('account.time') }}
             </th>
           </tr>
         </thead>

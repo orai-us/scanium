@@ -9,13 +9,17 @@ const i18nLangs: Array<{ label: string; i18nLang: string }> = [
     i18nLang: 'en',
   },
   {
-    label: '中文',
-    i18nLang: 'cn',
+    label: 'Vietnamese',
+    i18nLang: 'vi',
   },
-  {
-    label: 'Indonesian',
-    i18nLang: 'id',
-  },
+  // {
+  //   label: '中文',
+  //   i18nLang: 'cn',
+  // },
+  // {
+  //   label: 'Indonesian',
+  //   i18nLang: 'id',
+  // },
 ];
 
 let locale = ref(useI18n({ useScope: 'global' }).locale);
@@ -45,7 +49,7 @@ const handleLangChange = (lang: string) => {
   >
     <label
       tabindex="0"
-      class="btn btn-ghost btn-circle btn-sm ml-2 rounded-lg border border-base-300 bg-base h-[44px] w-[44px]"
+      class="btn btn-ghost btn-circle btn-sm ml-2 mr-3 rounded-lg border border-base-300 bg-base h-[44px] w-[44px]"
     >
       <Icon
         icon="mdi-translate"

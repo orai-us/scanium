@@ -37,14 +37,14 @@ function changeChart(type: string) {
       :class="{ 'tab-active': kind === 'price' }"
       @click="changeChart('price')"
     >
-      Price
+      {{ $t('index.price') }}
     </a>
     <a
       class="tab text-xs text-gray-400 uppercase"
       :class="{ 'tab-active': kind === 'volume' }"
       @click="changeChart('volume')"
     >
-      Volume
+      {{ $t('index.volume') }}
     </a>
   </div>
   <ApexCharts

@@ -78,23 +78,23 @@ watch(searchQuery,()=>{
 </script>
 <template>
   <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl p-5 flex gap-2 flex-col">
-    <div class="text-white font-bold text-lg">Assets Dashboard</div>
+    <div class="text-white font-bold text-lg">{{ $t('assets.assets_dashboard') }}</div>
     <div class="w-full h-[1px] bg-base-300"></div>
     <div class="flex xl:flex-row flex-col justify-between xl:items-center mt-2 mb-2 gap-2">
-      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ totalAssets }}</span> Assets</span>
+      <span class="text-white font-bold">{{ $t('assets.total_assets') }} <span class="text-[#CBAEFF]">{{ totalAssets }}</span> {{ $t('assets.assets') }}</span>
       <input
         class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
-        v-model="searchQuery" placeholder="Search by Name, Denom" />
+        v-model="searchQuery" :placeholder="$t('assets.search_by_name_denom')" />
     </div>
 
     <div class="overflow-x-auto">
       <table class="table w-full text-sm" v-if="assets.length > 0">
         <thead>
           <tr>
-            <th class="text-white font-bold text-sm">Name</th>
+            <th class="text-white font-bold text-sm">{{ $t('assets.name') }}</th>
             <th class="text-white font-bold text-sm text-right"></th>
-            <th class="text-white font-bold text-sm text-right">Denom</th>
-            <th class="text-white font-bold text-sm text-right">Price</th>
+            <th class="text-white font-bold text-sm text-right">{{ $t('assets.denom') }}</th>
+            <th class="text-white font-bold text-sm text-right">{{ $t('assets.price') }}</th>
             <!-- <th class="text-white font-bold text-sm text-right">Total Supply</th> -->
             <!-- <th class="text-white font-bold text-sm text-right">Circulating Supply</th> -->
           </tr>

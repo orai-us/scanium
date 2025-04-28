@@ -108,7 +108,9 @@ function suggest() {
         class="btn !bg-primary text-white px-10 hover:brightness-150"
         @click="suggest"
       >
-        Add {{ selected.chainName }} TO Keplr Wallet
+        <!-- Add {{ selected.chainName }} TO Keplr Wallet -->
+        {{ $t('wallet.add') + " " + selected.chainName + " " + $t('wallet.add_chain_to_keplr')}}
+
       </button>
     </div>
     <div class="text-main mt-5">
@@ -119,8 +121,7 @@ function suggest() {
       ></textarea>
     </div>
     <div class="mt-4 mb-4">
-      If the chain is not offically support on Keplr, you can submit these
-      parameters to enable Keplr.
+      {{ $t('wallet.keplr_description') }}
     </div>
   </div>
 </template>

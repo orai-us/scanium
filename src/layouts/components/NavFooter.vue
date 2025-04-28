@@ -20,13 +20,13 @@
         class="link link-primary no-underline mr-4 text-white"
         href="https://github.com/orai-us/scanium/blob/master/LICENSE"
         target="noopener noreferrer"
-        >License</a
+        >{{ $t('footer.license') }}</a
       >
       <a
         class="link link-primary no-underline text-white"
         href="https://github.com/orai-us/scanium"
         target="noopener noreferrer"
-        >Github</a
+        >{{ $t('footer.github') }}</a
       >
     </div>
   </footer>
