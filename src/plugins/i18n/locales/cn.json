@@ -20,7 +20,8 @@
     "add_to_favorite": "加入收藏夹",
     "all_blockchains": "全部区块链",
     "sponsors": "赞助商",
-    "links": "链接"
+    "links": "链接",
+    "my_wallet": "我的钱包"
   },
   "pages": {
     "title": "Scanium Dashboard",
@@ -69,6 +70,12 @@
     "error": "区块链上没有这个账号！"
   },
   "block": {
+    "block_proposer": "区块提议者",
+    "txs_count": "交易数量",
+    "created_time": "创建时间",
+    "block_summary": "区块摘要",
+    "block_height": "区块高度",
+    "block_time": "区块时间",
     "estimated_time": "预计时间",
     "countdown_for_block": "倒计时区块",
     "countdown_for_block_input": "请输入一个新的目标高度",
@@ -79,7 +86,10 @@
     "block_header": "区块高度",
     "last_commit": "最后提交",
     "recent": "最近区块",
+    "recent_tx": "交易",
     "future": "未来区块",
+    "block_hash": "区块哈希",
+    "block": "区块",
     "fees": "GAS费用",
     "only_tx": "本页面只显示最近区块里包含的交易"
   },
@@ -95,6 +105,7 @@
     "updated_at": "更新于",
     "proposer_sign": "Proposer Signed",
     "proposer_not_sign": "Proposer Not Signed",
+    "proposer": "Proposer",
     "sign": "Signed",
     "not_sign": "Not Signed",
     "tips": "Tips",
@@ -102,6 +113,10 @@
     "tips_description_2": "If you want to change the default rpc endpoint. make sure that `https` and `CORS` are enabled on your server."
   },
   "cosmwasm": {
+    "instantiate": "实例化",
+    "creator_address": "创建人地址",
+    "action": "操作",
+    "contracts": "合约",
     "title": "CosmWasm智能合约",
     "code_id": "代码ID",
     "code_hash": "代码哈希",
@@ -125,6 +140,7 @@
     "tips_description_1": "This feature is available when deploying contracts via WELLDONE Code. For more information, please check the document at the link below."
   },
   "gov": {
+    "create_proposal": "创建提案",
     "voting": "投票中",
     "passed": "已通过",
     "rejected": "已否决",
@@ -181,6 +197,9 @@
     "btn_in": "进"
   },
   "staking": {
+    "apr": "年利率",
+    "sponsor": "赞助商",
+    "community_pool": "社区池",
     "inflation": "通胀率",
     "unbonding_time": "赎回时间",
     "double_sign_slashing": "双签惩罚",
@@ -237,6 +256,7 @@
   "tx": {
     "title": "概要",
     "tx_hash": "Tx 哈希",
+    "result": "结果",
     "gas": "Gas",
     "fee": "手续费",
     "memo": "备注",
@@ -257,6 +277,7 @@
     "signed_blocks": "已签名数量",
     "missing_blocks": "未签名数量",
     "add_validators": "添加验证人",
+    "validators": "验证人",
     "add": "添加"
   },
   "widget": {
@@ -270,10 +291,14 @@
   "index": {
     "rank": "排名",
     "price_calculator": "价格计算器",
+    "price": "价格",
+    "volume": "成交量",
     "close": "关闭",
     "buy": "买入",
     "active_proposals": "进行中的提案",
     "metric": "Metrics",
+    "about": "关于我们",
+    "no_information": "没有信息",
     "no_active_proposals": "没有进行中的提案",
     "more": "更多",
     "reward": "奖励",
@@ -284,5 +309,32 @@
     "receive": "Receive",
     "app_versions": "应用版本",
     "node_info": "节点信息"
+  },
+  "assets": {
+    "assets_dashboard": "资产仪表盘",
+    "total_assets": "总资产",
+    "assets": "资产",
+    "search_by_name_denom": "按名称或单位搜索",
+    "search_by_height_address_contracts_txhash": "按高度、地址、合约和交易哈希搜索",
+    "name": "名称",
+    "denom": "单位",
+    "price": "价格"
+  },
+  "wallet": {
+    "wallet": "钱包",
+    "my_wallet": "我的钱包",
+    "wallet_connect": "连接钱包",
+    "wallet_not_connect": "未连接",
+    "add": "添加",
+    "add_chain_to_keplr": "到Keplr钱包",
+    "keplr_description": "如果链在Keplr上不受支持，您可以提交这些参数以启用Keplr。"
+  },
+  "footer": {
+    "license": "许可证",
+    "github": "Github"
+  },
+  "pagination": {
+    "next": "下一页",
+    "prev": "上一页"
   }
 }

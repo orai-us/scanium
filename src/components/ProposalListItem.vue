@@ -146,7 +146,7 @@ function metaItem(metadata: string | undefined): {
                 >
 
                 <span v-else>Vote</span> -->
-                <span>Vote</span>
+                <span>{{ $t('gov.voting') }}</span>
               </label>
             </div>
           </td>

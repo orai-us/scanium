@@ -672,7 +672,7 @@ watchEffect(async () => {
     </div>
 
     <div class="p-6 bg-[#141416] border border-[#242627] rounded-2xl mx-4 md:mx-6 mb-5" v-if="promoteOwallet.length">
-      <h1 class="text-xl">Sponsor</h1>
+      <h1 class="text-xl">{{ $t('staking.sponsor') }}</h1>
       <div class="w-full h-[1px] bg-[#242627] my-2"></div>
       <div class="overflow-x-auto">
         <table class="table staking-table w-full">
@@ -685,13 +685,13 @@ watchEffect(async () => {
                 {{ $t('staking.voting_power') }}
               </th>
               <th scope="col" class="text-right uppercase">
-                Self Bonded
+                {{ $t('staking.self_bonded') }}
               </th>
               <th scope="col" class="text-right uppercase">
-                Uptime
+                {{ $t('module.uptime') }}
               </th>
               <th scope="col" class="text-right uppercase">
-                APR
+                {{ $t('staking.apr') }}
               </th>
               <th scope="col" class="text-right uppercase">
                 {{ $t('staking.24h_changes') }}
@@ -827,7 +827,7 @@ watchEffect(async () => {
             $t('staking.active') }}</a>
           <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'inactive' }" @click="tab = 'inactive'">{{
             $t('staking.inactive') }}</a>
-          <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'uptime' }" @click="tab = 'uptime'">Uptime</a>
+          <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'uptime' }" @click="tab = 'uptime'">{{ $t('module.uptime') }}</a>
         </div>
         <input class="input w-[30%] !input-bordered" v-model="keywordSearchValidator"
           placeholder="Search validators name" />

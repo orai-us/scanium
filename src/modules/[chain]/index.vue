@@ -294,7 +294,7 @@ const amount = computed({
     <div class="grid grid-cols-1 gap-4 lg:!grid-cols-2">
       <div>
         <div class="px-6 py-4 text-lg font-semibold text-main">
-          About {{ coinInfo.name }}
+          {{ $t('index.about') }} {{ coinInfo.name }}
         </div>
         <div class="mx-4 flex flex-wrap items-center">
           <div v-for="tag in coinInfo.categories"
@@ -306,7 +306,7 @@ const amount = computed({
           <MdEditor :model-value="coinInfo.description?.en" previewOnly></MdEditor>
         </div>
         <div v-if="!coinInfo.description?.en && coinInfo.categories?.length === 0" class="text-center">
-          No informations
+          {{ $t('index.no_information') }}
         </div>
       </div>
       <div class="border-none lg:border-solid lg:border-l border-base-300">
@@ -336,11 +336,11 @@ const amount = computed({
     <div class="rounded mt-4 border-t border-base-300">
       <div class="flex flex-wrap justify-between items-center px-4 pt-4 pb-2 text-lg font-semibold text-main">
         <div class="flex-1">
-          <p class="text-[18px] text-[#f7f7f7] font-semibold">My Wallet</p>
+          <p class="text-[18px] text-[#f7f7f7] font-semibold">{{ $t('wallet.my_wallet') }}</p>
 
           <div class="flex gap-2 items-center">
             <p class="truncate max-w-[calc(100%-10px)] sm:w-[unset] text-link text-[14px] font-normal">
-              {{ walletStore.currentAddress || 'Not Connected' }}
+              {{ walletStore.currentAddress || $t('wallet.wallet_not_connect') }}
             </p>
             <CopyAddress v-if="walletStore.currentAddress" :fillSvg="'#B999F3'" />
           </div>

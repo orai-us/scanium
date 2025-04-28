@@ -24,6 +24,7 @@ import {
 import { useBlockModule } from '@/modules/[chain]/block/block';
 import { DEFAULT } from '@/libs';
 import { hexToRgb, rgbToHsl } from '@/libs/utils';
+import { useI18n } from 'vue-i18n';
 
 export const useBlockchain = defineStore('blockchain', {
   state: () => {
@@ -64,9 +65,12 @@ export const useBlockchain = defineStore('blockchain', {
       return this.current && this.current.providerChain;
     },
     computedChainMenu() {
+      const { t } = useI18n();
       let currNavItem: VerticalNavItems = [];
       const router = useRouter();
       const routes = router?.getRoutes() || [];
+      console.log({ routes });
+      
       if (this.current && routes) {
         if (this.current?.themeColor) {
           const { color } = hexToRgb(this.current?.themeColor);
@@ -127,9 +131,9 @@ export const useBlockchain = defineStore('blockchain', {
       // combine all together
       return [
         ...currNavItem,
-        { heading: 'Ecosystem' } as NavSectionTitle,
+        { heading: t('module.ecosystem') } as NavSectionTitle,
         {
-          title: 'Favorite',
+          title: t('module.favorite'),
           children: favNavItems,
           badgeContent: favNavItems.length,
           badgeClass: 'bg-primary',
@@ -137,7 +141,7 @@ export const useBlockchain = defineStore('blockchain', {
           icon: { icon: 'mdi-star', size: '22' },
         } as NavGroup,
         {
-          title: 'All Blockchains',
+          title: t('module.all_blockchains'),
           to: { path: '/' },
           badgeContent: this.dashboard.length,
           badgeClass: 'bg-primary',

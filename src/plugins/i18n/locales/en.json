@@ -21,7 +21,8 @@
     "add_to_favorite": "Add to favorite",
     "all_blockchains": "All Blockchain",
     "sponsors": "Sponsors",
-    "links": "Links"
+    "links": "Links",
+    "my_wallet": "My Wallet"
   },
   "pages": {
     "title": "Scanium Dashboard",
@@ -73,6 +74,12 @@
     "error": "Account does not exists on chain"
   },
   "block": {
+    "block_proposer": "Block Proposer",
+    "txs_count": "TXS Count",
+    "created_time": "Created Time",
+    "block_summary": "Block Summary",
+    "block_height": "Block Height",
+    "block_time": "Block Time",
     "estimated_time": "Estimated Time",
     "countdown_for_block": "Countdown For Block",
     "countdown_for_block_input": "Input A New Target Block Number",
@@ -83,6 +90,9 @@
     "block_header": "Block Header",
     "last_commit": "Last Commit",
     "recent": "Recent Block",
+    "recent_tx": "Recent Transactions",
+    "block_hash": "Block Hash",
+    "block": "Block",
     "future": "Future Block",
     "fees": "Fees",
     "only_tx": "Only show txs in recent blocks"
@@ -99,6 +109,7 @@
     "updated_at": "Updated at",
     "proposer_sign": "Proposer Signed",
     "proposer_not_sign": "Proposer Not Signed",
+    "proposer": "Proposer",
     "sign": "Signed",
     "not_sign": "Not Signed",
     "tips": "Tips",
@@ -106,6 +117,10 @@
     "tips_description_2": "If you want to change the default rpc endpoint. make sure that `https` and `CORS` are enabled on your server."
   },
   "cosmwasm": {
+    "instantiate": "Instantiate",
+    "creator_address": "Creator Address",
+    "action": "Action",
+    "contracts": "Contracts",
     "title": "Cosmos Wasm Smart Contracts",
     "code_id": "Code Id",
     "code_hash": "Code Hash",
@@ -134,6 +149,7 @@
     "tips_description_1": "This feature is available when deploying contracts via WELLDONE Code. For more information, please check the document at the link below."
   },
   "gov": {
+    "create_proposal": "Create Proposal",
     "voting": "Voting",
     "passed": "Passed",
     "rejected": "Rejected",
@@ -190,6 +206,9 @@
     "btn_in": "In"
   },
   "staking": {
+    "apr": "APR",
+    "sponsor": "Sponsor",
+    "community_pool": "Community Pool",
     "inflation": "Inflation",
     "unbonding_time": "Unbonding Time",
     "double_sign_slashing": "Double Sign Slashing",
@@ -249,6 +268,7 @@
   "tx": {
     "title": "Summary",
     "tx_hash": "Tx Hash",
+    "result": "Result",
     "gas": "Gas",
     "fee": "Fee",
     "memo": "Memo",
@@ -271,6 +291,7 @@
     "signed_blocks": "Signed Blocks",
     "missing_blocks": "Missing Blocks",
     "add_validators": "Add Validators",
+
     "add": "Add"
   },
   "widget": {
@@ -284,10 +305,14 @@
   "index": {
     "rank": "Rank",
     "price_calculator": "Price Calculator",
+    "price": "Price",
+    "volume": "Volume",
     "close": "Close",
     "buy": "Buy",
     "active_proposals": "Active Proposals",
     "metric": "Metrics",
+    "about": "About Us",
+    "no_information": "No information",
     "no_active_proposals": "No active proposals",
     "more": "More details",
     "reward": "Reward",
@@ -298,5 +323,32 @@
     "receive": "Receive",
     "app_versions": "Application Versions",
     "node_info": "Node Information"
+  },
+  "assets": {
+    "assets_dashboard": "Assets Dashboard",
+    "total_assets": "There are",
+    "assets": "Assets",
+    "search_by_name_denom": "Search by Name, Denom",
+    "search_by_height_address_contracts_txhash": "Search by Height, Address, Contracts, and TxHash",
+    "name": "Name",
+    "denom": "Denom",
+    "price": "Price"
+  },
+  "wallet": {
+    "wallet": "Wallet",
+    "my_wallet": "My Wallet",
+    "wallet_connect": "Connect Wallet",
+    "wallet_not_connect": "Not Connected",
+    "add": "Add",
+    "add_chain_to_keplr": " TO Keplr Wallet",
+    "keplr_description": "If the chain is not offically support on Keplr, you can submit these parameters to enable Keplr."
+  },
+  "footer": {
+    "license": "License",
+    "github": "Github"
+  },
+  "pagination": {
+    "next": "Next",
+    "prev": "Prev"
   }
 }

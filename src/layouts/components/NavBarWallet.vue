@@ -29,7 +29,7 @@ function walletStateChange(res: any) {
         height="20"
       />
       <span class="ml-1 hidden md:block">
-        {{ walletStore.shortAddress || 'Wallet' }}</span
+        {{ walletStore.shortAddress || $t('wallet.wallet') }}</span
       >
       <Icon
         icon="mdi:chevron-down"

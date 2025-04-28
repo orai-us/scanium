@@ -77,7 +77,7 @@ function updateTarget() {
 </script>
 <template>
   <div class="flex">
-    <div class="m-2 md:m-4 border border-base-400 bg-base-100 rounded-[8px] w-[50%]">
+    <div class="m-2 md:m-4 border border-base-400 bg-base-100 rounded-[8px] w-[50%]" v-if="list.length > 0">
       <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
         <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'blocks' }">{{ $t('block.recent')
         }}</a>
@@ -88,13 +88,13 @@ function updateTarget() {
           <table class="table w-full table-compact">
             <thead class="border border-base-200">
               <tr>
-                <th class="text-white text-xs font-bold">Block</th>
+                <th class="text-white text-xs font-bold">{{ $t('block.block') }}</th>
                 <th class="text-white text-xs font-bold">
-                  Proposer
+                  {{ $t('consensus.proposer') }}
                 </th>
-                <th class="text-white text-xs font-bold">TXS Count</th>
+                <th class="text-white text-xs font-bold">{{ $t('block.block_hash') }}</th>
                 <th class="text-white text-xs font-bold text-right">
-                  Created Time
+                  {{ $t('account.time') }}
                 </th>
               </tr>
             </thead>
@@ -118,7 +118,7 @@ function updateTarget() {
                 </td>
                 <td>
                   <span class="text-right mt-1 whitespace-nowrap text-white">
-                    {{ item?.txs?.length || 0 }}
+                    {{ shortenTxHash(item?.hash, 5,5) }}
                   </span>
                 </td>
                 <td class="truncate text-right">
@@ -135,9 +135,9 @@ function updateTarget() {
       </div>
 
     </div>
-    <div class="m-2 md:m-4 border border-base-400 bg-base-100 rounded-[8px] w-[50%]">
+    <div class="m-2 md:m-4 border border-base-400 bg-base-100 rounded-[8px] w-[50%]" v-if="listTxs.length > 0">
       <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
-        <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'blocks' }">{{ $t('tx.txs') }}</a>
+        <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'blocks' }">{{ $t('block.recent_tx') }}</a>
       </div>
 
       <div class="grid grid-cols-1 gap-3">
@@ -145,13 +145,15 @@ function updateTarget() {
           <table class="table w-full table-compact">
             <thead class="border border-base-200">
               <tr>
-                <th class="text-white text-xs font-bold">Hash</th>
+                <th class="text-white text-xs font-bold">{{ $t('tx.tx_hash') }}</th>
                 <th class="text-white text-xs font-bold">
-                  Status
+                  {{ $t('tx.tx_hash') }}
                 </th>
-                <th class="text-white text-xs font-bold">Block</th>
+                <th class="text-white text-xs font-bold">
+                  {{ $t('block.block') }}
+                </th>
                 <th class="text-white text-xs font-bold text-right">
-                  Time
+                  {{ $t('account.time') }}
                 </th>
               </tr>
             </thead>

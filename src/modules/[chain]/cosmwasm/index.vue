@@ -69,7 +69,7 @@ function myContracts() {
         <div class="join flex items-center gap-3 mt-4 md:mt-0">
           <input v-model="creator" type="text"
             class="input input-bordered w-[50vw] md:w-[27vw] bg-[#2E2E33] border border-[#383B40]"
-            placeholder="Creator address" />
+            :placeholder="$t('cosmwasm.creator_address')" />
           <button class="btn btn-primary bg-[#2E2E33] border border-[#383B40]" :class="!creator.length ? 'cursor-not-allowed pointer-events-none' : ''
             " @click="myContracts()">
             {{ $t('cosmwasm.btn_query') }}
@@ -87,9 +87,9 @@ function myContracts() {
             <th>{{ $t('cosmwasm.code_id') }}</th>
             <th>{{ $t('cosmwasm.code_hash') }}</th>
             <th>{{ $t('cosmwasm.creator') }}</th>
-            <th>Contracts</th>
+            <th>{{ $t('cosmwasm.contracts') }}</th>
             <th class="text-right">{{ $t('cosmwasm.permissions') }}</th>
-            <th>Action</th>
+            <th>{{ $t('cosmwasm.action') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -127,11 +127,15 @@ function myContracts() {
                 dialog.open('wasm_instantiate_contract', {
                   codeId: v.codeId,
                 })
-                " v-if="walletStore.currentAddress">Instantiate</label>
+                " v-if="walletStore.currentAddress">
+                {{ $t('cosmwasm.instantiate') }}
+              </label>
 
               <div v-if="!walletStore.currentAddress">
                 <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
-                  class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">Instantiate</label>
+                  class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">
+                  {{ $t('cosmwasm.instantiate') }}
+                </label>
               </div>
             </td>
           </tr>

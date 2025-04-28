@@ -93,11 +93,13 @@ onBeforeRouteUpdate(async (to, from, next) => {
               <tr>
                 <th class="text-white text-xs font-bold">#ID</th>
                 <th class="text-white text-xs font-bold">
-                  Block Proposer
+                  {{ $t('block.block_proposer') }}
                 </th>
-                <th class="text-white text-xs font-bold">TXS Count</th>
+                <th class="text-white text-xs font-bold">
+                  {{ $t('block.txs_count') }}
+                </th>
                 <th class="text-white text-xs font-bold text-right">
-                  Created Time
+                  {{ $t('block.created_time') }}
                 </th>
               </tr>
             </thead>

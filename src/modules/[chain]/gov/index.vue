@@ -51,7 +51,7 @@ function page(p: number) {
         }" @click="changeTab(ProposalStatus.PROPOSAL_STATUS_REJECTED)">{{ $t('gov.rejected') }}</a>
       </div>
       <label for="CreateProposal" class="btn btn-sm btn-primary rounded-md">
-        Create Proposal
+        {{ $t('gov.create_proposal') }}
       </label>
     </div>
     <ProposalListItem :proposals="store?.proposals[tab]" />

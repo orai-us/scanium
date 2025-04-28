@@ -74,13 +74,13 @@ function goPreviousPage() {
         class="btn bg-gray-100 text-gray-500 hover:text-white hover:btn-primary border-none dark:bg-base dark:text-white"
         @click="goPreviousPage()"
       >
-        Prev
+        {{ $t('pagination.prev') }}
       </button>
       <button
         class="btn bg-gray-100 text-gray-500 hover:text-white hover:btn-primary border-none dark:bg-base dark:text-white"
         @click="goNextPage()"
       >
-        Next
+        {{ $t('pagination.next') }}
       </button>
     </div>
   </div>
