@@ -257,6 +257,7 @@
     "tx_hash": "Tx Hash",
     "gas": "Bahan bakar",
     "fee": "Biaya",
+    "message": "Pesan",
     "memo": "Memo",
     "no_messages": "Tidak ada pesan"
   },
@@ -322,7 +323,7 @@
     "wallet": "Dompet",
     "my_wallet": "Dompet Saya",
     "wallet_connect": "Hubungkan Dompet",
-    "wallet_not_connect": "Tidak Terhubung",  
+    "wallet_not_connect": "Tidak Terhubung",
     "add": "Tambahkan",
     "add_chain_to_keplr": " ke Dompet Keplr",
     "keplr_description": "Jika rantai tidak resmi didukung di Keplr, Anda dapat mengirim parameter ini untuk mengaktifkan Keplr."

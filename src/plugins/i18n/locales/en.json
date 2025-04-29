@@ -270,6 +270,7 @@
     "tx_hash": "Tx Hash",
     "result": "Result",
     "gas": "Gas",
+    "message": "Message",
     "fee": "Fee",
     "memo": "Memo",
     "txs":"Recent Transaction",

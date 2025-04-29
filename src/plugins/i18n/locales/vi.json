@@ -255,6 +255,7 @@
     "result": "Kết quả",
     "title": "Tóm tắt",
     "tx_hash": "Mã băm giao dịch",
+    "message": "Tin nhắn",
     "gas": "Gas",
     "fee": "Phí",
     "memo": "Ghi chú",

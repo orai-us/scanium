@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router';
 
 const props = defineProps(['chain']);
 const base = useBaseStore();
-const route = useRoute(); 
+const route = useRoute();
 const format = useFormatter();
 const tab = ref('blocks');
 const lastHeight = ref(Number(base.latest?.block?.header?.height || 0) + 10000);
@@ -147,7 +147,7 @@ function updateTarget() {
               <tr>
                 <th class="text-white text-xs font-bold">{{ $t('tx.tx_hash') }}</th>
                 <th class="text-white text-xs font-bold">
-                  {{ $t('tx.tx_hash') }}
+                  {{ $t('tx.message') }}
                 </th>
                 <th class="text-white text-xs font-bold">
                   {{ $t('block.block') }}
@@ -201,10 +201,10 @@ function updateTarget() {
 .fixed-height {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  overflow: hidden; 
+  overflow: hidden;
   text-overflow: ellipsis;
-  height: 20px; 
-  width: 130px; 
+  height: 20px;
+  width: 130px;
 }
 </style>
 
