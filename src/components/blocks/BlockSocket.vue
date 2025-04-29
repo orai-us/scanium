@@ -3,6 +3,7 @@ import { useBaseStore, useFormatter } from '@/stores';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { shortenTxHash } from '@/utils';
 import { useRoute } from 'vue-router';
+import { useWindowSize } from '@vueuse/core';
 
 const props = defineProps(['chain']);
 const base = useBaseStore();
@@ -11,6 +12,8 @@ const format = useFormatter();
 const tab = ref('blocks');
 const lastHeight = ref(Number(base.latest?.block?.header?.height || 0) + 10000);
 const target = ref(Number(lastHeight.value || 0));
+const { width } = useWindowSize();
+const isMobile = computed(() => width.value < 768);
 base.listenToBlocks();
 
 const list = computed(() => {
@@ -74,17 +77,57 @@ function updateTarget() {
 //   }
 // });
 
+function changeTab(selectedTab: string) {
+  tab.value = selectedTab;
+}
+
 </script>
 <template>
-  <div class="flex">
-    <div class="m-2 md:m-4 border border-base-400 bg-base-100 rounded-[8px] w-[50%]" v-if="list.length > 0">
-      <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
+  <div class="flex flex-col md:flex-row">
+    <div v-if="isMobile" class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
+      <a class="tab text-gray-400 capitalize !pb-3 w-[50%]" :class="{ 'tab-active': tab === 'blocks' }"
+        @click="changeTab('blocks')">{{ $t('block.recent') }}</a>
+      <a class="tab text-gray-400 capitalize !pb-3 w-[50%]" :class="{ 'tab-active': tab === 'transactions' }"
+        @click="changeTab('transactions')">{{ $t('block.recent_tx') }}</a>
+    </div>
+
+    <div class="m-2 md:m-4 w-[96%] md:w-[50%] border border-base-400 bg-base-100 rounded-[8px]"
+      v-if="list.length > 0 && tab === 'blocks'">
+      <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0" v-if="!isMobile">
         <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'blocks' }">{{ $t('block.recent')
         }}</a>
       </div>
 
       <div class="grid grid-cols-1 gap-3">
-        <div class="bg-base-100 overflow-x-auto w-full rounded-2xl mb-4 px-5">
+        <div v-if="isMobile" v-for="item in list.slice(0, 10)" :index="item?.height" class="hover:bg-base-300">
+          <div class="p-4 border border-[#383B40] rounded-lg flex flex-col gap-2">
+            <span class="text-white text-sm font-bold">
+              <RouterLink :to="`/Oraichain/block/${item?.height}`" class="text-link cursor-pointer hover:text-primary">
+                {{ item?.height }}
+              </RouterLink>
+            </span>
+            <div class="flex flex-row justify-between gap-2">
+              <span>{{ $t('consensus.proposer') }}</span>
+              <span class="text-white text-sm font-bold">{{
+                format.validator(
+                  item?.proposer_address &&
+                  item?.proposer_address
+                )
+              }}</span>
+            </div>
+            <div class="flex flex-row justify-between gap-2">
+              <span>{{ $t('block.block_hash') }}</span>
+              <span class="text-white text-sm font-bold"> {{ shortenTxHash(item?.hash, 5, 5) }}</span>
+            </div>
+            <div class="flex flex-row justify-between gap-2">
+              <span> {{ $t('account.time') }}</span>
+              <span class="text-white text-sm font-bold"> {{
+                format.getRelativeTimeString(item?.time?.toString())
+                }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-base-100 overflow-x-auto w-full rounded-2xl mb-4 px-5" v-if="!isMobile">
           <table class="table w-full table-compact">
             <thead class="border border-base-200">
               <tr>
@@ -99,7 +142,7 @@ function updateTarget() {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in list.slice(0, 50)" :index="item?.height" class="hover:bg-base-300">
+              <tr v-for="item in list.slice(0, 10)" :index="item?.height" class="hover:bg-base-300">
                 <td>
                   <RouterLink :to="`/Oraichain/block/${item?.height}`"
                     class="text-link cursor-pointer hover:text-primary">
@@ -118,7 +161,7 @@ function updateTarget() {
                 </td>
                 <td>
                   <span class="text-right mt-1 whitespace-nowrap text-white">
-                    {{ shortenTxHash(item?.hash, 5,5) }}
+                    {{ shortenTxHash(item?.hash, 5, 5) }}
                   </span>
                 </td>
                 <td class="truncate text-right">
@@ -135,13 +178,41 @@ function updateTarget() {
       </div>
 
     </div>
-    <div class="m-2 md:m-4 border border-base-400 bg-base-100 rounded-[8px] w-[50%]" v-if="listTxs.length > 0">
-      <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
-        <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'blocks' }">{{ $t('block.recent_tx') }}</a>
+    <div class="m-2 md:m-4 w-[96%] md:w-[50%] border border-base-400 bg-base-100 rounded-[8px]"
+      v-if="listTxs.length > 0 && (tab === 'transactions' || !isMobile)">
+      <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0" v-if="!isMobile">
+        <a class="tab text-gray-400 capitalize !pb-3"
+          :class="{ 'tab-active': (tab === 'transactions' || !isMobile) }">{{ $t('block.recent_tx') }}</a>
       </div>
 
       <div class="grid grid-cols-1 gap-3">
-        <div class="bg-base-100 overflow-x-auto w-full rounded-2xl mb-4 px-5">
+        <div v-if="isMobile" v-for="item in listTxs.slice(0, 10)" :index="item?.height" class="hover:bg-base-300">
+          <div class="p-4 border border-[#383B40] rounded-lg flex flex-col gap-2">
+            <span class="text-white text-sm font-bold">
+              <RouterLink :to="`/Oraichain/tx/${item?.hash}`" class="text-link cursor-pointer hover:text-primary">
+                    {{ shortenTxHash(item?.hash) }}
+                  </RouterLink>
+              </span>
+            <div class="flex flex-row justify-between gap-2">
+              <span>{{ $t('tx.message') }}</span>
+              <span class="text-white text-sm font-bold"> {{ format.messages([{
+                "@type": item?.message,
+              }]) }}</span>
+            </div>
+            <div class="flex flex-row justify-between gap-2">
+              <span>{{ $t('block.block') }}</span>
+              <span class="text-white text-sm font-bold"> {{ item?.height }}</span>
+            </div>
+            <div class="flex flex-row justify-between gap-2">
+              <span> {{ $t('account.time') }}</span>
+              <span class="text-white text-sm font-bold"> {{
+                format.getRelativeTimeString(item?.timestamp?.toString())
+                }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-base-100 overflow-x-auto w-full rounded-2xl mb-4 px-5" v-if="!isMobile">
           <table class="table w-full table-compact">
             <thead class="border border-base-200">
               <tr>
@@ -158,10 +229,9 @@ function updateTarget() {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in listTxs.slice(0, 50)" :index="item?.hash" class="hover:bg-base-300">
+              <tr v-for="item in listTxs.slice(0, 10)" :index="item?.hash" class="hover:bg-base-300">
                 <td>
-                  <RouterLink :to="`/Oraichain/tx/${item?.hash}`"
-                    class="text-link cursor-pointer hover:text-primary">
+                  <RouterLink :to="`/Oraichain/tx/${item?.hash}`" class="text-link cursor-pointer hover:text-primary">
                     {{ shortenTxHash(item?.hash) }}
                   </RouterLink>
                 </td>
