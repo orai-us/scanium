@@ -257,6 +257,7 @@
     "title": "概要",
     "tx_hash": "Tx 哈希",
     "result": "结果",
+    "message": "消息",
     "gas": "Gas",
     "fee": "手续费",
     "memo": "备注",
