@@ -145,14 +145,13 @@ export const useBaseStore = defineStore('baseStore', {
           console.log('WebSocket connection established');
         };
         socket.onmessage = (event) => {
-          const topic = JSON.parse(event.data); 
+          const topic = JSON.parse(event.data);
           if(topic.type === 'REDPANDA_TOPIC_BLOCK') {
             if (this.blocks.length >= 10) {
               this.blocks.pop();
             }
-            this.blocks.push(topic.payload);
+            this.blocks.unshift(topic.payload);
           }
-        
           if(topic.type === 'REDPANDA_TOPIC_TXS') {
             if (this.txs.length >= 10) {
               this.txs.shift();
