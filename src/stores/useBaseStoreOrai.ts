@@ -63,7 +63,6 @@ export const useBaseStoreOrai = defineStore('baseStoreOrai', {
             localStorage.setItem('baseStoreOrai', JSON.stringify(data)); // Lưu dữ liệu vào localStorage
         },
         loadFromStorage() {
-            console.log('loadFromStorage');
             const data = localStorage.getItem('baseStoreOrai');
             if (data) {
                 this.transaction_count = JSON.parse(data).transaction_count;
