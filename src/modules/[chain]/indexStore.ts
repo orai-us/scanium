@@ -6,10 +6,12 @@ import {
   useFormatter,
   useGovStore,
 } from '@/stores';
+import { useBaseStoreOrai } from '@/stores/useBaseStoreOrai';
 import { useDistributionStore } from '@/stores/useDistributionStore';
 import { useMintStore } from '@/stores/useMintStore';
 import { useStakingStore } from '@/stores/useStakingStore';
 import type { Tally } from '@/types';
+import { formatNumber } from '@/utils';
 import type { Coin } from '@cosmjs/stargate';
 import numeral from 'numeral';
 import { defineStore } from 'pinia';
@@ -206,6 +208,50 @@ export const useIndexModule = defineStore('module-index', {
             1e18
           ),
           change: 0,
+        },
+      ];
+    },
+
+
+    statsOraichain() {
+      const base = useBaseStoreOrai();
+      const { t } = useI18n();
+      return [
+        {
+          title: t('index.market_cap'),
+          color: 'primary',
+          icon: 'mdi-bank',
+          stats: String(formatNumber(base.market_cap)),
+        },
+        {
+          title: t('index.trading_volume'),
+          color: 'primary',
+          icon: 'mdi-swap-horizontal',
+          stats: String(formatNumber(base.trading_volume))
+        },
+        {
+          title: t('block.total_blocks'),
+          color: 'primary',
+          icon: 'mdi-block-helper',
+          stats: String(formatNumber(base.total_blocks)),
+        },
+        {
+          title: t('tx.total_transactions'),
+          color: 'primary',
+          icon: 'mdi-pound',
+          stats: String(formatNumber(base.transaction_count)),
+        },
+        {
+          title: t('uptime.number_of_validators'),
+          color: 'primary',
+          icon: 'mdi-human-queue',
+          stats: String(base.number_of_validators),
+        },
+        {
+          title: t('block.block_time'),
+          color: 'primary',
+          icon: 'mdi-clock',
+          stats: String(formatNumber(base.block_time)),
         },
       ];
     },
