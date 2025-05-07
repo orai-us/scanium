@@ -71,6 +71,7 @@
     "block_proposer": "Người đề xuất khối",
     "txs_count": "Số giao dịch",
     "created_time": "Thời gian tạo",
+    "total_blocks": "Tổng số khối",
     "block_summary": "Tóm tắt khối",
     "block_height": "Chiều cao khối",
     "block_time": "Thời gian khối",
@@ -259,7 +260,8 @@
     "gas": "Gas",
     "fee": "Phí",
     "memo": "Ghi chú",
-    "no_messages": "Không có tin nhắn"
+    "no_messages": "Không có tin nhắn",
+    "total_transactions": "Tổng số giao dịch"
   },
   "uptime": {
     "overall": "Tổng quan",
@@ -277,7 +279,8 @@
     "missing_blocks": "Khối bị thiếu",
     "add_validators": "Thêm người xác thực",
     "validators": "Người xác thực",
-    "add": "Thêm"
+    "add": "Thêm",
+    "number_of_validators": "Số lượng người xác thực"
   },
   "widget": {
     "title": "Cài đặt ban đầu",
@@ -307,7 +310,9 @@
     "btn_swap": "Hoán đổi",
     "receive": "Nhận",
     "app_versions": "Phiên bản ứng dụng",
-    "node_info": "Thông tin node"
+    "node_info": "Thông tin node",
+    "market_cap": "Market Cap",
+    "trading_volume": "24 Hour Trading Volume"
   },
   "assets": {
     "assets_dashboard": "Bảng điều khiển tài sản",

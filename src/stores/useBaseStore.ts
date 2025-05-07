@@ -46,7 +46,7 @@ export const useBaseStore = defineStore('baseStore', {
           );
           const latestHeight = Number(this.latest.block?.header?.height);
           const earlestHeight = Number(this.earlest.block?.header?.height);
-          if(isNaN(latestHeight) || isNaN(earlestHeight)) return 6000;
+          if (isNaN(latestHeight) || isNaN(earlestHeight)) return 6000;
           const blocks = latestHeight - earlestHeight;
           return diff / blocks;
         }
@@ -103,7 +103,7 @@ export const useBaseStore = defineStore('baseStore', {
       if (
         !this.earlest ||
         this.earlest?.block?.header?.chainId !=
-          this.latest?.block?.header?.chainId
+        this.latest?.block?.header?.chainId
       ) {
         //reset earlest and recents
         this.earlest = this.latest;
@@ -146,17 +146,24 @@ export const useBaseStore = defineStore('baseStore', {
         };
         socket.onmessage = (event) => {
           const topic = JSON.parse(event.data);
-          if(topic.type === 'REDPANDA_TOPIC_BLOCK') {
-            if (this.blocks.length >= 10) {
-              this.blocks.pop();
+          if (topic.type === 'REDPANDA_TOPIC_BLOCK') {
+            const existingBlock = this.blocks.some(b => b.hash === topic.payload.hash);
+            if (!existingBlock) {
+              if (this.blocks.length >= 10) {
+                this.blocks.pop();
+              }
+              this.blocks.unshift(topic.payload);
             }
-            this.blocks.unshift(topic.payload);
+
           }
-          if(topic.type === 'REDPANDA_TOPIC_TXS') {
-            if (this.txs.length >= 10) {
-              this.txs.shift();
+          if (topic.type === 'REDPANDA_TOPIC_TXS') {
+            const existingTx = this.blocks.some(b => b.hash === topic.payload.hash);
+            if (!existingTx) {
+              if (this.txs.length >= 10) {
+                this.txs.pop();
+              }
+              this.txs.unshift(topic.payload);
             }
-            this.txs.push(topic.payload);
           }
         };
 

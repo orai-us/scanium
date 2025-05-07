@@ -76,6 +76,7 @@
   "block": {
     "block_proposer": "Block Proposer",
     "txs_count": "TXS Count",
+    "total_blocks": "Total Blocks",
     "created_time": "Created Time",
     "block_summary": "Block Summary",
     "block_height": "Block Height",
@@ -275,7 +276,8 @@
     "memo": "Memo",
     "txs":"Recent Transaction",
     "no_messages": "No messages",
-    "no_logs": "No logs"
+    "no_logs": "No logs",
+    "total_transactions": "Total Transactions"
   },
   "uptime": {
     "overall": "Overall",
@@ -292,8 +294,9 @@
     "signed_blocks": "Signed Blocks",
     "missing_blocks": "Missing Blocks",
     "add_validators": "Add Validators",
-
-    "add": "Add"
+    "validators": "Validators",
+    "add": "Add",
+    "number_of_validators": "Number of Validators"
   },
   "widget": {
     "title": "Initial Setting",
@@ -323,7 +326,9 @@
     "btn_swap": "Swap",
     "receive": "Receive",
     "app_versions": "Application Versions",
-    "node_info": "Node Information"
+    "node_info": "Node Information",
+    "market_cap": "Market Cap",
+    "trading_volume": "24 Hour Trading Volume"
   },
   "assets": {
     "assets_dashboard": "Assets Dashboard",

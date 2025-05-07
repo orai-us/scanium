@@ -22,6 +22,7 @@ import BlockSocket from '@/components/blocks/BlockSocket.vue';
 import sendImg from '../../assets/images/svg/send.svg';
 import delegateImg from '../../assets/images/svg/delegate.svg';
 import { NETWORK_TYPE } from '@/config';
+import { useBaseStoreOrai } from '@/stores/useBaseStoreOrai';
 const props = defineProps(['chain']);
 const blockchain = useBlockchain();
 const store = useIndexModule();
@@ -30,14 +31,18 @@ const format = useFormatter();
 const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const paramStore = useParamStore();
+const baseStoreOrai = useBaseStoreOrai();
 const coinInfo = computed(() => {
   return store.coinInfo;
-});
+})
 
 onMounted(() => {
   store.loadDashboard();
   walletStore.loadMyAsset();
   paramStore.handleAbciInfo();
+  if (props.chain.toLowerCase() === 'oraichain') {
+    baseStoreOrai.fetchLatest();
+  }
   // if(!(coinInfo.value && coinInfo.value.name)) {
   // }
 });
@@ -314,7 +319,10 @@ const amount = computed({
           {{ $t('index.metric') }}
         </div>
         <div class="grid grid-cols-1 gap-4 md:!grid-cols-3 p-6 pt-0 items-stretch">
-          <div v-for="(item, key) in store.stats" :key="key" class="border border-[#383B40] rounded-lg p-4">
+          <div v-if="props.chain.toLowerCase() !== 'oraichain'" v-for="(item, key) in store.stats" :key="key" class="border border-[#383B40] rounded-lg p-4">
+            <CardStatisticsVertical v-bind="item" />
+          </div>
+          <div v-if="props.chain.toLowerCase() === 'oraichain'" v-for="(item, key) in store.statsOraichain" :key="key" class="border border-[#383B40] rounded-lg p-4">
             <CardStatisticsVertical v-bind="item" />
           </div>
         </div>

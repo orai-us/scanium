@@ -68,6 +68,7 @@
     "error": "Akun tidak ada di dalam rantai"
   },
   "block": {
+    "total_blocks": "Total Blok",
     "block_proposer": "Proposer Blok",
     "txs_count": "Jumlah Transaksi",
     "created_time": "Waktu Dibuat",
@@ -259,7 +260,8 @@
     "fee": "Biaya",
     "message": "Pesan",
     "memo": "Memo",
-    "no_messages": "Tidak ada pesan"
+    "no_messages": "Tidak ada pesan",
+    "total_transactions": "Total Transaksi"
   },
   "uptime": {
     "overall": "Secara keseluruhan",
@@ -277,7 +279,8 @@
     "missing_blocks": "Blok yang Hilang",
     "add_validators": "Tambahkan Validator",
     "validators": "Validator",
-    "add": "Tambahkan"
+    "add": "Tambahkan",
+    "number_of_validators": "Jumlah Validator"
   },
   "widget": {
     "title": "Pengaturan Awal",
@@ -307,7 +310,9 @@
     "btn_swap": "Tukar",
     "receive": "Terima",
     "app_versions": "Versi Aplikasi",
-    "node_info": "Informasi Node"
+    "node_info": "Informasi Node",
+    "market_cap": "Market Cap",
+    "trading_volume": "Volume Trading 24 Jam"
   },
   "assets": {
     "assets_dashboard": "Dasbor Aset",
