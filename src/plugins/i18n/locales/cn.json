@@ -72,6 +72,7 @@
   "block": {
     "block_proposer": "区块提议者",
     "txs_count": "交易数量",
+    "total_blocks": "总区块",
     "created_time": "创建时间",
     "block_summary": "区块摘要",
     "block_height": "区块高度",
@@ -261,7 +262,8 @@
     "gas": "Gas",
     "fee": "手续费",
     "memo": "备注",
-    "no_messages": "没有消息"
+    "no_messages": "没有消息",
+    "total_transactions": "总交易"
   },
   "uptime": {
     "overall": "整体",
@@ -279,7 +281,8 @@
     "missing_blocks": "未签名数量",
     "add_validators": "添加验证人",
     "validators": "验证人",
-    "add": "添加"
+    "add": "添加",
+    "number_of_validators": "验证人数量"
   },
   "widget": {
     "title": "初始设置",
@@ -309,7 +312,9 @@
     "btn_swap": "Swap",
     "receive": "Receive",
     "app_versions": "应用版本",
-    "node_info": "节点信息"
+    "node_info": "节点信息",
+    "market_cap": "市值",
+    "trading_volume": "24小时交易量"
   },
   "assets": {
     "assets_dashboard": "资产仪表盘",

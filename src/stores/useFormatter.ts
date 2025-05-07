@@ -502,7 +502,7 @@ export const useFormatter = defineStore('formatter', {
       const now: any = new Date();
       const diffInSeconds = Math.floor((now - date) / 1000);
       if (diffInSeconds < 60) {
-        return `${diffInSeconds}s ago`;
+        return `${diffInSeconds < 0 ? ~0 : diffInSeconds}s ago`;
       } else if (diffInSeconds < 3600) {
         const minutes = Math.floor(diffInSeconds / 60);
         return `${minutes}m ago`;
