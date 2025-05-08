@@ -221,13 +221,13 @@ export const useIndexModule = defineStore('module-index', {
           title: t('index.market_cap'),
           color: 'primary',
           icon: 'mdi-bank',
-          stats: String(formatNumber(base.market_cap)),
+          stats: "$" + String(formatNumber(base.market_cap)),
         },
         {
           title: t('index.trading_volume'),
           color: 'primary',
           icon: 'mdi-swap-horizontal',
-          stats: String(formatNumber(base.trading_volume))
+          stats: "$" + String(formatNumber(base.trading_volume))
         },
         {
           title: t('block.total_blocks'),
