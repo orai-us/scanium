@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useBaseStore, useFormatter } from '@/stores';
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { shortenTxHash } from '@/utils';
 import { useRoute } from 'vue-router';
 import { useWindowSize } from '@vueuse/core';
@@ -16,13 +16,15 @@ const lastHeight = ref(Number(base.latest?.block?.header?.height || 0) + 10000);
 const target = ref(Number(lastHeight.value || 0));
 const { width } = useWindowSize();
 const isMobile = computed(() => width.value < 768);
-base.listenToBlocks();
+
+onMounted(() => {
+  console.log('mounted');
+  base.listenToBlocks();
+});
 
 const list = computed(() => {
   const recents = base.blocks;
-  return recents.sort(
-    (a, b) => Number(b?.height) - Number(a?.height)
-  );
+  return recents
 });
 
 const listTxs = computed(() => {
@@ -53,9 +55,7 @@ const listTxs = computed(() => {
         messageLength: messages?.length ?? 0
       }
     });
-    return result.sort(
-      (a, b) => Number(b?.height) - Number(a?.height)
-    );
+    return result;
   } catch (error) {
     console.log({ catch: error });
     return [];

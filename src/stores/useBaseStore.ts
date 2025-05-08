@@ -149,18 +149,18 @@ export const useBaseStore = defineStore('baseStore', {
           if (topic.type === 'REDPANDA_TOPIC_BLOCK') {
             const existingBlock = this.blocks.some(b => b.hash === topic.payload.hash);
             if (!existingBlock) {
-              if (this.blocks.length >= 10) {
-                this.blocks.pop();
+              if (this.blocks.length > 10) {
+                this.blocks.pop()
               }
               this.blocks.unshift(topic.payload);
             }
 
           }
           if (topic.type === 'REDPANDA_TOPIC_TXS') {
-            const existingTx = this.blocks.some(b => b.hash === topic.payload.hash);
+            const existingTx = this.txs.some(b => b.hash === topic.payload.hash);
             if (!existingTx) {
-              if (this.txs.length >= 10) {
-                this.txs.pop();
+              if (this.txs.length > 10) {
+                this.txs.pop()
               }
               this.txs.unshift(topic.payload);
             }
