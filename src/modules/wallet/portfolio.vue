@@ -58,6 +58,9 @@ const prices = ref(
   }[]
 );
 
+console.log({ prices, balances, delegations });
+
+
 const loading = ref(0);
 const loaded = ref(0);
 watchEffect(() => {
@@ -259,19 +262,13 @@ const currencySign = computed(() => {
   <div class="overflow-x-auto w-full rounded-md">
     <div class="flex flex-wrap justify-between bg-base-100 p-5 box-content">
       <div class="min-w-0">
-        <h2
-          class="text-2xl font-bold leading-7 sm:!truncate sm:!text-3xl sm:!tracking-tight text-white"
-        >
-          Portfolio
+        <h2 class="text-2xl font-bold leading-7 sm:!truncate sm:!text-3xl sm:!tracking-tight text-white">
+          {{ $t('portfolio.portfolio') }}
         </h2>
         <div>
           <div class="flex items-center text-sm">
-            Currency:
-            <select
-              v-model="currency"
-              @change="loadPrice"
-              class="ml-1 uppercase"
-            >
+            {{ $t('portfolio.currency') }}:
+            <select v-model="currency" @change="loadPrice" class="ml-1 uppercase">
               <option>usd</option>
               <option>cny</option>
               <option>eur</option>
@@ -286,17 +283,14 @@ const currencySign = computed(() => {
         </div>
       </div>
       <div class="text-right">
-        <div>Total Value</div>
+        <div> {{ $t('account.total_value') }}</div>
         <div class="text-success font-bold">
           {{ currencySign }} {{ format.formatNumber(totalValue, '0,0.[00]') }}
         </div>
-        <div
-          class="text-xs"
-          :class="{
-            'text-success': totalChangeIn24 > 0,
-            'text-error': totalChangeIn24 < 0,
-          }"
-        >
+        <div class="text-xs" :class="{
+          'text-success': totalChangeIn24 > 0,
+          'text-error': totalChangeIn24 < 0,
+        }">
           {{ format.formatNumber(totalChangeIn24, '+0,0.[00]') }}
         </div>
       </div>
@@ -304,23 +298,13 @@ const currencySign = computed(() => {
     <div class="box-content">
       <div v-if="tokenList" class="grid grid-cols-1 md:grid-cols-3">
         <div>
-          <DonutChart
-            height="280"
-            :series="Object.values(tokenValues)"
-            :labels="
-              Object.keys(tokenValues).map((x) =>
-                format.tokenDisplayDenom(x)?.toUpperCase()
-              )
-            "
-          />
+          <DonutChart height="280" :series="Object.values(tokenValues)" :labels="Object.keys(tokenValues).map((x) =>
+            format.tokenDisplayDenom(x)?.toUpperCase()
+          )
+            " />
         </div>
         <div class="md:col-span-2">
-          <ApexCharts
-            type="area"
-            height="280"
-            :options="chartConfig"
-            :series="changeData"
-          />
+          <ApexCharts type="area" height="280" :options="chartConfig" :series="changeData" />
         </div>
       </div>
 
@@ -328,9 +312,9 @@ const currencySign = computed(() => {
         <table class="table w-full">
           <thead class="bg-base-200">
             <tr>
-              <th>Token</th>
-              <th class="text-right">Value</th>
-              <th class="text-right">Percent</th>
+              <th>{{ $t('portfolio.token') }}</th>
+              <th class="text-right">{{ $t('portfolio.value') }}</th>
+              <th class="text-right">{{ $t('portfolio.percent') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -357,12 +341,10 @@ const currencySign = computed(() => {
           </tbody>
         </table>
       </div>
-      <div class="p-4 text-center" v-if="tokenList.length === 0">No Data</div>
+      <div class="p-4 text-center" v-if="tokenList.length === 0">{{ $t('portfolio.portfolio_empty') }}</div>
     </div>
     <div class="text-center my-5 bg-base-200">
-      <RouterLink to="./accounts" class="btn btn-link !text-link"
-        >Add More Asset</RouterLink
-      >
+      <RouterLink to="./accounts" class="btn btn-link !text-link">{{ $t('portfolio.add_more_asset') }}</RouterLink>
     </div>
   </div>
 </template>

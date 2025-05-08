@@ -41,7 +41,7 @@ onMounted(() => {
   walletStore.loadMyAsset();
   paramStore.handleAbciInfo();
   if (props.chain.toLowerCase() === 'oraichain') {
-    baseStoreOrai.fetchLatest();
+    baseStoreOrai.initial()
   }
   // if(!(coinInfo.value && coinInfo.value.name)) {
   // }
@@ -167,10 +167,10 @@ const amount = computed({
                 <div
                   class="bg-gray-100 dark:bg-base flex flex-col items-center justify-between px-4 py-2 cursor-pointer rounded-lg border border-base-300">
                   <div class="flex justify-between gap-2 text-[#B4B7BB] font-normal text-[14px] w-full">
-                    <span> Select Exchange </span>
+                    <span> {{ $t('index.select_exchange') }} </span>
                     <span>
                       {{ shortName(ticker?.base, ticker?.coin_id) }}{{ ' ' }}
-                      Price
+                      {{ $t('index.price') }}
                     </span>
                   </div>
                   <div class="w-full flex items-center justify-between mt-1">

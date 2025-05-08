@@ -294,6 +294,7 @@
     "rank": "Peringkat",
     "price_calculator": "Kalkulator Harga",
     "price": "Harga",
+    "select_exchange": "Pilih Sistem Pertukaran",
     "volume": "Volume",
     "close": "Tutup",
     "buy": "Beli",
@@ -326,8 +327,11 @@
   },
   "wallet": {
     "wallet": "Dompet",
+    "account_address": "Alamat Akun",
+    "accounts": "Akun",
     "my_wallet": "Dompet Saya",
     "wallet_connect": "Hubungkan Dompet",
+    "disconnect": "Memutus Koneksi",
     "wallet_not_connect": "Tidak Terhubung",
     "add": "Tambahkan",
     "add_chain_to_keplr": " ke Dompet Keplr",
@@ -340,5 +344,16 @@
   "pagination": {
     "next": "Selanjutnya",
     "prev": "Sebelumnya"
+  },
+  "portfolio": {
+    "portfolio": "Portofolio",
+    "currency": "Mata Uang",
+    "add_more_asset": "Tambahkan Aset",
+    "token": "Aset",
+    "value": "Nilai",
+    "percent": "Persentase",
+    "portfolio_description": "Portofolio Anda",
+    "portfolio_empty": "Portofolio Anda kosong",
+    "portfolio_empty_description": "Anda dapat menambahkan aset ke portofolio Anda dengan mengklik tombol 'Tambahkan aset' di bawah."
   }
 }
