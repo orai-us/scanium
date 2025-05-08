@@ -310,6 +310,7 @@
     "rank": "Rank",
     "price_calculator": "Price Calculator",
     "price": "Price",
+    "select_exchange": "Select Exchange",
     "volume": "Volume",
     "close": "Close",
     "buy": "Buy",
@@ -342,8 +343,11 @@
   },
   "wallet": {
     "wallet": "Wallet",
+    "account_address": "Account Address",
+    "accounts": "Accounts",
     "my_wallet": "My Wallet",
     "wallet_connect": "Connect Wallet",
+    "disconnect": "Disconnect",
     "wallet_not_connect": "Not Connected",
     "add": "Add",
     "add_chain_to_keplr": " TO Keplr Wallet",
@@ -356,5 +360,16 @@
   "pagination": {
     "next": "Next",
     "prev": "Prev"
+  },
+  "portfolio": {
+    "portfolio": "Portfolio",
+    "currency": "Currency",
+    "add_more_asset": "Add More Asset",
+    "token": "Token",
+    "value": "Value",
+    "percent": "Percent",
+    "portfolio_description": "Your Portfolio",
+    "portfolio_empty": "Your Portfolio is empty",
+    "portfolio_empty_description": "You can add assets to your portfolio by clicking the 'Add Asset' button below."
   }
 }

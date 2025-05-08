@@ -294,6 +294,7 @@
     "rank": "Thứ hạng",
     "price_calculator": "Máy tính giá",
     "price": "Giá",
+    "select_exchange": "Chọn sàn giao dịch",
     "volume": "Khối lượng",
     "close": "Đóng",
     "buy": "Mua",
@@ -328,6 +329,9 @@
     "wallet": "Ví",
     "my_wallet": "Ví của tôi",
     "wallet_connect": "Kết nối ví",
+    "disconnect": "Ngắt kết nối",
+    "account_address": "Địa chỉ tài khoản",
+    "accounts": "Tài khoản",
     "wallet_not_connect": "Không kết nối",
     "add": "Thêm",
     "add_chain_to_keplr": " vào ví Keplr",
@@ -340,5 +344,16 @@
   "pagination": {
     "next": "Tiếp theo",
     "prev": "Trước"
+  },
+  "portfolio": {
+    "portfolio": "Danh mục đầu tư",
+    "currency": "Loại tiền",
+    "add_more_asset": "Thêm tài sản",
+    "token": "Tài sản",
+    "value": "Giá trị",
+    "percent": "Phần trăm",
+    "portfolio_description": "Danh mục đầu tư của bạn",
+    "portfolio_empty": "Danh mục đầu tư của bạn trống",
+    "portfolio_empty_description": "Bạn có thể thêm tài sản vào danh mục đầu tư của bạn bằng cách nhấp vào nút 'Thêm tài sản' bên dưới."
   }
 }

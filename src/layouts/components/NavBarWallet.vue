@@ -51,7 +51,7 @@ function walletStateChange(res: any) {
         v-if="walletStore.currentAddress"
         class="px-4 mt-2 mb-1 text-gray-500 dark:text-gray-400 font-semibold"
       >
-        Account Address
+        {{ $t('wallet.account_address') }}
       </div>
       <div>
         <a
@@ -85,7 +85,7 @@ function walletStateChange(res: any) {
                 </clipPath>
               </defs>
             </svg>
-            Accounts
+            {{ $t('wallet.accounts') }}
           </div>
         </RouterLink>
         <RouterLink v-if="walletStore.currentAddress" to="/wallet/portfolio">
@@ -104,7 +104,7 @@ function walletStateChange(res: any) {
                 fill="#B4B7BB"
               />
             </svg>
-            Portfolio
+            {{ $t('portfolio.portfolio') }}
           </div>
         </RouterLink>
         <a
@@ -130,7 +130,7 @@ function walletStateChange(res: any) {
               fill="#FF5252"
             />
           </svg>
-          Disconnect</a
+          {{ $t('wallet.disconnect') }}</a
         >
       </div>
     </div>
