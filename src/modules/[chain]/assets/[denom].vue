@@ -53,12 +53,12 @@ watchEffect(async () => {
         <RouterLink :to="`/${chain}/assets/${encodeURIComponent(denom)}?sector=${SECTOR.TRANSACTIONS}`"
           class="font-bold text-lg hover:cursor-pointer"
           :class="{ 'border-b-2 border-[#CBAEFF] text-white': sector === SECTOR.TRANSACTIONS }">
-          <div>Transactions</div>
+          <div>{{ $t('account.transactions') }}</div>
         </RouterLink>
         <RouterLink :to="`/${chain}/assets/${encodeURIComponent(denom)}?sector=${SECTOR.HOLDERS}`"
           class="font-bold text-lg hover:cursor-pointer"
           :class="{ 'border-b-2 border-[#CBAEFF] text-white': sector === SECTOR.HOLDERS }">
-          <div>Holders</div>
+          <div>{{ $t('assets.holders') }}</div>
         </RouterLink>
       </div>
       <div class="w-full h-[1px] bg-base-300"></div>

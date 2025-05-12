@@ -145,7 +145,7 @@ watchEffect(() => {
             <div v-else-if="k === 'contract'">
               <ContractMessage :contract="v" :chain="chain" />
             </div>
-            <div v-else>
+            <div v-else class="w-[80%]">
               <DynamicComponent :value="v" :direct="'messageTx'" />
             </div>
           </div>

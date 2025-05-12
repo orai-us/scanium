@@ -265,7 +265,7 @@ function color(v: string) {
                 v-model="keyword"
                 type="text"
                 class="w-full flex-1 outline-none text-base text-white dark:bg-[#2E2E33]"
-                placeholder="Search validators by name"
+                :placeholder="$t('staking.search_by_name')"
               />
             </div>
           </div>

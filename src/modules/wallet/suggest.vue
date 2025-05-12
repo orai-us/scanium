@@ -220,8 +220,7 @@ function suggest() {
         </button>
 
         <div class="mt-4">
-          If the chain is not offically support on Keplr/Metamask Snap, you can
-          submit these parameters to enable Keplr/Metamask Snap.
+          {{ $t('wallet.wallet_description_suggest') }}
         </div>
       </div>
     </div>

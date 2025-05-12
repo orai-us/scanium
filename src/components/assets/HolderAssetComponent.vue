@@ -12,8 +12,8 @@ const handleSearch = (event: any) => {
 <template>
   <div>
     <div class="mb-3 flex xl:flex-row flex-col justify-between xl:items-center mt-2 gap-2">
-      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalHolder || 0)
-          }}</span> holders</span>
+      <span class="text-white font-bold">{{ $t('assets.total_assets') }} <span class="text-[#CBAEFF]">{{ formatNumber(totalHolder || 0)
+          }}</span> {{ $t('assets.holders') }}</span>
       <input
         class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
         :value="searchQuery" placeholder="Search by Address" @input="handleSearch" />
@@ -23,9 +23,9 @@ const handleSearch = (event: any) => {
         <table class="table w-full text-sm" v-if="owners.length > 0">
           <thead>
             <tr>
-              <th class="text-white font-bold text-sm">Address</th>
-              <th class="text-white font-bold text-sm text-right">Amount</th>
-              <th class="text-white font-bold text-sm text-right">Value</th>
+              <th class="text-white font-bold text-sm">{{ $t('account.address') }}</th>
+              <th class="text-white font-bold text-sm text-right">{{ $t('assets.amount') }}</th>
+              <th class="text-white font-bold text-sm text-right">{{ $t('portfolio.value') }}</th>
             </tr>
           </thead>
           <tbody>

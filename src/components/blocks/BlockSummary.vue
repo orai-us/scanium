@@ -1,19 +1,16 @@
 <script lang="ts" setup>
-import { useIndexModule } from '@/modules/[chain]/indexStore';
-import { useBaseStore } from '@/stores';
-import { computed, ref, watch, watchEffect } from 'vue';
+import { useBaseStore, useFormatter, useMintStore, useStakingStore } from '@/stores';
+import { ref, watch } from 'vue';
 
-
-const indexModule = useIndexModule();
+const staking = useStakingStore();
 const store = useBaseStore();
 const blockTime = ref();
+const formatter = useFormatter();
+const props = defineProps(['chain']);
+const mintStore = useMintStore();
 
-const blockSummary = computed(()=>{
-  return indexModule.stats
-})
-
-watch(blockSummary,async () => {
-  const heightNew = Number(blockSummary.value[0]?.stats);
+watch(store, async () => {
+  const heightNew = Number(store?.latest?.block?.header?.height);
   if (heightNew > 5) {
     const heightOld = Number(heightNew) - 5;
     const [blockOld, blockNew] = await Promise.all([
@@ -26,6 +23,7 @@ watch(blockSummary,async () => {
     blockTime.value = (blockTimeNew - blockTimeOld) / 5000 + " s"
   }
 })
+
 </script>
 
 <template>
@@ -34,20 +32,27 @@ watch(blockSummary,async () => {
     <div class="grid grid-cols-1 xl:gap-5 gap-2 xl:grid-cols-4">
       <div class="border border-[#383B40] rounded-lg p-4 flex xl:flex-col flex-row xl:gap-0 gap-2">
         <span>{{ $t('block.block_height') }}</span>
-        <span class="text-white text-16 font-semibold">{{ !!blockSummary[0]?.stats ? blockSummary[0]?.stats : "-"
-          }}</span>
+        <span class="text-white text-16 font-semibold">{{ props?.chain?.toLowerCase() === 'oraichain' ?
+          store?.blocks?.[0]?.height ??
+          store?.latest?.block?.header?.height ?? "0" :
+          store?.latest?.block?.header?.height ?? "0" }}</span>
       </div>
       <div class="border border-[#383B40] rounded-lg p-4 flex xl:flex-col flex-row xl:gap-0 gap-2">
         <span>{{ $t('staking.total_bonded') }}</span>
-        <span class="text-white text-16 font-semibold">{{ blockSummary[3]?.stats }}</span>
+        <span class="text-white text-16 font-semibold">{{
+          formatter.formatToken({
+            amount: staking?.pool?.bondedTokens,
+            denom: staking.params.bondDenom,
+          })
+        }}</span>
       </div>
       <div class="border border-[#383B40] rounded-lg p-4 flex xl:flex-col flex-row xl:gap-0 gap-2">
         <span>{{ $t('staking.inflation') }}</span>
-        <span class="text-white text-16 font-semibold">{{ blockSummary[4]?.stats }}</span>
+        <span class="text-white text-16 font-semibold">{{ formatter.formatDecimalToPercent(mintStore.inflation) }}</span>
       </div>
       <div class="border border-[#383B40] rounded-lg p-4 flex xl:flex-col flex-row xl:gap-0 gap-2">
         <span>{{ $t('block.block_time') }}</span>
-        <span class="text-white text-16 font-semibold">{{ blockTime ? blockTime : "-" }}</span>
+        <span class="text-white text-16 font-semibold">{{ blockTime ? "≈"+blockTime : "-" }}</span>
       </div>
     </div>
 

@@ -278,12 +278,12 @@ onClickOutside(refSearchInput, event => clickOutsideSearch.value = false);
           class="py-2 px-4 flex items-center cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-base border border-[#242627] borderImage h-[48px]"
           :class="{
             '!bg-base borderImageActive': selected($route, {
-              to: { path: '/wallet/suggest', title: 'Wallet Helper' },
+              to: { path: '/wallet/suggest', title: $t('wallet.wallet_helper') },
             } as NavLink),
           }">
           <Icon icon="mdi:frequently-asked-questions" class="text-xl mr-2" />
           <div class="text-base capitalize flex-1 text-gray-600 dark:text-gray-200">
-            Wallet Helper
+            {{ $t('wallet.wallet_helper') }}
           </div>
         </RouterLink>
 

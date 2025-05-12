@@ -19,7 +19,7 @@ const isMobile = computed(() => width.value < 768);
 
 onMounted(() => {
   console.log('mounted');
-  base.listenToBlocks();
+  base.listenToBlocks(true);
 });
 
 const list = computed(() => {

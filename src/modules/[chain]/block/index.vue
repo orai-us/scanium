@@ -2,9 +2,9 @@
 import BlockSummary from '@/components/blocks/BlockSummary.vue';
 import Countdown from '@/components/Countdown.vue';
 import { useBaseStore, useFormatter } from '@/stores';
-import { toBase64 } from '@cosmjs/encoding';
+import { fromBase64, toBase64, toHex } from '@cosmjs/encoding';
 import type { BlockResponse } from '@cosmjs/tendermint-rpc';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 const props = defineProps(['chain']);
 
@@ -16,7 +16,59 @@ const target = ref(Number(lastHeight.value || 0));
 const current = ref({} as BlockResponse);
 const list = ref([] as Array<any>)
 
+const isOraichain = computed(() => {
+  return props.chain.toLowerCase() === 'oraichain'
+})
+// Listen to blocks Oraichain
+onMounted(() => {
+  if (isOraichain.value) {
+    base.listenToBlocks(false)
+  }
+})
+
+// Disconnect WebSocket Oraichain
+onBeforeUnmount(() => {
+  if (isOraichain.value) {
+    base.disconnectWebSocket()
+  }
+})
+
+// Oraichain
 watchEffect(() => {
+  if (isOraichain.value) {
+    const result = base.blocks.map(block => {
+      return {
+        block: {
+          evidence: [],
+          header: {
+            height: block.height,
+            time: block.time,
+            proposerAddress: fromBase64(block.proposer_address),
+            lastCommitHash: block.hash,
+          },
+          lastCommit: {
+            height: 0,
+            round: 0,
+            signatures: [],
+          },
+          txs: block?.txs ?? [],
+        },
+        blockId: {
+          hash: block.hash,
+          parts: {
+            total: 0,
+            hash: block.hash,
+          },
+        },
+      }
+    })
+    list.value = result;
+  }
+})
+
+// Cosmos
+watchEffect(() => {
+  if (isOraichain.value) return;
   const recents = base.recents;
   const result = recents.sort(
     (a, b) => Number(b.block.header.height) - Number(a.block.header.height)
@@ -55,7 +107,7 @@ function updateTarget() {
 }
 
 onBeforeRouteUpdate(async (to, from, next) => {
-  if (from.path !== to.path) {
+  if (from.path !== to.path && !isOraichain.value) {
     base.fetchBlock(String(to.params.height)).then((x) => {
       current.value = x;
     });
@@ -65,7 +117,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
 </script>
 <template>
   <div>
-    <BlockSummary />
+    <BlockSummary  />
     <div class="m-4 md:m-6 border border-base-400 bg-base-100 rounded-2xl">
       <div class="tabs tabs-boxed customTabV2 bg-transparent mb-4 p-6 pb-0">
         <a class="tab text-gray-400 capitalize !pb-3" :class="{ 'tab-active': tab === 'blocks' }"
@@ -136,7 +188,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
                 <td class="truncate text-right">
                   <span class="rounded text-xs whitespace-nowrap font-normal text-white text-right">
                     {{
-                      format.toDay(item.block?.header?.time.toString(), 'from')
+                      format.getRelativeTimeString(item.block?.header?.time.toString())
                     }}
                   </span>
                 </td>

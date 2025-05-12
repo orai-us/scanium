@@ -199,6 +199,7 @@
   },
   "staking": {
     "apr": "年利率",
+    "search_by_name": "按名称搜索验证人",
     "sponsor": "赞助商",
     "community_pool": "社区池",
     "inflation": "通胀率",
@@ -325,7 +326,10 @@
     "search_by_height_address_contracts_txhash": "按高度、地址、合约和交易哈希搜索",
     "name": "名称",
     "denom": "单位",
-    "price": "价格"
+    "price": "价格",
+    "holders": "持有人",
+    "decimals": "小数位",
+    "amount": "数量"
   },
   "wallet": {
     "wallet": "钱包",
@@ -337,7 +341,9 @@
     "disconnect": "断开连接",
     "add": "添加",
     "add_chain_to_keplr": "到Keplr钱包",
-    "keplr_description": "如果链在Keplr上不受支持，您可以提交这些参数以启用Keplr。"
+    "wallet_helper": "钱包助手",
+    "keplr_description": "如果链在Keplr上不受支持，您可以提交这些参数以启用Keplr。",
+    "wallet_description_suggest": "如果链在Keplr/Metamask Snap上不受支持，您可以提交这些参数以启用Keplr/Metamask Snap。"
   },
   "footer": {
     "license": "许可证",

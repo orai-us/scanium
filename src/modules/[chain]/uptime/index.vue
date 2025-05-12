@@ -186,7 +186,7 @@ function fetchAllKeyRotation() {
         <input
           type="text"
           v-model="keyword"
-          placeholder="Search validators by name"
+          :placeholder="$t('staking.search_by_name')"
           class="w-full flex-1 outline-none text-base text-white dark:bg-[#2E2E33]"
         />
         <button
