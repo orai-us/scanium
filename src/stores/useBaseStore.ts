@@ -137,19 +137,25 @@ export const useBaseStore = defineStore('baseStore', {
     async fetchAbciInfo() {
       return this.blockchain.rpc.getBaseNodeInfo();
     },
-    async listenToBlocks() {
+    async listenToBlocks(isSimulate = false) {
       try {
         const socket = new WebSocket(WS_URL);
         this.socket = socket;
         socket.onopen = () => {
           console.log('WebSocket connection established');
+          if (isSimulate) {
+            socket.send(JSON.stringify({
+              type: 'message',
+              payload: 'Hello, server!'
+            }));
+          }
         };
         socket.onmessage = (event) => {
           const topic = JSON.parse(event.data);
           if (topic.type === 'REDPANDA_TOPIC_BLOCK') {
             const existingBlock = this.blocks.some(b => b.hash === topic.payload.hash);
             if (!existingBlock) {
-              if (this.blocks.length > 10) {
+              if (this.blocks.length > 30) {
                 this.blocks.pop()
               }
               this.blocks.unshift(topic.payload);
@@ -159,7 +165,7 @@ export const useBaseStore = defineStore('baseStore', {
           if (topic.type === 'REDPANDA_TOPIC_TXS') {
             const existingTx = this.txs.some(b => b.hash === topic.payload.hash);
             if (!existingTx) {
-              if (this.txs.length > 10) {
+              if (this.txs.length > 30) {
                 this.txs.pop()
               }
               this.txs.unshift(topic.payload);

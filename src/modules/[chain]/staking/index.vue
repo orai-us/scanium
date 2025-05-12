@@ -830,7 +830,7 @@ watchEffect(async () => {
           <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'uptime' }" @click="tab = 'uptime'">{{ $t('module.uptime') }}</a>
         </div>
         <input class="input w-[30%] !input-bordered" v-model="keywordSearchValidator"
-          placeholder="Search validators name" />
+          :placeholder="$t('staking.search_by_name')" />
         <!-- <div class="text-lg font-semibold pr-4">
           {{ list.length }}/{{ staking.params.maxValidators }}
         </div> -->
@@ -853,14 +853,14 @@ watchEffect(async () => {
                   {{ $t('staking.voting_power') }}
                 </th>
                 <th scope="col" class="text-right uppercase">
-                  Self Bonded
+                  {{ $t('staking.self_bonded') }}
                 </th>
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('uptime')">
-                  Uptime
+                  {{ $t('module.uptime') }}
                 </th>
                 <th scope="col" class="text-right uppercase">
-                  APR
+                  {{ $t('staking.apr') }}
                 </th>
                 <th scope="col" class="text-right uppercase hover:text-white hover:cursor-pointer"
                   @click="handleChangeSort('24h_changes')">

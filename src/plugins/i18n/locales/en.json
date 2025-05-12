@@ -207,6 +207,7 @@
     "btn_in": "In"
   },
   "staking": {
+    "search_by_name": "Search validators by name",
     "apr": "APR",
     "sponsor": "Sponsor",
     "community_pool": "Community Pool",
@@ -339,7 +340,10 @@
     "search_by_height_address_contracts_txhash": "Search by Height, Address, Contracts, and TxHash",
     "name": "Name",
     "denom": "Denom",
-    "price": "Price"
+    "price": "Price",
+    "holders": "Holders",
+    "decimals": "Decimals",
+    "amount": "Amount"
   },
   "wallet": {
     "wallet": "Wallet",
@@ -351,7 +355,9 @@
     "wallet_not_connect": "Not Connected",
     "add": "Add",
     "add_chain_to_keplr": " TO Keplr Wallet",
-    "keplr_description": "If the chain is not offically support on Keplr, you can submit these parameters to enable Keplr."
+    "wallet_helper": "Wallet Helper",
+    "keplr_description": "If the chain is not offically support on Keplr, you can submit these parameters to enable Keplr.",
+    "wallet_description_suggest": "If the chain is not offically support on Keplr/Metamask Snap, you can submit these parameters to enable Keplr/Metamask Snap."
   },
   "footer": {
     "license": "License",

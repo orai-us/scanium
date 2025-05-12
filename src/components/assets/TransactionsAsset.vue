@@ -100,9 +100,9 @@ const txsMerge = computed(() => {
 <template>
   <div>
     <div class="mb-3" v-if="!loadingCountTxs">
-      <span class="text-white font-bold">There are <span class="text-[#CBAEFF]">{{ formatNumber(totalCount || 0)
+      <span class="text-white font-bold">{{ $t('assets.total_assets') }} <span class="text-[#CBAEFF]">{{ formatNumber(totalCount || 0)
           }}</span>
-        transactions</span>
+        {{ $t('account.transactions') }}</span>
     </div>
     <TransactionTable :transactions="txsMerge" :chain="chain" :txTotal="totalCount" :pagination="pagination"
       :handlePagination="handlePagination" :page="pagination.page" />

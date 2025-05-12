@@ -18,7 +18,7 @@
     "ecosystem": "Hệ sinh thái",
     "favorite": "Yêu thích",
     "add_to_favorite": "Thêm vào yêu thích",
-    "all_blockcgovhains": "Tất cả Blockchain",
+    "all_blockchains": "Tất cả Blockchain",
     "sponsors": "Nhà tài trợ",
     "links": "Liên kết"
   },
@@ -198,6 +198,7 @@
   "staking": {
     "apr": "Lợi nhuận",
     "sponsor": "Nhà tài trợ",
+    "search_by_name": "Tìm kiếm người xác thực theo tên",
     "inflation": "Lạm phát",
     "unbonding_time": "Thời gian hủy ràng buộc",
     "community_pool": "Quỹ cộng đồng",
@@ -323,7 +324,10 @@
     "search_by_height_address_contracts_txhash": "Tìm kiếm theo chiều cao, địa chỉ, hợp đồng và mã băm giao dịch",
     "name": "Tên",
     "denom": "Đơn vị",
-    "price": "Giá"
+    "price": "Giá",
+    "holders": "Người nắm giữ",
+    "decimals": "Số thập phân",
+    "amount": "Số lượng"
   },
   "wallet": {
     "wallet": "Ví",
@@ -335,7 +339,9 @@
     "wallet_not_connect": "Không kết nối",
     "add": "Thêm",
     "add_chain_to_keplr": " vào ví Keplr",
-    "keplr_description": "Nếu chuỗi không được hỗ trợ trên Keplr, bạn có thể gửi các tham số này để kích hoạt Keplr."
+    "wallet_helper": "Trợ giúp ví",
+    "keplr_description": "Nếu chuỗi không được hỗ trợ trên Keplr, bạn có thể gửi các tham số này để kích hoạt Keplr.",
+    "wallet_description_suggest": "Nếu chuỗi không được hỗ trợ trên Keplr/Metamask Snap, bạn có thể gửi các tham số này để kích hoạt Keplr/Metamask Snap."
   },
   "footer": {
     "license": "Giấy phép",

@@ -196,6 +196,7 @@
     "btn_in": "Masuk"
   },
   "staking": {
+    "search_by_name": "Cari validator berdasarkan nama",
     "apr": "Laba",
     "sponsor": "Sponsor",
     "inflation": "Inflasi",
@@ -323,7 +324,10 @@
     "search_by_height_address_contracts_txhash": "Cari berdasarkan Ketinggian, Alamat, Kontrak, dan Hash Transaksi",
     "name": "Nama",
     "denom": "Denom",
-    "price": "Harga"
+    "price": "Harga",
+    "holders": "Pemilik",
+    "decimals": "Desimal",
+    "amount": "Jumlah"
   },
   "wallet": {
     "wallet": "Dompet",
@@ -335,7 +339,9 @@
     "wallet_not_connect": "Tidak Terhubung",
     "add": "Tambahkan",
     "add_chain_to_keplr": " ke Dompet Keplr",
-    "keplr_description": "Jika rantai tidak resmi didukung di Keplr, Anda dapat mengirim parameter ini untuk mengaktifkan Keplr."
+    "keplr_description": "Jika rantai tidak resmi didukung di Keplr, Anda dapat mengirim parameter ini untuk mengaktifkan Keplr.",
+    "wallet_helper": "Dompet Helper",
+    "wallet_description_suggest": "Jika rantai tidak resmi didukung di Keplr/Metamask Snap, Anda dapat mengirim parameter ini untuk mengaktifkan Keplr/Metamask Snap."
   },
   "footer": {
     "license": "Lisensi",

@@ -101,14 +101,14 @@ const copyWebsite = async (url: string) => {
         </div>
       </div>
       <div class="flex flex-row items-center">
-        <div class="xl:w-[200px] w-[100px]">Denom</div>
+        <div class="xl:w-[200px] w-[100px]">{{ $t('assets.denom') }}</div>
         <div class="flex flex-row items-center w-[65%] xl:w-fit">
           <span class="text-white break-words truncate">{{ asset.type_asset === "cw20" ? `cw20:${asset.base}`: asset.base }}</span>
         </div>
         <Icon icon="mdi:content-copy" class="ml-2 cursor-pointer" v-show="asset.base" @click="copyWebsite(asset.base || '')" />
       </div>
       <div class="flex flex-row">
-        <div class="xl:w-[200px] w-[100px]">Decimals</div>
+        <div class="xl:w-[200px] w-[100px]">{{ $t('assets.decimals') }}</div>
         <span class="text-white">{{ asset.denom_units?.slice(-1)[0].exponent }}</span>
       </div>
     </div>
