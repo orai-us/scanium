@@ -37,6 +37,9 @@ export const useIndexModule = defineStore('module-index', {
         symbol: '',
         description: {
           en: '',
+          vi: '',
+          id: '',
+          cn: '',
         },
         categories: [] as string[],
         market_cap_rank: 0,

@@ -58,7 +58,7 @@ function calculateValue(value: any) {
     v-if="props.cardItem?.items && props.cardItem?.items?.length > 0"
   >
     <div class="text-base font-semibold mb-3 text-white">
-      {{ props.cardItem?.title }}
+      {{ $t(props.cardItem?.title) }}
     </div>
     <div
       class="grid grid-cols-2 md:!grid-cols-2 gap-4"
@@ -73,7 +73,7 @@ function calculateValue(value: any) {
         class="rounded-lg bg-[rgba(180,183,187,0.10)] px-4 py-2"
       >
         <div class="text-sm mb-2 text-[#B4B7BB] capitalize text-break">
-          {{ formatTitle(item?.subtitle) }}
+          {{ $t(item?.subtitle) }}
         </div>
         <div class="text-[14px] text-white text-break font-semibold">
           {{ calculateValue(item?.value) }}

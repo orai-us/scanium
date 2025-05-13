@@ -50,13 +50,13 @@ watchEffect(() => {
     <table class="table w-full text-sm" v-if="txs?.length > 0">
       <thead>
         <tr>
-          <th>Tx Hash</th>
-          <th>Result</th>
-          <th>Message</th>
-          <th>Height</th>
-          <th>Fee</th>
-          <th v-if="displayStatus">Status</th>
-          <th>Time</th>
+          <th>{{ $t('tx.tx_hash') }}</th>
+          <th>{{ $t('tx.result') }}</th>
+          <th>{{ $t('tx.message') }}</th>
+          <th>{{ $t('account.height') }}</th>
+          <th>{{ $t('tx.fee') }}</th>
+          <th v-if="displayStatus">{{ $t('tx.status') }}</th>
+          <th>{{ $t('account.time') }}</th>
         </tr>
       </thead>
       <tbody class="text-sm">

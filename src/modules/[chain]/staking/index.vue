@@ -830,7 +830,7 @@ watchEffect(async () => {
           <a class="tab text-gray-400" :class="{ 'tab-active': tab === 'uptime' }" @click="tab = 'uptime'">{{ $t('module.uptime') }}</a>
         </div>
         <input class="input w-[30%] !input-bordered" v-model="keywordSearchValidator"
-          :placeholder="$t('staking.search_by_name')" />
+        :placeholder="$t('staking.search_by_name')" />
         <!-- <div class="text-lg font-semibold pr-4">
           {{ list.length }}/{{ staking.params.maxValidators }}
         </div> -->
