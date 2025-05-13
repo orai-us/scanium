@@ -347,7 +347,7 @@ function mapDelegators(tx: ExtraTxResponse) {
                 {{ v.description?.identity || '-' }}
               </div>
               <label for="delegate" class="btn btn-primary btn-sm w-full" @click="
-                  dialog.open('delegate2', {
+                  dialog.open('delegate', {
                     validator_address: v.operatorAddress,
                   })
                 ">{{ $t('account.btn_delegate') }}</label>

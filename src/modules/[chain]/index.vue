@@ -177,7 +177,7 @@ const amount = computed({
                     <span> {{ $t('index.select_exchange') }} </span>
                     <span>
                       {{ shortName(ticker?.base, ticker?.coin_id) }}{{ ' ' }}
-                      Price
+                      {{ $t('index.price') }}
                     </span>
                   </div>
                   <div class="w-full flex items-center justify-between mt-1">
