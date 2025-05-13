@@ -16,7 +16,7 @@ const handleSearch = (event: any) => {
           }}</span> {{ $t('assets.holders') }}</span>
       <input
         class="input w-[300px] !input-bordered bg-base text-[14px] font-normal h-[44px] focus:outline-none text-white"
-        :value="searchQuery" placeholder="Search by Address" @input="handleSearch" />
+        :value="searchQuery" :placeholder="$t('staking.search_by_address')" @input="handleSearch" />
     </div>
     <div v-if="!loading">
       <div class="overflow-x-auto">

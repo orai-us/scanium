@@ -21,25 +21,25 @@ export const useParamStore = defineStore('paramstore', {
       class: 'border-primary',
       items: [
         {
-          subtitle: 'height',
+          subtitle: 'account.height',
           icon: 'BoxIcon',
           color: 'light-success',
           value: '-',
         },
         {
-          subtitle: 'bonded_and_supply',
+          subtitle: 'staking.bonded_and_supply',
           icon: 'DollarSignIcon',
           color: 'light-danger',
           value: '-',
         },
         {
-          subtitle: 'bonded_ratio',
+          subtitle: 'staking.bonded_ratio',
           icon: 'PercentIcon',
           color: 'light-warning',
           value: '-',
         },
         {
-          subtitle: 'inflation',
+          subtitle: 'staking.inflation',
           icon: 'TrendingUpIcon',
           color: 'light-primary',
           value: '-',
@@ -47,31 +47,31 @@ export const useParamStore = defineStore('paramstore', {
       ],
     },
     mint: {
-      title: 'Mint Parameters',
+      title: 'staking.mint_parameters',
       items: [] as Array<any>,
     },
     staking: {
-      title: 'Staking Parameters',
+      title: 'staking.staking_parameters',
       items: [] as Array<any>,
     },
     distribution: {
-      title: 'Distribution Parameters',
+      title: 'staking.distribution_parameters',
       items: [] as Array<any>,
     },
     slashing: {
-      title: 'Slashing Parameters',
+      title: 'staking.slashing_parameters',
       items: [] as Array<any>,
     },
     gov: {
-      title: 'Governance Parameters',
+      title: 'gov.governance_parameters',
       items: [] as Array<any>,
     },
     appVersion: {
-      title: 'Application Version',
+      title: 'staking.application_version',
       items: [] as Array<any>,
     },
     nodeVersion: {
-      title: 'Node Information',
+      title: 'staking.node_information',
       items: [] as Array<any>,
     },
   }),
@@ -94,7 +94,7 @@ export const useParamStore = defineStore('paramstore', {
       try {
         const res = await this.getBaseTendermintBlockLatest();
         const height = this.chain.items.findIndex(
-          (x) => x.subtitle === 'height'
+          (x) => x.subtitle === 'account.height'
         );
         this.chain.title = `Chain ID: ${res.block.header.chainId}`;
         this.chain.items[height].value = res.block.header.height.toString();
@@ -114,7 +114,7 @@ export const useParamStore = defineStore('paramstore', {
       if (!res) return;
       const bond_denom = res?.params.bondDenom;
       this.staking.items = Object.entries(res.params)
-        .map(([key, value]) => ({ subtitle: key, value: value }))
+        .map(([key, value]) => ({ subtitle: `staking.${key}`, value: value }))
         .filter((item: any) => {
           if (
             !['min_commission_rate', 'min_self_delegation'].includes(
@@ -130,7 +130,7 @@ export const useParamStore = defineStore('paramstore', {
           const amount = resArr[1]?.amount;
           const assets = this.blockchain.current?.assets;
           const bondedAndSupply = this.chain.items.findIndex(
-            (x) => x.subtitle === 'bonded_and_supply'
+            (x) => x.subtitle === 'staking.bonded_and_supply'
           );
           this.chain.items[bondedAndSupply].value = `${formatNumber(
             formatTokenAmount(assets, pool.bondedTokens, 2, bond_denom, false),
@@ -164,7 +164,7 @@ export const useParamStore = defineStore('paramstore', {
     async handleSlashingParams() {
       const res = await this.getSlashingParams();
       this.slashing.items = Object.entries(res.params).map(([key, value]) => ({
-        subtitle: key,
+        subtitle: `staking.${key}`,
         value: value,
       }));
     },
@@ -173,7 +173,7 @@ export const useParamStore = defineStore('paramstore', {
       // try to convert to ascii
       this.distribution.items = Object.entries(res.params).map(
         ([key, value]) => ({
-          subtitle: key,
+          subtitle: `staking.${key}`,
           value: typeof value === 'string' ? toAscii(value) : value,
         })
       );
@@ -194,7 +194,7 @@ export const useParamStore = defineStore('paramstore', {
           ...resArr[2]?.tallyParams,
         };
         this.gov.items = Object.entries(govParams).map(([key, value]) => ({
-          subtitle: key,
+          subtitle: `gov.${key}`,
           value: value,
         }));
       });

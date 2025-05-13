@@ -11,7 +11,7 @@ import {
   useStakingStore,
   useParamStore,
 } from '@/stores';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { useIndexModule, colorMap } from './indexStore';
 
 import CardStatisticsVertical from '@/components/CardStatisticsVertical.vue';
@@ -23,6 +23,8 @@ import sendImg from '../../assets/images/svg/send.svg';
 import delegateImg from '../../assets/images/svg/delegate.svg';
 import { NETWORK_TYPE } from '@/config';
 import { useBaseStoreOrai } from '@/stores/useBaseStoreOrai';
+import { useI18n } from 'vue-i18n';
+import { useLangStore } from '@/stores/useLangStore';
 const props = defineProps(['chain']);
 const blockchain = useBlockchain();
 const store = useIndexModule();
@@ -47,6 +49,11 @@ onMounted(() => {
   // }
 });
 const ticker = computed(() => store.coinInfo.tickers[store.tickerIndex]);
+const langStore = useLangStore();
+let lang = ref(langStore.lang as 'en' | 'vi' | 'id' | 'cn');
+watch(langStore, (newLang) => {
+  lang.value = newLang.lang as 'en' | 'vi' | 'id' | 'cn';
+});
 
 const currName = ref('');
 blockchain.$subscribe((m, s) => {
@@ -170,7 +177,7 @@ const amount = computed({
                     <span> {{ $t('index.select_exchange') }} </span>
                     <span>
                       {{ shortName(ticker?.base, ticker?.coin_id) }}{{ ' ' }}
-                      {{ $t('index.price') }}
+                      Price
                     </span>
                   </div>
                   <div class="w-full flex items-center justify-between mt-1">
@@ -308,9 +315,9 @@ const amount = computed({
           </div>
         </div>
         <div class="max-h-[250px] overflow-auto p-4 text-sm mb-4">
-          <MdEditor :model-value="coinInfo.description?.en" previewOnly></MdEditor>
+          <MdEditor :model-value="coinInfo?.description?.[lang]" previewOnly></MdEditor>
         </div>
-        <div v-if="!coinInfo.description?.en && coinInfo.categories?.length === 0" class="text-center">
+        <div v-if="!coinInfo?.description?.[lang] && coinInfo?.categories?.length === 0" class="text-center">
           {{ $t('index.no_information') }}
         </div>
       </div>
