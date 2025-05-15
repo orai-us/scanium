@@ -43,7 +43,7 @@ export const useBaseStoreOrai = defineStore('baseStoreOrai', {
                 this.market_cap = market?.market_cap || 0;
                 this.trading_volume = market?.total_volume || 0;
                 this.total_blocks = status?.latest_block_height || 0;
-                this.number_of_validators = status?.total_validator_num || 0;
+                this.number_of_validators = status?.total_validator_active || 0;
                 this.block_time = status?.block_time || 0;
 
                 this.saveToStorage();

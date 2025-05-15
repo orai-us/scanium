@@ -55,7 +55,7 @@ watchEffect(() => {
           <th>{{ $t('tx.message') }}</th>
           <th>{{ $t('account.height') }}</th>
           <th>{{ $t('tx.fee') }}</th>
-          <th v-if="displayStatus">{{ $t('tx.status') }}</th>
+          <th v-if="displayStatus">{{ $t('staking.status') }}</th>
           <th>{{ $t('account.time') }}</th>
         </tr>
       </thead>
