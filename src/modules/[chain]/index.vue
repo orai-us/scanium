@@ -34,8 +34,17 @@ const dialog = useTxDialog();
 const stakingStore = useStakingStore();
 const paramStore = useParamStore();
 const baseStoreOrai = useBaseStoreOrai();
+const descriptionOraichainVI = "Oraichain là nền tảng blockchain Layer 1 đầu tiên được thiết kế chuyên biệt cho Trí tuệ nhân tạo (AI), kết hợp công nghệ oracle để tích hợp AI vào hợp đồng thông minh một cách đáng tin cậy. Với khả năng tối ưu về tốc độ, khả năng tương tác và bảo mật, Oraichain cung cấp cơ sở hạ tầng lý tưởng để phát triển các ứng dụng AI phi tập trung (AI dApps). Hệ sinh thái sản phẩm nổi bật bao gồm Thesis.io, Distilled AI, LFG!!!, OWallet, OraiDEX và nhiều công cụ hỗ trợ Web3 khác, góp phần thúc đẩy việc ứng dụng AI một cách thực tiễn và đáng tin cậy trong thế giới Web3.";
+
 const coinInfo = computed(() => {
-  return store.coinInfo;
+  const isOraichain = props.chain.toLowerCase() === 'oraichain'
+  return {
+    ...store.coinInfo,
+    description: {
+      ...store.coinInfo.description,
+     vi: isOraichain ? descriptionOraichainVI : store.coinInfo?.description?.en
+    }
+  }
 })
 
 onMounted(() => {
