@@ -449,5 +449,3 @@ function getNameValidator(validatorAddress: string) {
   </div>
   <div v-else class="text-no text-sm">{{ $t('account.error') }}</div>
 </template>
-
-
