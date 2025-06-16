@@ -5,7 +5,7 @@ import {
   QueryDenomOwnersRequest,
   QueryDenomOwnersResponse,
 } from 'cosmjs-types/cosmos/bank/v1beta1/query';
-import { BASE_URL_COINGECKO, BASE_URL_LCD_COSMOS_BANK, BASE_URL_LCD_COSMWASM, BASE_URL_MARKET_ORAI, BASE_URL_ORAIDEX, BASE_URL_SCANIUM, MULTICALL_ADDRESS } from '@/config';
+import { BASE_URL_COINGECKO, BASE_URL_LCD_COSMOS_BANK, BASE_URL_LCD_COSMWASM, BASE_URL_MARKET_ORAI, BASE_URL_OPTIMAL_QUERIES_SCANIUM, BASE_URL_ORAIDEX, BASE_URL_SCANIUM, MULTICALL_ADDRESS } from '@/config';
 
 const baseMarketOrai = BASE_URL_MARKET_ORAI;
 const baseCoingecko = BASE_URL_COINGECKO;
@@ -14,9 +14,16 @@ const baseCosmwasm = BASE_URL_LCD_COSMWASM;
 const multiCallContractAddress = MULTICALL_ADDRESS;
 const baseURLScanium = BASE_URL_SCANIUM;
 const baseURLOraidex = BASE_URL_ORAIDEX;
+const baseOptimalQueriesScanium = BASE_URL_OPTIMAL_QUERIES_SCANIUM;
 const urlBalancesCw20 = 'v1/balance';
 export interface ParamsSimplePrice {
   ids: string;
+}
+
+export interface ParamsDownloadCSV {
+  account: string;
+  // startTime: number;
+  // endTime: number;
 }
 
 export interface ParamsHolderAssetsCw20 {
@@ -41,6 +48,16 @@ export const getPriceByIds = async (params: ParamsSimplePrice) => {
       include_24hr_change: true,
       include_last_updated_at: true,
     },
+  };
+  const res = await api.request(config);
+  return res?.data;
+};
+
+export const getDownloadCSV = async (params: ParamsDownloadCSV) => {
+  const config = {
+    baseURL: baseOptimalQueriesScanium,
+    url: `v1/transaction/export-csv/${params.account}`,
+    method: METHODS.GET,
   };
   const res = await api.request(config);
   return res?.data;
