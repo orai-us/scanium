@@ -52,7 +52,7 @@ jobs:
         run: echo SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} > .env.sentry-build-plugin
       - name: Build source
         run: |
-          export NODE_OPTIONS="--max-old-space-size=8192"
+          export NODE_OPTIONS="--max-old-space-size=12288"
           yarn build
         env:
           CI: false
