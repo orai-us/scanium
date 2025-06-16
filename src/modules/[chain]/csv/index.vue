@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import router from '@/router';
 import { onMounted, ref, toRaw, watch, watchEffect } from 'vue';
-import VueDatePicker from '@vuepic/vue-datepicker';
 import { getDownloadCSV } from '@/service/assetsService';
-import '@vuepic/vue-datepicker/dist/main.css';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
