@@ -76,7 +76,7 @@ onBeforeRouteUpdate((to, from, next) => {
         <TransactionsTransfers :address="address" :chain="chain" />
       </div>
     </div>
-    <div class="flex justify-end">
+    <div class="flex justify-end" v-show="txType === TRANSACTION_TYPE.ALL">
       <div
         @click="downloadCSV"
         class="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 cursor-pointer rounded hover:bg-gray-100 dark:hover:bg-gray-800"

@@ -63,7 +63,7 @@ async function downloadCSV() {
     const objectUrl = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = objectUrl;
-    link.download = `transaction_${address.value}_${new Date().getTime()}.csv`;
+    link.download = `transaction_${address.value}_${new Date().toISOString()}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -118,7 +118,7 @@ watch(() => route.query.address, (newAddress) => {
             <h2 class="text-2xl font-semibold">
                 Transaction History on {{ chain }} (Last 10,000 transactions)
             </h2>
-            <p class="text-sm text-gray-500 w-2/3 font-medium">
+            <p class="md:w-2/3 text-sm text-gray-500 font-medium">
                 Available message types for download include: Send, Receive, IBC Send, IBC Receive, Multi Send, Delegate, Undelegate, Redelegate, Reward and Commission.
             </p>
             <p class="text-sm text-red-500 font-bold">
@@ -133,7 +133,7 @@ watch(() => route.query.address, (newAddress) => {
                     <span class="text-gray-700 dark:text-gray-300 font-medium min-w-[120px]">Address:</span>
                     <div class="flex-1">
                         <div class="flex items-center">
-                            <div class="font-mono p-2 rounded text-sm break-all" :class="{ 'text-red-500': !isValidAddress }">
+                            <div class="font-mono md:p-2 rounded text-sm break-all" :class="{ 'text-red-500': !isValidAddress }">
                                 {{ address }}
                             </div>
                             <button
@@ -169,7 +169,7 @@ watch(() => route.query.address, (newAddress) => {
                     <span class="text-gray-700 dark:text-gray-300 font-medium min-w-[120px]">Created time:</span>
                     <div class="flex-1">
                         <div class="flex items-center">
-                            <div class="font-mono p-2 rounded text-sm break-all" :class="{ 'text-red-500': !isValidAddress }">
+                            <div class="font-mono md:p-2 rounded text-sm break-all" :class="{ 'text-red-500': !isValidAddress }">
                                 {{ new Date(Date.now()).toLocaleString('en-US', { timeZone: 'UTC' }) }}
                             </div>
                         </div>
