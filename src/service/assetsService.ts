@@ -22,8 +22,7 @@ export interface ParamsSimplePrice {
 
 export interface ParamsDownloadCSV {
   account: string;
-  // startTime: number;
-  // endTime: number;
+  type: string;
 }
 
 export interface ParamsHolderAssetsCw20 {
@@ -54,10 +53,11 @@ export const getPriceByIds = async (params: ParamsSimplePrice) => {
 };
 
 export const getDownloadCSV = async (params: ParamsDownloadCSV) => {
+  const url = params.type === 'all' ? `v1/transaction/export-csv/${params.account}` : `v1/token-transfer/export-csv/${params.account}`;
   const config = {
     baseURL: baseOptimalQueriesScanium,
-    url: `v1/transaction/export-csv/${params.account}`,
-    method: METHODS.GET,
+    url,
+    method: METHODS.GET
   };
   const res = await api.request(config);
   return res?.data;
