@@ -18,7 +18,7 @@ const showErrorSection = ref(false);
 const errorMessage = ref('');
 const isValidAddress = ref(true);
 const showAddressCopySuccess = ref(false);
-
+const typeCsv = ref('txs');
 function validateAddress(addr: string): boolean {
   // Validate Oraichain address format
   const addressRegex = /^[a-z\d]+1[a-z\d]{38,48}$/;
@@ -37,9 +37,21 @@ function updateAddress(addr: string) {
   }
 }
 
+function updateType(type: string) {
+  typeCsv.value = type;
+  if (!['all', 'transfers'].includes(type)) {
+    typeCsv.value = 'all';
+  }
+}
+
 onMounted(() => {
   const queryAddress = route.query.address?.toString() || '';
   updateAddress(queryAddress);
+});
+
+onMounted(() => {
+  const queryType = route.query.type?.toString() || '';
+  updateType(queryType);
 });
 
 async function downloadCSV() {
@@ -55,7 +67,7 @@ async function downloadCSV() {
     showSuccessSection.value = false;
     showErrorSection.value = false;
 
-    const response = await getDownloadCSV({ account: address.value });
+    const response = await getDownloadCSV({ account: address.value, type: typeCsv.value });
 
     if (response.msg !== 'success') {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -180,6 +192,30 @@ watch(
               <div v-if="!isValidAddress" class="mt-1 text-sm text-red-500">
                 Invalid address format
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border border-base-400 p-4 rounded-lg"
+          :class="{ 'border-red-500': !isValidAddress }"
+        >
+          <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+            <span
+              class="text-gray-700 dark:text-gray-300 font-medium min-w-[120px]"
+              >Type Export:</span
+            >
+            <div class="flex-1">
+              <div class="flex items-center">
+                <div
+                  class="font-mono md:p-2 rounded text-sm break-all"
+                  :class="{ 'text-red-500': !isValidAddress }"
+                >
+                  {{ typeCsv === 'all' ? 'All Transactions' : 'Token Transfers' }}
+                </div>
+
+              </div>
+
             </div>
           </div>
         </div>
