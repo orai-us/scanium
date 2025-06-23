@@ -13,7 +13,7 @@
       "address": "https://exa-rpc.orai.network/"
     }
   ],
-  "cosmwasm_enabled": true,
+  "cosmwasm_enabled": false,
   "sdk_version": "0.53.0",
   "coin_type": "60",
   "min_tx_fee": "800",
