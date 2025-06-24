@@ -7,6 +7,9 @@
       "hosting": {
         "oraichainscan": [
           "oraichainscan"
+        ],
+        "scanium-testnet": [
+          "scanium-testnet"
         ]
       }
     }
