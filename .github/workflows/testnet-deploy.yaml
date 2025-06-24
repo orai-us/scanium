@@ -1,27 +1,70 @@
+name: Deploy Testnet
 
-name: Testnet Deploy
+run-name: Deploy to firebase by ${{ inputs.tag || github.ref_name }}
 
 on:
   push:
-    branches: [ testnet ]
-  pull_request:
-    branches: [ testnet ]
+    tags:
+      - testnet/[0-9]+.[0-9]+.[0-9]+*
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      tag:
+        default: ''
+        description: 'Tag to deploy'
+        type: string
+        required: true
+
+env:
+  NODE_VERSION: 20
 
 jobs:
-  deploy:
-    name: Ping deploy
-    runs-on: testnet 
+  build:
+    runs-on: ubuntu-latest
     steps:
-    - name: print
-      run: echo ${GITHUB_REF#refs/heads/}
-    - name: Git Checkout Latest
-      uses: actions/checkout@v2
-      
-    - name: Install
-      run: yarn install
-
-    - name: Build
-      run: yarn run vue-cli-service build
-
-    - name: Deploy
-      run: cp -rf ./dist/* /var/www/html/
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Install Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Check and Install Yarn
+        run: |
+          if ! yarn --version > /dev/null 2>&1; then
+            echo "Yarn is not installed. Installing Yarn."
+            npm i -g yarn
+          else
+            echo "Yarn is already installed."
+          fi
+      - name: Install dependencies
+        run: yarn install
+      - name: Create env file
+        run: cp .env.testnet .env
+      - name: Setup Sentry key
+        run: echo SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} > .env.sentry-build-plugin
+      - name: Build source
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=12288"
+          yarn build
+        env:
+          CI: false
+      - name: Import Firebase service account credentials
+        id: import-credentials
+        run: |
+          echo ${{ secrets.ORAICHAIN_DAPP_FIREBASE_DEPLOYER_CREDENTIALS }} | base64 -d > $(pwd)/serviceaccount.json
+          echo "file_path=$(pwd)/serviceaccount.json" >> $GITHUB_OUTPUT
+      - name: Deploy to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.import-credentials.outputs.file_path }}
+        run: yarn firebase -P default deploy --only hosting:scanium-testnet
+      - name: Remove credentials file
+        if: always()
+        run: rm ${{ steps.import-credentials.outputs.file_path }}
