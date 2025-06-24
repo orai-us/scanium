@@ -1,5 +1,6 @@
 import * as injProto from '@injectivelabs/core-proto-ts';
 import evmosProto from '@/libs/protos/evmos';
+import cosmosProto from '@/libs/protos/cosmos';
 import osmoProto from '@/libs/protos/osmosis';
 import { MsgType } from '@injectivelabs/ts-types';
 import ObjectElement from './ObjectElement.vue';
@@ -27,7 +28,7 @@ const ExtendedRegistry = Object.fromEntries(
 );
 
 export function select(v: any, direct?: string) {
-  if(direct === 'messageTx')
+  if (direct === 'messageTx')
     return ObjectMessageTxElement;
   const type = typeof v;
   switch (type) {
@@ -52,8 +53,8 @@ function selectObject(v: Object, direct?: string) {
     case v &&
       Object.keys(v).includes('amount') &&
       Object.keys(v).includes('denom'): {
-      return TokenElement;
-    }
+        return TokenElement;
+      }
     case v && Object.keys(v).includes('seconds'):
     case v instanceof Date: {
       return TimestampElement;
@@ -99,22 +100,25 @@ export const decodeProto = (msg: {
   const typeUrl = msg?.typeUrl ?? msg?.type_url;
   if (!typeUrl) return msg;
   let type;
-  if (typeUrl.startsWith('/osmosis.')) {
-    // fallback with osmosis
-    type = lookupType(osmoProto, typeUrl);
-  } else if (
-    typeUrl.startsWith('/evmos.') ||
-    typeUrl.startsWith('/ethermint.')
-  ) {
-    // fallback with evmos
-    type = lookupType(evmosProto, typeUrl);
-  } else if (typeUrl.startsWith('/secret.')) {
-    type = MsgRegistry.get(typeUrl);
-  } else if (ExtendedRegistry[typeUrl]) {
-    type = ExtendedRegistry[typeUrl];
-  } else {
-    type = findType(injProto, typeMap[typeUrl] ?? typeUrl.split('.').pop());
-  }
+
+  if (typeUrl.startsWith('/cosmos.evm.vm.v1')) {
+    type = lookupType(cosmosProto, typeUrl);
+  } else if (typeUrl.startsWith('/osmosis.')) {
+      // fallback with osmosis
+      type = lookupType(osmoProto, typeUrl);
+    } else if (
+      typeUrl.startsWith('/evmos.') ||
+      typeUrl.startsWith('/ethermint.')
+    ) {
+      // fallback with evmos
+      type = lookupType(evmosProto, typeUrl);
+    } else if (typeUrl.startsWith('/secret.')) {
+      type = MsgRegistry.get(typeUrl);
+    } else if (ExtendedRegistry[typeUrl]) {
+      type = ExtendedRegistry[typeUrl];
+    } else {
+      type = findType(injProto, typeMap[typeUrl] ?? typeUrl.split('.').pop());
+    }
 
   if (type) {
     const instance = (type.decode || type.deserialize)(
