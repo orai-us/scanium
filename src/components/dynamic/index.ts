@@ -1,5 +1,6 @@
 import * as injProto from '@injectivelabs/core-proto-ts';
 import evmosProto from '@/libs/protos/evmos';
+import cosmosProto from '@/libs/protos/cosmos';
 import osmoProto from '@/libs/protos/osmosis';
 import { MsgType } from '@injectivelabs/ts-types';
 import ObjectElement from './ObjectElement.vue';
@@ -27,8 +28,7 @@ const ExtendedRegistry = Object.fromEntries(
 );
 
 export function select(v: any, direct?: string) {
-  if(direct === 'messageTx')
-    return ObjectMessageTxElement;
+  if (direct === 'messageTx') return ObjectMessageTxElement;
   const type = typeof v;
   switch (type) {
     case 'object':
@@ -99,7 +99,9 @@ export const decodeProto = (msg: {
   const typeUrl = msg?.typeUrl ?? msg?.type_url;
   if (!typeUrl) return msg;
   let type;
-  if (typeUrl.startsWith('/osmosis.')) {
+  if (typeUrl.startsWith('/cosmos.evm.vm.v1')) {
+    type = lookupType(cosmosProto, typeUrl);
+  } else if (typeUrl.startsWith('/osmosis.')) {
     // fallback with osmosis
     type = lookupType(osmoProto, typeUrl);
   } else if (
