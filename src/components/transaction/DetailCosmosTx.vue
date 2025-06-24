@@ -71,10 +71,6 @@ const messages = computed(() => {
   );
 });
 
-console.log({
-  messages,
-});
-
 const txLogs = computed(() => {
   const eventLogsByIndex = {} as any;
   tx.value?.txResponse?.events.forEach((event) => {
