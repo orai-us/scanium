@@ -21,28 +21,18 @@
     "logo": "https://raw.githubusercontent.com/cosmos/chain-registry/master/oraichain/images/orai.png",
     "assets": [
       {
-        "base": "exa",
+        "base": "uexa",
         "symbol": "EXA",
         "exponent": "6",
         "coingecko_id": "exachain",
         "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png"
       },
       {
-        "base": "uexa",
-        "symbol": "EXA",
-        "exponent": "6"
-      },
-      {
-        "base": "usdx",
-        "symbol": "USDX",
-        "exponent": "6",
-        "coingecko_id": "usdx",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png"
-      },
-      {
         "base": "uusdx",
         "symbol": "USDX",
-        "exponent": "6"
+        "exponent": "6",
+        "coingecko_id": "",
+        "logo": ""
       }
     ]
   }
