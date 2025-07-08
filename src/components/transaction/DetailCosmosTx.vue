@@ -88,20 +88,17 @@ const messagesEvm = computed(() => {
           data: hexData,
         });
 
-        const eventFragment = log?.eventFragment?.inputs;
-        const dataEvent = eventFragment.reduce((acc: any, item: any, index: number) => {
-          acc[item.name] = log?.args[index];
-          return acc;
-        }, {});
-
-        console.log({
-          dataEvent,
-          log,
-          eventFragment
-        });
+        const eventFragment = log.eventFragment.inputs || [];
+        const dataEvent = eventFragment.reduce(
+          (acc: any, item: any, index: number) => {
+            acc[item.name] = log.args[index];
+            return acc;
+          },
+          {}
+        );
 
         return {
-          typeUrl: log?.name || 'Unknow',
+          typeUrl: log.name || 'Unknow',
           ...dataEvent,
         };
       }
@@ -183,8 +180,8 @@ watchEffect(() => {
 
 const allowTypeEvm = '/cosmos.evm.vm.v1';
 const isExachainEvm = computed(() => {
-  return tx.value?.tx?.body?.messages.some(
-    (msg) => msg.typeUrl.startsWith(allowTypeEvm)
+  return tx.value?.tx?.body?.messages.some((msg) =>
+    msg.typeUrl.startsWith(allowTypeEvm)
   );
 });
 
@@ -325,7 +322,9 @@ const timestamp = computed(() => {
           class="bg-base-100 xl:px-4 xl:pt-2 p-1 rounded-lg"
         >
           <div class="rounded-lg mt-4 bg-base-200">
-            <div class="flex justify-between xl:p-5 p-4 collapse-title border-b border-solid border-stone-700">
+            <div
+              class="flex justify-between xl:p-5 p-4 collapse-title border-b border-solid border-stone-700"
+            >
               <h5 class="xl:text-lg text-sm font-bold">
                 # {{ $t('account.logs') }} ({{ messagesEvm.length }})
               </h5>
