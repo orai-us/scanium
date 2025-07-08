@@ -33,6 +33,13 @@
         "exponent": "6",
         "coingecko_id": "",
         "logo": ""
+      },
+      {
+        "base": "ausdx",
+        "symbol": "AUSDX",
+        "exponent": "18",
+        "coingecko_id": "",
+        "logo": ""
       }
     ]
   }

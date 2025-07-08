@@ -18,6 +18,8 @@ import { useRoute, useRouter } from 'vue-router';
 import EvmMessage from './EvmMessage.vue';
 import TokenElement from '../dynamic/TokenElement.vue';
 import { getBlockByHeight } from '@/service/blocksService';
+import EXACHAIN_BRIDGE_ABI from '@/abis/exachain-bridge.json';
+import { Interface } from 'ethers/lib/utils';
 
 const props = defineProps(['hash', 'chain']);
 
@@ -25,6 +27,7 @@ const blockchain = useBlockchain();
 const baseStore = useBaseStore();
 const format = useFormatter();
 const tx = ref({} as GetTxResponse | undefined);
+const eventLogsEvm = ref([] as Array<any>);
 const messageOpens = ref([true] as Array<boolean>);
 const logOpens = ref([true] as Array<boolean>);
 const timestampByHeight = ref();
@@ -71,6 +74,45 @@ const messages = computed(() => {
   );
 });
 
+const messagesEvm = computed(() => {
+  return (
+    eventLogsEvm.value.map((msg) => {
+      if (msg.type === 'tx_log') {
+        const attr = msg.attributes.find((attr: any) => attr.key === 'txLog');
+        const attrValue = JSON.parse(attr.value);
+        const erc20Interface = new Interface(EXACHAIN_BRIDGE_ABI);
+        const data = Buffer.from(attrValue.data, 'base64');
+        const hexData = '0x' + data.toString('hex');
+        const log = erc20Interface.parseLog({
+          topics: attrValue.topics,
+          data: hexData,
+        });
+
+        const eventFragment = log?.eventFragment?.inputs;
+        const dataEvent = eventFragment.reduce((acc: any, item: any, index: number) => {
+          acc[item.name] = log?.args[index];
+          return acc;
+        }, {});
+
+        console.log({
+          dataEvent,
+          log,
+          eventFragment
+        });
+
+        return {
+          typeUrl: log?.name || 'Unknow',
+          ...dataEvent,
+        };
+      }
+    }) || []
+  );
+});
+
+watchEffect(() => {
+  console.log('messagesEvm:', messagesEvm.value);
+});
+
 const txLogs = computed(() => {
   const eventLogsByIndex = {} as any;
   tx.value?.txResponse?.events.forEach((event) => {
@@ -85,6 +127,9 @@ const txLogs = computed(() => {
       };
     }
     eventLogsByIndex[msgIndex].events.push(event);
+    if (event.type === 'tx_log' && isExachainEvm.value) {
+      eventLogsEvm.value.push(event);
+    }
   });
 
   if (tx.value?.txResponse?.logs && tx.value?.txResponse?.logs.length) {
@@ -134,6 +179,13 @@ async function fetchBlockByHeight(height: string | number) {
 watchEffect(() => {
   const height = Number(tx.value?.txResponse?.height).toString();
   if (height) fetchBlockByHeight(height);
+});
+
+const allowTypeEvm = '/cosmos.evm.vm.v1';
+const isExachainEvm = computed(() => {
+  return tx.value?.tx?.body?.messages.some(
+    (msg) => msg.typeUrl.startsWith(allowTypeEvm)
+  );
 });
 
 const timestamp = computed(() => {
@@ -268,6 +320,36 @@ const timestamp = computed(() => {
       </div>
 
       <div v-if="tab === 'msg'">
+        <div
+          v-if="isExachainEvm"
+          class="bg-base-100 xl:px-4 xl:pt-2 p-1 rounded-lg"
+        >
+          <div class="rounded-lg mt-4 bg-base-200">
+            <div class="flex justify-between xl:p-5 p-4 collapse-title border-b border-solid border-stone-700">
+              <h5 class="xl:text-lg text-sm font-bold">
+                # {{ $t('account.logs') }} ({{ messagesEvm.length }})
+              </h5>
+            </div>
+            <div
+              v-for="(msg, i) in messagesEvm"
+              :key="i"
+              class="xl:m-8 m-2 mt-4 bg-base-200"
+            >
+              <div
+                v-for="(item, index) in Object.entries(msg)"
+                :key="index"
+                class="xl:h-10 mb-4 flex flex-col xl:flex-row gap-2 xl:gap-10 items-start xl:items-center"
+              >
+                <div class="font-semibold w-full xl:w-40 break-words">
+                  {{ formatTitle(item[0].toString()) }}:
+                </div>
+                <div class="w-full break-words">
+                  {{ item[1] }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div
           v-if="tx?.txResponse"
           class="bg-base-100 xl:px-4 xl:pt-3 xl:pb-4 p-1 rounded mb-4"
