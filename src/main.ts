@@ -48,14 +48,21 @@ Sentry.init({
     Sentry.browserTracingIntegration({ router }),
     Sentry.replayIntegration(),
   ],
+  // ignore errors
   ignoreErrors: [
+    // User cancelled or reject wallet or connection timeout when making requests
     'Request rejected',
+    'User rejected the request',
+    // Network connectivity issues or API endpoint is down
     'Failed to fetch',
+    // Resource loading failures (images, scripts, etc.)
     'Load failed',
     'Query failed',
-    'User rejected the request',
+    // General network connectivity issues
     'Network Error',
+    // Promise rejection that was not properly handled
     'Object captured as promise rejection',
+    // DOM manipulation error, usually from race conditions in UI updates
     "Failed to execute 'insertBefore' on 'Node'"
   ],
   // Tracing
