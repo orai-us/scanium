@@ -1,9 +1,9 @@
 {
-    "chain_name": "Exachain",
-    "registry_name": "exachain",
+    "chain_name": "Viexchain",
+    "registry_name": "viexchain",
     "api": [
       {
-        "provider": "Exachain",
+        "provider": "Viexchain",
         "address": "https://rpc.zken.io"
       }
     ],
@@ -17,14 +17,14 @@
     "sdk_version": "0.53.0",
     "coin_type": "60",
     "min_tx_fee": "800",
-    "addr_prefix": "exa",
+    "addr_prefix": "viex",
     "logo": "https://raw.githubusercontent.com/cosmos/chain-registry/master/oraichain/images/orai.png",
     "assets": [
       {
-        "base": "uexa",
-        "symbol": "EXA",
+        "base": "uviex",
+        "symbol": "VIEX",
         "exponent": "6",
-        "coingecko_id": "exachain",
+        "coingecko_id": "viexchain",
         "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/7533.png"
       },
       {

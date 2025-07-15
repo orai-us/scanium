@@ -158,8 +158,9 @@ function removeAddress(addr: string) {
 
 // add address to the local list
 async function addAddress(acc: AccountEntry) {
-  const { data } = fromBech32(acc.address);
-  const key = toBase64(data);
+  // const { data } = fromBech32(acc.address);
+  // const key = toBase64(data);
+  const key = acc.chainName;
 
   if (conf.value[key]) {
     // existed
@@ -193,7 +194,7 @@ async function loadBalances(
   endpoint: string,
   address: string
 ) {
-  const endpointObj = chainStore.randomEndpoint(chainName);
+  const endpointObj = await chainStore.getEndpoint(chainName);
   const client = CosmosRestClient.newDefault(endpointObj?.address || endpoint);
   const paginatedBalances = await client.getBankBalances(address);
   balances.value[address] = paginatedBalances.filter(

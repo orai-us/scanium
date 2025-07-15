@@ -70,7 +70,7 @@ export const useBlockchain = defineStore('blockchain', {
       const router = useRouter();
       const routes = router?.getRoutes() || [];
       console.log({ routes });
-      
+
       if (this.current && routes) {
         if (this.current?.themeColor) {
           const { color } = hexToRgb(this.current?.themeColor);
@@ -193,6 +193,33 @@ export const useBlockchain = defineStore('blockchain', {
         `endpoint-${this.chainName}`,
         JSON.stringify(endpoint)
       );
+    },
+
+    async getEndpoint(chainName: string) {
+      const endpoints = this.dashboard.chains[chainName]?.endpoints?.rpc || [];
+
+      for (const endpoint of endpoints) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+          const statusEndpoint = await fetch(endpoint.address + '/status', {
+            signal: controller.signal
+          });
+
+          clearTimeout(timeoutId);
+
+          if (statusEndpoint.ok) {
+            return endpoint;
+          }
+        } catch (error) {
+          console.warn(`Failed to check status for endpoint ${endpoint.address}:`, error);
+          continue; // Try next endpoint
+        }
+      }
+
+      // If no endpoints are working, return the first one as fallback
+      return endpoints[0];
     },
 
     async setCurrent(name: string) {

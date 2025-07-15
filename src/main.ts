@@ -48,6 +48,16 @@ Sentry.init({
     Sentry.browserTracingIntegration({ router }),
     Sentry.replayIntegration(),
   ],
+  ignoreErrors: [
+    'Request rejected',
+    'Failed to fetch',
+    'Load failed',
+    'Query failed',
+    'User rejected the request',
+    'Network Error',
+    'Object captured as promise rejection',
+    "Failed to execute 'insertBefore' on 'Node'"
+  ],
   // Tracing
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled

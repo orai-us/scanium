@@ -112,7 +112,7 @@ const delegatesAssets = computed(() => {
     if (!!balance) {
       const denom = balance.denom;
       let id, exponent = 0;
-      let display = denom.toUpperCase();
+      let display = denom?.toUpperCase();
       if (Array.isArray(assets)) {
         const asset = assets.find((item) => item.name === denom || item.base === denom);
         if (!!asset) {
