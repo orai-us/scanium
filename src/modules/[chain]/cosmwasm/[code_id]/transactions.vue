@@ -20,8 +20,11 @@ import type { ContractInfo } from 'cosmjs-types/cosmwasm/wasm/v1/types';
 import 'vue3-json-viewer/dist/index.css';
 import TransactionContractIndexs from '@/components/contracts/TransactionContractIndexs.vue';
 import TransactionContractRpc from '@/components/contracts/TransactionContractRpc.vue';
-import { CHAIN_INDEXS } from '@/constants';
+import { CHAIN_INDEXS, LIST_COIN } from '@/constants';
 import { decodeBuffer } from '@/libs/utils';
+import { getPriceByIds } from '@/service/assetsService';
+import { tokenMap } from '@/libs/amm-v3';
+import { formatNumber } from '@/utils';
 
 const props = defineProps(['chain'])
 const chainStore = useBlockchain();
@@ -152,6 +155,32 @@ const radioContent = [
 ];
 
 const selectedRadio = ref('raw');
+
+const coingeckoSymbols = Object.values(LIST_COIN);
+const coingeckoIds = Object.keys(LIST_COIN);
+const pricesToken = ref({} as any);
+watchEffect(async() => {
+  if (Array.isArray(balances.value)) {
+    const ids = balances.value.map(item => coingeckoIds[coingeckoSymbols.indexOf(item.denom)])?.join(",");
+    try {
+      const result: any = {};
+      const res = await getPriceByIds({ ids });
+      for (let item in res) {
+        if (coingeckoIds.indexOf(item) > -1) {
+          const denom = coingeckoSymbols[coingeckoIds.indexOf(item)] as string
+          result[denom] = {
+            price: res[item]?.usd,
+            decimal: tokenMap[denom].coinDecimals
+          }
+        }
+      }
+      pricesToken.value = result;
+    } catch (error) {
+      console.log({ error });
+    }
+  }
+})
+
 </script>
 <template>
   <div class="p-5">
@@ -269,8 +298,8 @@ const selectedRadio = ref('raw');
             </div>
             <ul class="menu mt-5">
               <li v-for="b in balances">
-                <a class="flex justify-between"
-                  ><span>{{ format.formatToken(b) }}</span> {{ b.amount }}
+                <a class="flex justify-between"><span>{{ format.formatToken(b) }}</span>
+                  ${{ formatNumber(Number(b.amount) * Number(pricesToken[b.denom]?.price / Math.pow(10, pricesToken[b.denom]?.decimal))) }}
                 </a>
               </li>
               <li v-if="balances.length === 0" class="my-10 text-center">
