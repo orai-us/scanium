@@ -204,7 +204,7 @@ export const useBlockchain = defineStore('blockchain', {
           const timeoutId = setTimeout(() => controller.abort(), 5000);
 
           const statusEndpoint = await fetch(endpoint.address + '/status', {
-            signal: controller.signal
+            signal: controller.signal,
           });
 
           clearTimeout(timeoutId);
@@ -213,7 +213,10 @@ export const useBlockchain = defineStore('blockchain', {
             return endpoint;
           }
         } catch (error) {
-          console.warn(`Failed to check status for endpoint ${endpoint.address}:`, error);
+          console.warn(
+            `Failed to check status for endpoint ${endpoint.address}:`,
+            error
+          );
           continue; // Try next endpoint
         }
       }

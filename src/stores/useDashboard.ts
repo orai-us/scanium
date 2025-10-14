@@ -410,6 +410,7 @@ export const useDashboard = defineStore('dashboard', {
             ],
             type_asset: type,
           };
+
           assets.push(asset);
         }
       }

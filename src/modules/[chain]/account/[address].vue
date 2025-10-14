@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import {
   useBlockchain,
+  useDashboard,
   useFormatter,
   useStakingStore,
   useTxDialog,
   useWalletStore,
 } from '@/stores';
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
-
+import { LoadingStatus } from '@/stores/useDashboard';
 import { PageRequest } from '@/types';
 
 import type { Coin } from '@cosmjs/amino';
@@ -26,6 +27,7 @@ const props = defineProps(['address', 'chain']);
 
 const walletStore = useWalletStore();
 const blockchain = useBlockchain();
+const dashboard = useDashboard();
 const stakingStore = useStakingStore();
 const dialog = useTxDialog();
 const format = useFormatter();
@@ -193,6 +195,7 @@ function getNameValidator(validatorAddress: string) {
         isBalancesLoaded &&
         isDelegationLoaded &&
         isRewardLoaded &&
+        dashboard.status === LoadingStatus.Loaded &&
         isUnbodingLoaded &&
         !address.startsWith('0x')
       "
