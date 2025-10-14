@@ -8,9 +8,7 @@ import {
 } from '@/stores';
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 
-import {
-  PageRequest,
-} from '@/types';
+import { PageRequest } from '@/types';
 
 import type { Coin } from '@cosmjs/amino';
 import type {
@@ -21,7 +19,7 @@ import { BaseAccount } from 'cosmjs-types/cosmos/auth/v1beta1/auth';
 import type { ExtraTxResponse } from '@/libs/client';
 import type { QueryDelegationTotalRewardsResponse } from 'cosmjs-types/cosmos/distribution/v1beta1/query';
 import TransactionsHistory from '@/components/account/TransactionsHistory.vue';
-import Assets from "@/components/account/Assets.vue";
+import Assets from '@/components/account/Assets.vue';
 import TransactionAccountRpc from '@/components/account/TransactionAccountRpc.vue';
 
 const props = defineProps(['address', 'chain']);
@@ -52,7 +50,7 @@ onMounted(() => {
 });
 watchEffect(() => {
   loadAccount(props.address);
-})
+});
 
 function loadAccount(address: string) {
   blockchain.rpc.getAuthAccount(address).then((x) => {
@@ -90,12 +88,12 @@ function loadAccount(address: string) {
           for (const entries of unbond.entries) {
             resultUnbondingList.push({
               ...entries,
-              validatorAddress: unbond.validatorAddress
-            })
+              validatorAddress: unbond.validatorAddress,
+            });
           }
         }
       }
-      unbondingList.value = resultUnbondingList
+      unbondingList.value = resultUnbondingList;
     }
     isUnbodingLoaded.value = true;
   });
@@ -128,24 +126,27 @@ function updateEvent() {
 // }
 
 const isOwnerWallet = computed(() => {
-  return walletStore.currentAddress === props.address
-})
+  return walletStore.currentAddress === props.address;
+});
 
 function getNameValidator(validatorAddress: string) {
-  let name = ""
+  let name = '';
   const validators = staking?.validators;
   if (Array.isArray(validators)) {
-    const validator = validators.find((item: any) => item?.operatorAddress === validatorAddress);
-    if (!!validator) name = validator.description?.moniker
+    const validator = validators.find(
+      (item: any) => item?.operatorAddress === validatorAddress
+    );
+    if (!!validator) name = validator.description?.moniker;
   }
   return name;
 }
-
 </script>
 <template>
   <div v-if="account">
     <!-- address -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
+    <div
+      class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]"
+    >
       <div class="flex items-center">
         <!-- img -->
         <!-- <div class="inline-flex relative w-11 h-11 rounded-md">
@@ -187,35 +188,70 @@ function getNameValidator(validatorAddress: string) {
     </div>
 
     <!-- Assets -->
-    <div v-if="isBalancesLoaded && isDelegationLoaded && isRewardLoaded && isUnbodingLoaded && !address.startsWith('0x')">
-      <Assets :balances="balances" :delegations="delegations" :rewards="rewards" :unbonding="unbonding"
-        :unbondingTotal="unbondingTotal" :address="address" :chain="chain" />
+    <div
+      v-if="
+        isBalancesLoaded &&
+        isDelegationLoaded &&
+        isRewardLoaded &&
+        isUnbodingLoaded &&
+        !address.startsWith('0x')
+      "
+    >
+      <Assets
+        :balances="balances"
+        :delegations="delegations"
+        :rewards="rewards"
+        :unbonding="unbonding"
+        :unbondingTotal="unbondingTotal"
+        :address="address"
+        :chain="chain"
+      />
     </div>
 
     <!-- Delegations -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]" v-if="!address.startsWith('0x')">
+    <div
+      class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]"
+      v-if="!address.startsWith('0x')"
+    >
       <div class="flex justify-between">
         <h2 class="card-title mb-4 text-white">
           {{ $t('account.delegations') }}
         </h2>
         <div>
           <div class="flex justify-end mb-4" v-if="walletStore.currentAddress">
-            <label for="delegate" class="bg-base rounded-md text-white p-2 mr-2 xl:text-sm text-xs hover:cursor-pointer"
+            <label
+              for="delegate"
+              class="bg-base rounded-md text-white p-2 mr-2 xl:text-sm text-xs hover:cursor-pointer"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
-              @click="() => { if (!isOwnerWallet) return; dialog.open('delegate', {}, updateEvent) }">{{
-              $t('account.btn_delegate') }}</label>
-            <label for="withdraw" class="bg-base rounded-md text-white p-2 xl:text-sm text-xs hover:cursor-pointer"
+              @click="
+                () => {
+                  if (!isOwnerWallet) return;
+                  dialog.open('delegate', {}, updateEvent);
+                }
+              "
+              >{{ $t('account.btn_delegate') }}</label
+            >
+            <label
+              for="withdraw"
+              class="bg-base rounded-md text-white p-2 xl:text-sm text-xs hover:cursor-pointer"
               :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'"
-              @click="() => { if (!isOwnerWallet) return; dialog.open('withdraw', {}, updateEvent) }">Claim
-              Reward</label>
+              @click="
+                () => {
+                  if (!isOwnerWallet) return;
+                  dialog.open('withdraw', {}, updateEvent);
+                }
+              "
+              >Claim Reward</label
+            >
           </div>
           <div v-if="!walletStore.currentAddress">
             <label
               class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm"
-              :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''">{{ $t('wallet.wallet_connect') }}</label>
+              :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
+              >{{ $t('wallet.wallet_connect') }}</label
+            >
           </div>
         </div>
-
       </div>
       <div class="overflow-x-auto">
         <table class="table w-full text-sm table-zebra">
@@ -237,33 +273,45 @@ function getNameValidator(validatorAddress: string) {
             </tr>
             <tr v-for="(v, index) in delegations" :key="index">
               <td class="text-caption text-link py-3 !break-normal">
-                <RouterLink :to="`/${chain}/staking/${v.delegation.validatorAddress}`">{{
-                  format.validatorFromBech32(v.delegation.validatorAddress) ||
-                  v.delegation.validatorAddress
-                  }}</RouterLink>
+                <RouterLink
+                  :to="`/${chain}/staking/${v.delegation.validatorAddress}`"
+                  >{{
+                    format.validatorFromBech32(v.delegation.validatorAddress) ||
+                    v.delegation.validatorAddress
+                  }}</RouterLink
+                >
               </td>
               <td class="py-3 !break-normal">
                 {{ format.formatToken(v.balance, true, '0,0.[000000]') }}
               </td>
               <td class="py-3 !break-normal">
                 {{
-                format.formatTokens(
-                rewards?.rewards?.find(
-                (x) =>
-                x.validatorAddress === v.delegation.validatorAddress
-                )?.reward,
-                undefined,
-                undefined,
-                undefined,
-                1e18
-                )
+                  format.formatTokens(
+                    rewards?.rewards?.find(
+                      (x) =>
+                        x.validatorAddress === v.delegation.validatorAddress
+                    )?.reward,
+                    undefined,
+                    undefined,
+                    undefined,
+                    1e18
+                  )
                 }}
               </td>
               <td class="py-3 !break-normal">
                 <div>
-                  <div v-if="v.balance && walletStore.currentAddress" class="flex justify-start">
-                    <label for="delegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
-                      :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'" @click="() => {
+                  <div
+                    v-if="v.balance && walletStore.currentAddress"
+                    class="flex justify-start"
+                  >
+                    <label
+                      for="delegate"
+                      class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
+                      :class="
+                        !isOwnerWallet && 'opacity-50 hover:cursor-default'
+                      "
+                      @click="
+                        () => {
                           if (!isOwnerWallet) return;
                           dialog.open(
                             'delegate',
@@ -271,11 +319,19 @@ function getNameValidator(validatorAddress: string) {
                               validator_address: v.delegation.validatorAddress,
                             },
                             updateEvent
-                          )
+                          );
                         }
-                        ">{{ $t('account.btn_delegate') }}</label>
-                    <label for="redelegate" class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
-                      :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'" @click="() => {
+                      "
+                      >{{ $t('account.btn_delegate') }}</label
+                    >
+                    <label
+                      for="redelegate"
+                      class="text-link cursor-pointer hover:brightness-150 font-semibold mr-2"
+                      :class="
+                        !isOwnerWallet && 'opacity-50 hover:cursor-default'
+                      "
+                      @click="
+                        () => {
                           if (!isOwnerWallet) return;
                           dialog.open(
                             'redelegate',
@@ -283,11 +339,19 @@ function getNameValidator(validatorAddress: string) {
                               validator_address: v.delegation.validatorAddress,
                             },
                             updateEvent
-                          )
+                          );
                         }
-                        ">{{ $t('account.btn_redelegate') }}</label>
-                    <label for="unbond" class="text-link cursor-pointer hover:brightness-150 font-semibold"
-                      :class="!isOwnerWallet && 'opacity-50 hover:cursor-default'" @click="() => {
+                      "
+                      >{{ $t('account.btn_redelegate') }}</label
+                    >
+                    <label
+                      for="unbond"
+                      class="text-link cursor-pointer hover:brightness-150 font-semibold"
+                      :class="
+                        !isOwnerWallet && 'opacity-50 hover:cursor-default'
+                      "
+                      @click="
+                        () => {
                           if (!isOwnerWallet) return;
                           dialog.open(
                             'unbond',
@@ -295,16 +359,22 @@ function getNameValidator(validatorAddress: string) {
                               validator_address: v.delegation.validatorAddress,
                             },
                             updateEvent
-                          )
+                          );
                         }
-                        ">{{ $t('account.btn_unbond') }}</label>
+                      "
+                      >{{ $t('account.btn_unbond') }}</label
+                    >
                   </div>
                   <div v-if="!walletStore.currentAddress">
-                    <label :for="!walletStore.currentAddress ? 'PingConnectWallet' : ''"
-                      class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm">{{ $t('wallet.wallet_connect') }}</label>
+                    <label
+                      :for="
+                        !walletStore.currentAddress ? 'PingConnectWallet' : ''
+                      "
+                      class="rounded-lg bg-[#7332E7] text-white text-[14px] font-medium cursor-pointer hover:filter hover:brightness-125 transition-all duration-500 px-3 py-[11px] md:px-6 truncate !inline-flex text-xs md:!text-sm"
+                      >{{ $t('wallet.wallet_connect') }}</label
+                    >
                   </div>
                 </div>
-
               </td>
             </tr>
           </tbody>
@@ -313,8 +383,10 @@ function getNameValidator(validatorAddress: string) {
     </div>
 
     <!-- Unbonding Delegations -->
-    <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]"
-      v-if="unbonding && unbonding.length > 0 && !address.startsWith('0x')">
+    <div
+      class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]"
+      v-if="unbonding && unbonding.length > 0 && !address.startsWith('0x')"
+    >
       <h2 class="card-title mb-4 text-white">
         {{ $t('account.unbonding_delegations') }}
       </h2>
@@ -327,7 +399,11 @@ function getNameValidator(validatorAddress: string) {
               <th class="py-3">Unbond Completed By</th>
             </tr>
           </thead>
-          <tbody class="text-sm" v-for="(v, index) in unbondingList" :key="index">
+          <tbody
+            class="text-sm"
+            v-for="(v, index) in unbondingList"
+            :key="index"
+          >
             <tr>
               <td class="text-caption py-3 text-link">
                 <RouterLink :to="`/${chain}/staking/${v.validatorAddress}`">{{
@@ -336,19 +412,22 @@ function getNameValidator(validatorAddress: string) {
               </td>
               <td class="text-caption py-3">
                 {{
-                format.formatToken(
-                {
-                amount: v.initialBalance,
-                denom: stakingStore.params.bondDenom,
-                },
-                true,
-                '0,0.[00]'
-                )
+                  format.formatToken(
+                    {
+                      amount: v.initialBalance,
+                      denom: stakingStore.params.bondDenom,
+                    },
+                    true,
+                    '0,0.[00]'
+                  )
                 }}
               </td>
               <td class="text-caption py-3">
-                <span v-if="!isNaN(Number(v.completionTime?.seconds))">{{ format.toLocaleDate(new
-                  Date(Number(v.completionTime.seconds) * 1000)) }}</span>
+                <span v-if="!isNaN(Number(v.completionTime?.seconds))">{{
+                  format.toLocaleDate(
+                    new Date(Number(v.completionTime.seconds) * 1000)
+                  )
+                }}</span>
                 <span v-else>-</span>
               </td>
             </tr>

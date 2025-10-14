@@ -3,11 +3,22 @@ import { useBlockchain, useStakingStore } from '@/stores';
 import { computed, onMounted, ref, watch } from 'vue';
 import DonutChart from '../charts/DonutChart.vue';
 import { Icon } from '@iconify/vue';
-import { getCw20Balances, getPriceByIds, getPricePoolTokens } from '@/service/assetsService';
+import {
+  getCw20Balances,
+  getPriceByIds,
+  getPricePoolTokens,
+} from '@/service/assetsService';
 import { formatNumber, shortenDenom } from '@/utils';
 import { useRoute, useRouter } from 'vue-router';
 
-const props = defineProps(['balances', 'delegations', 'rewards', 'unbondingTotal', 'address', 'chain']);
+const props = defineProps([
+  'balances',
+  'delegations',
+  'rewards',
+  'unbondingTotal',
+  'address',
+  'chain',
+]);
 
 const route = useRoute();
 const router = useRouter();
@@ -27,29 +38,43 @@ const pricePoolTokensOraidex = ref({} as any);
 const labels = ['Balance', 'Delegation', 'Reward', 'Unbonding'];
 
 function changeStatusSupported(supported: boolean) {
-  router.push({ path: `/${props.chain}/account/${props.address}`, query: { ...route.query, supported: supported.toString() } });
+  router.push({
+    path: `/${props.chain}/account/${props.address}`,
+    query: { ...route.query, supported: supported.toString() },
+  });
 }
 
 async function fetchBalancesCw20() {
   const assets = blockchain.current?.assets;
 
   if (Array.isArray(assets)) {
-    const assetCw20s = assets.filter((item: any) => item?.type_asset === "cw20");
+    const assetCw20s = assets.filter(
+      (item: any) => item?.type_asset === 'cw20'
+    );
     if (!assetCw20s) return;
     const contractAddresses = [];
     for (const asset of assetCw20s) {
       if (!!asset) contractAddresses.push(asset.base);
     }
 
-    const multiplyContract = await getCw20Balances(props.address, contractAddresses);
+    const multiplyContract = await getCw20Balances(
+      props.address,
+      contractAddresses
+    );
+
     if (!!multiplyContract && multiplyContract.data) {
       const returnData = multiplyContract.data.return_data;
       if (!!returnData) {
-        const returnDataBalance = returnData.map((rs: any) => JSON.parse(atob(rs.data)).balance);
-        const balances = returnDataBalance?.map((item: string, index: number) => ({
-          denom: assetCw20s[index].denom_units[1].denom,
-          amount: (Number(item)).toString()
-        })).filter((balance: any) => balance?.amount != '0');
+        const returnDataBalance = returnData.map(
+          (rs: any) => JSON.parse(atob(rs.data)).balance
+        );
+
+        const balances = returnDataBalance
+          ?.map((item: string, index: number) => ({
+            denom: assetCw20s[index].denom_units[1].denom,
+            amount: Number(item).toString(),
+          }))
+          .filter((balance: any) => balance?.amount != '0');
         if (!balances) return;
         balancesChain.value = balances;
       }
@@ -62,19 +87,19 @@ async function fetchPricePoolTokens() {
     const res = await getPricePoolTokens();
     pricePoolTokensOraidex.value = res;
   } catch (error) {
-    console.log({ error })
+    console.log({ error });
   }
 }
 
 onMounted(async () => {
-  fetchBalancesCw20()
-  fetchPricePoolTokens()
-})
+  fetchBalancesCw20();
+  fetchPricePoolTokens();
+});
 
 watch([() => props.address], () => {
-  fetchBalancesCw20()
-  fetchPricePoolTokens()
-})
+  fetchBalancesCw20();
+  fetchPricePoolTokens();
+});
 
 const balancesAssets = computed(() => {
   const balances = [...props.balances, ...balancesChain.value];
@@ -83,10 +108,13 @@ const balancesAssets = computed(() => {
   const resultUnSupported: Array<any> = [];
   for (const balance of balances) {
     const denom = balance.denom;
-    let id, exponent = 0;
+    let id,
+      exponent = 0;
     let display = denom.toUpperCase();
     if (Array.isArray(assets)) {
-      const asset = assets.find((item) => item.name === denom || item.base === denom);
+      const asset = assets.find(
+        (item) => item.name === denom || item.base === denom
+      );
       if (!!asset) {
         // @ts-ignore
         exponent = asset.exponent;
@@ -95,13 +123,11 @@ const balancesAssets = computed(() => {
       }
     }
     const amount = (balance.amount || 0) / 10 ** exponent;
-    if (id)
-      resultSupported.push({ amount, denom, display, id });
-    else
-      resultUnSupported.push({ amount, denom, display });
+    if (id) resultSupported.push({ amount, denom, display, id });
+    else resultUnSupported.push({ amount, denom, display });
   }
   return supportedAssets.value ? resultSupported : resultUnSupported;
-})
+});
 
 const delegatesAssets = computed(() => {
   const resultSupported: Array<any> = [];
@@ -111,10 +137,13 @@ const delegatesAssets = computed(() => {
     const balance = delegation.balance;
     if (!!balance) {
       const denom = balance.denom;
-      let id, exponent = 0;
+      let id,
+        exponent = 0;
       let display = denom?.toUpperCase();
       if (Array.isArray(assets)) {
-        const asset = assets.find((item) => item.name === denom || item.base === denom);
+        const asset = assets.find(
+          (item) => item.name === denom || item.base === denom
+        );
         if (!!asset) {
           // @ts-ignore
           exponent = asset.exponent;
@@ -123,36 +152,42 @@ const delegatesAssets = computed(() => {
         }
       }
       const amount = (balance.amount || 0) / 10 ** exponent;
-      if (id)
-        resultSupported.push({ amount, denom, display, id });
-      else
-        resultUnSupported.push({ amount, denom, display });
+      if (id) resultSupported.push({ amount, denom, display, id });
+      else resultUnSupported.push({ amount, denom, display });
     }
   }
-  const resultDelegates = supportedAssets.value ? resultSupported : resultUnSupported;
-  const groupDelegatesByDenom = resultDelegates.reduce((accumulator, currentValue) => {
-    if (accumulator[currentValue.denom]) {
-      accumulator[currentValue.denom].amount += currentValue.amount;
-    } else {
-      accumulator[currentValue.denom] = currentValue;
-    }
-    return accumulator
-  }, {})
+  const resultDelegates = supportedAssets.value
+    ? resultSupported
+    : resultUnSupported;
+  const groupDelegatesByDenom = resultDelegates.reduce(
+    (accumulator, currentValue) => {
+      if (accumulator[currentValue.denom]) {
+        accumulator[currentValue.denom].amount += currentValue.amount;
+      } else {
+        accumulator[currentValue.denom] = currentValue;
+      }
+      return accumulator;
+    },
+    {}
+  );
   return Object.values(groupDelegatesByDenom) as any;
-})
+});
 
 const rewardsTotalAssets = computed(() => {
   const resultSupported: Array<any> = [];
   const resultUnSupported: Array<any> = [];
   const assets = blockchain.current?.assets;
-  const rewardsTotal = props.rewards?.total
+  const rewardsTotal = props.rewards?.total;
   if (Array.isArray(rewardsTotal)) {
     for (let reward of rewardsTotal) {
       const denom = reward.denom;
-      let id, exponent = 0;
+      let id,
+        exponent = 0;
       let display = denom.toUpperCase();
       if (Array.isArray(assets)) {
-        const asset = assets.find((item) => item.name === reward.denom || item.base === reward.denom);
+        const asset = assets.find(
+          (item) => item.name === reward.denom || item.base === reward.denom
+        );
         if (asset) {
           // @ts-ignore
           exponent = asset.exponent;
@@ -160,15 +195,13 @@ const rewardsTotalAssets = computed(() => {
           id = asset.coingecko_id;
         }
       }
-      const amount = ((reward.amount || 0) / 10 ** 18) / 10 ** exponent;
-      if (id)
-        resultSupported.push({ amount, denom, display, id });
-      else
-        resultUnSupported.push({ amount, denom, display });
+      const amount = (reward.amount || 0) / 10 ** 18 / 10 ** exponent;
+      if (id) resultSupported.push({ amount, denom, display, id });
+      else resultUnSupported.push({ amount, denom, display });
     }
   }
   return supportedAssets.value ? resultSupported : resultUnSupported;
-})
+});
 
 const unbondingAssets = computed(() => {
   const resultSupported: Array<any> = [];
@@ -177,10 +210,13 @@ const unbondingAssets = computed(() => {
   const totalUnbonding = Number(props.unbondingTotal);
   if (!!totalUnbonding) {
     const denom = stakingStore.params.bondDenom;
-    let id, exponent = 0;
+    let id,
+      exponent = 0;
     let display = denom.toUpperCase();
     if (Array.isArray(assets)) {
-      const asset = assets.find((item) => item.name === denom || item.base === denom);
+      const asset = assets.find(
+        (item) => item.name === denom || item.base === denom
+      );
       if (asset) {
         // @ts-ignore
         exponent = asset.exponent;
@@ -189,82 +225,95 @@ const unbondingAssets = computed(() => {
       }
     }
     const amount = totalUnbonding / 10 ** exponent;
-    if (id)
-      resultSupported.push({ amount, denom, display, id });
-    else
-      resultUnSupported.push({ amount, denom, display });
+    if (id) resultSupported.push({ amount, denom, display, id });
+    else resultUnSupported.push({ amount, denom, display });
   }
   return supportedAssets.value ? resultSupported : resultUnSupported;
-})
+});
 
-const assets = computed(()=>{
-  return [...balancesAssets.value, ...delegatesAssets.value, ...rewardsTotalAssets.value, ...unbondingAssets.value];
-})
+const assets = computed(() => {
+  return [
+    ...balancesAssets.value,
+    ...delegatesAssets.value,
+    ...rewardsTotalAssets.value,
+    ...unbondingAssets.value,
+  ];
+});
 
-watch([() => assets.value.length, supportedAssets, balancesChain], async () => {
-  const idSet = new Set();
-  assets.value.forEach(item => {
-    idSet.add(item.id)
-  });
-  const ids = Array.from(idSet);
-  const result: any = {};
-  if (ids?.length > 0) {
+watch(
+  [() => assets.value.length, supportedAssets, balancesChain],
+  async () => {
+    const idSet = new Set();
     assets.value.forEach((item) => {
-      if (pricePoolTokensOraidex.value[item.denom]) {
-        result[item.id] = pricePoolTokensOraidex.value[item.denom]
-      }
-    })
-    const promiseAllInfoToken = [];
-    for (let i = 0; i < ids.length; i += 10) {
-      promiseAllInfoToken.push(getPriceByIds({ ids: ids.slice(i, i + 10).join(",") }))
-    }
-    const infoTokens = await Promise.all(promiseAllInfoToken);
-    if (Array.isArray(infoTokens)) {
-      infoTokens.forEach((info) => {
-        for (let item of Object.keys(info)) {
-          result[item] = info[item]?.usd;
+      idSet.add(item.id);
+    });
+    const ids = Array.from(idSet);
+    const result: any = {};
+    if (ids?.length > 0) {
+      assets.value.forEach((item) => {
+        if (pricePoolTokensOraidex.value[item.denom]) {
+          result[item.id] = pricePoolTokensOraidex.value[item.denom];
         }
-      })
+      });
+      const promiseAllInfoToken = [];
+      for (let i = 0; i < ids.length; i += 10) {
+        promiseAllInfoToken.push(
+          getPriceByIds({ ids: ids.slice(i, i + 10).join(',') })
+        );
+      }
+      const infoTokens = await Promise.all(promiseAllInfoToken);
+      if (Array.isArray(infoTokens)) {
+        infoTokens.forEach((info) => {
+          for (let item of Object.keys(info)) {
+            result[item] = info[item]?.usd;
+          }
+        });
+      }
+      priceBySymbol.value = result;
+
+      let total = 0;
+      for (let item of assets.value) {
+        if (result[item.id]) total += item.amount * result[item.id];
+      }
+      totalValue.value = total;
+    } else {
+      totalValue.value = 0;
     }
-    priceBySymbol.value = result;
 
-    let total = 0;
-    for (let item of assets.value) {
-      if (result[item.id])
-        total += item.amount * result[item.id];
+    let sumBalance = 0;
+    let sumDelegate = 0;
+    let sumReward = 0;
+    let sumUnbonding = 0;
+
+    for (let item of balancesAssets.value) {
+      const price = result[item.id] ? result[item.id] : 1;
+      sumBalance += item.amount * price;
     }
-    totalValue.value = total;
-  } else {
-    totalValue.value = 0;
-  }
 
-  let sumBalance = 0;
-  let sumDelegate = 0;
-  let sumReward = 0;
-  let sumUnbonding = 0;
+    for (let item of delegatesAssets.value) {
+      const price = result[item.id] ? result[item.id] : 1;
+      sumDelegate += item.amount * price;
+    }
 
-  for (let item of balancesAssets.value) {
-    const price = result[item.id] ? result[item.id] : 1;
-    sumBalance += item.amount * price;
-  }
+    for (let item of rewardsTotalAssets.value) {
+      const price = result[item.id] ? result[item.id] : 1;
+      sumReward += item.amount * price;
+    }
 
-  for (let item of delegatesAssets.value) {
-    const price = result[item.id] ? result[item.id] : 1;
-    sumDelegate += item.amount * price;
-  }
+    for (let item of unbondingAssets.value) {
+      const price = result[item.id] ? result[item.id] : 1;
+      sumUnbonding += item.amount * price;
+    }
 
-  for (let item of rewardsTotalAssets.value) {
-    const price = result[item.id] ? result[item.id] : 1;
-    sumReward += item.amount * price;
-  }
-
-  for (let item of unbondingAssets.value) {
-    const price = result[item.id] ? result[item.id] : 1;
-    sumUnbonding += item.amount * price;
-  }
-
-  totalAmountByCategory.value = [sumBalance, sumDelegate, sumReward, sumUnbonding];
-}, { flush: 'post' })
+    totalAmountByCategory.value = [
+      sumBalance,
+      sumDelegate,
+      sumReward,
+      sumUnbonding,
+    ];
+  },
+  { flush: 'post' }
+);
 
 let showCopyToast = ref(null as any);
 
@@ -294,14 +343,24 @@ const tipMsg = computed(() => {
 </script>
 
 <template>
-  <div class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]">
+  <div
+    class="m-4 md:m-6 mb-4 p-4 md:p-6 rounded-[16px] shadow bg-[#141416] border border-[#242627]"
+  >
     <div class="flex xl:flex-row flex-col justify-between">
       <h2 class="card-title mb-4 text-white">{{ $t('account.assets') }}</h2>
       <div class="flex gap-2 mb-4 w-full xl:w-[300px]">
-        <button class="w-1/2 xl:text-sm text-xs py-2" :class="{ 'bg-base rounded-md text-white': supportedAssets }" @click="changeStatusSupported(true)">
+        <button
+          class="w-1/2 xl:text-sm text-xs py-2"
+          :class="{ 'bg-base rounded-md text-white': supportedAssets }"
+          @click="changeStatusSupported(true)"
+        >
           Supported Assets
         </button>
-        <button class="w-1/2 xl:text-sm text-xs py-2" :class="{ 'bg-base rounded-md text-white': !supportedAssets }" @click="changeStatusSupported(false)">
+        <button
+          class="w-1/2 xl:text-sm text-xs py-2"
+          :class="{ 'bg-base rounded-md text-white': !supportedAssets }"
+          @click="changeStatusSupported(false)"
+        >
           Unsupported Assets
         </button>
       </div>
@@ -315,110 +374,255 @@ const tipMsg = computed(() => {
         <!-- list-->
         <div class="xl:max-h-80 md:max-h-60 overflow-scroll">
           <!--balances  -->
-          <div class="flex items-center px-4 mb-2" v-for="(balanceItem, index) in balancesAssets" :key="index">
-            <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
+          <div
+            class="flex items-center px-4 mb-2"
+            v-for="(balanceItem, index) in balancesAssets"
+            :key="index"
+          >
+            <div
+              class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4"
+            >
               <Icon icon="mdi-account-cash" class="text-info" size="20" />
-              <div class="absolute top-0 bottom-0 left-0 right-0 bg-info opacity-20"></div>
+              <div
+                class="absolute top-0 bottom-0 left-0 right-0 bg-info opacity-20"
+              ></div>
             </div>
             <div class="flex-1">
-              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
-                {{ formatNumber(balanceItem?.amount) }} {{ balanceItem?.display?.toUpperCase() }}
-              </div>
-              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+              <div
+                class="xl:text-sm text-xs font-semibold"
+                v-if="supportedAssets"
+              >
                 {{ formatNumber(balanceItem?.amount) }}
-                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(balanceItem?.denom?.toUpperCase() || '')" >
-                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(balanceItem?.denom?.toUpperCase()) }}</span>
+                {{ balanceItem?.display?.toUpperCase() }}
+              </div>
+              <div
+                class="text-sm font-semibold flex gap-1 flex-col xl:flex-row"
+                v-else
+              >
+                {{ formatNumber(balanceItem?.amount) }}
+                <div
+                  class="flex gap-1 items-center hover:cursor-pointer"
+                  @click="copyWebsite(balanceItem?.denom?.toUpperCase() || '')"
+                >
+                  <span class="xl:text-sm text-xs font-semibold">{{
+                    shortenDenom(balanceItem?.denom?.toUpperCase())
+                  }}</span>
                   <Icon icon="mdi:content-copy" class="cursor-pointer w-3" />
                 </div>
               </div>
               <div class="text-xs">
-                {{ formatNumber(((priceBySymbol[balanceItem?.id] || 0) * balanceItem?.amount) / totalValue * 100) }}%
+                {{
+                  formatNumber(
+                    (((priceBySymbol[balanceItem?.id] || 0) *
+                      balanceItem?.amount) /
+                      totalValue) *
+                      100
+                  )
+                }}%
               </div>
             </div>
-            <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-              ${{ formatNumber((priceBySymbol[balanceItem?.id] || 0) * balanceItem?.amount) }}
+            <div
+              class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2"
+            >
+              ${{
+                formatNumber(
+                  (priceBySymbol[balanceItem?.id] || 0) * balanceItem?.amount
+                )
+              }}
             </div>
           </div>
           <!--delegations  -->
-          <div class="flex items-center px-4 mb-2" v-for="(delegationItem, index) in delegatesAssets" :key="index">
-            <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
+          <div
+            class="flex items-center px-4 mb-2"
+            v-for="(delegationItem, index) in delegatesAssets"
+            :key="index"
+          >
+            <div
+              class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4"
+            >
               <Icon icon="mdi-user-clock" class="text-warning" size="20" />
-              <div class="absolute top-0 bottom-0 left-0 right-0 bg-warning opacity-20"></div>
+              <div
+                class="absolute top-0 bottom-0 left-0 right-0 bg-warning opacity-20"
+              ></div>
             </div>
             <div class="flex-1">
-              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
-                {{ formatNumber(delegationItem?.amount) }} {{ delegationItem?.denom?.toUpperCase() }}
-              </div>
-              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+              <div
+                class="xl:text-sm text-xs font-semibold"
+                v-if="supportedAssets"
+              >
                 {{ formatNumber(delegationItem?.amount) }}
-                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(delegationItem?.denom?.toUpperCase() || '')" >
-                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(delegationItem?.denom?.toUpperCase()) }}</span>
-                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
+                {{ delegationItem?.denom?.toUpperCase() }}
+              </div>
+              <div
+                class="text-sm font-semibold flex gap-1 flex-col xl:flex-row"
+                v-else
+              >
+                {{ formatNumber(delegationItem?.amount) }}
+                <div
+                  class="flex gap-1 items-center hover:cursor-pointer"
+                  @click="
+                    copyWebsite(delegationItem?.denom?.toUpperCase() || '')
+                  "
+                >
+                  <span class="xl:text-sm text-xs font-semibold">{{
+                    shortenDenom(delegationItem?.denom?.toUpperCase())
+                  }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3" />
                 </div>
               </div>
               <div class="text-xs">
-                {{ formatNumber((priceBySymbol[delegationItem?.id] * delegationItem?.amount) / totalValue * 100) }}%
+                {{
+                  formatNumber(
+                    ((priceBySymbol[delegationItem?.id] *
+                      delegationItem?.amount) /
+                      totalValue) *
+                      100
+                  )
+                }}%
               </div>
             </div>
-            <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-              ${{ formatNumber(priceBySymbol[delegationItem?.id] * delegationItem?.amount) }}
+            <div
+              class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2"
+            >
+              ${{
+                formatNumber(
+                  priceBySymbol[delegationItem?.id] * delegationItem?.amount
+                )
+              }}
             </div>
           </div>
           <!-- rewards.total -->
-          <div class="flex items-center px-4 mb-2" v-for="(rewardItem, index) in rewardsTotalAssets" :key="index">
-            <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
-              <Icon icon="mdi-account-arrow-up" class="text-success" size="20" />
-              <div class="absolute top-0 bottom-0 left-0 right-0 bg-success opacity-20"></div>
+          <div
+            class="flex items-center px-4 mb-2"
+            v-for="(rewardItem, index) in rewardsTotalAssets"
+            :key="index"
+          >
+            <div
+              class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4"
+            >
+              <Icon
+                icon="mdi-account-arrow-up"
+                class="text-success"
+                size="20"
+              />
+              <div
+                class="absolute top-0 bottom-0 left-0 right-0 bg-success opacity-20"
+              ></div>
             </div>
             <div class="flex-1">
-              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
-                {{ formatNumber(rewardItem?.amount) }} {{ rewardItem?.denom?.toUpperCase() }}
-              </div>
-              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+              <div
+                class="xl:text-sm text-xs font-semibold"
+                v-if="supportedAssets"
+              >
                 {{ formatNumber(rewardItem?.amount) }}
-                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(rewardItem?.denom?.toUpperCase() || '')" >
-                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(rewardItem?.denom?.toUpperCase()) }}</span>
-                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
+                {{ rewardItem?.denom?.toUpperCase() }}
+              </div>
+              <div
+                class="text-sm font-semibold flex gap-1 flex-col xl:flex-row"
+                v-else
+              >
+                {{ formatNumber(rewardItem?.amount) }}
+                <div
+                  class="flex gap-1 items-center hover:cursor-pointer"
+                  @click="copyWebsite(rewardItem?.denom?.toUpperCase() || '')"
+                >
+                  <span class="xl:text-sm text-xs font-semibold">{{
+                    shortenDenom(rewardItem?.denom?.toUpperCase())
+                  }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3" />
                 </div>
               </div>
               <div class="text-xs">
-                {{ formatNumber(((priceBySymbol[rewardItem?.id] || 0) * rewardItem?.amount) / totalValue * 100) }}%
+                {{
+                  formatNumber(
+                    (((priceBySymbol[rewardItem?.id] || 0) *
+                      rewardItem?.amount) /
+                      totalValue) *
+                      100
+                  )
+                }}%
               </div>
             </div>
-            <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-              ${{ formatNumber((priceBySymbol[rewardItem?.id] || 0) * rewardItem?.amount) }}
+            <div
+              class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2"
+            >
+              ${{
+                formatNumber(
+                  (priceBySymbol[rewardItem?.id] || 0) * rewardItem?.amount
+                )
+              }}
             </div>
           </div>
           <!-- mdi-account-arrow-right -->
-          <div class="flex items-center px-4" v-if="unbondingAssets?.length > 0">
-            <div class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4">
-              <Icon icon="mdi-account-arrow-right" class="text-error" size="20" />
-              <div class="absolute top-0 bottom-0 left-0 right-0 bg-error opacity-20"></div>
+          <div
+            class="flex items-center px-4"
+            v-if="unbondingAssets?.length > 0"
+          >
+            <div
+              class="w-9 h-9 rounded overflow-hidden flex items-center justify-center relative mr-4"
+            >
+              <Icon
+                icon="mdi-account-arrow-right"
+                class="text-error"
+                size="20"
+              />
+              <div
+                class="absolute top-0 bottom-0 left-0 right-0 bg-error opacity-20"
+              ></div>
             </div>
             <div class="flex-1">
-              <div class="xl:text-sm text-xs font-semibold" v-if="supportedAssets">
-                {{ formatNumber(unbondingAssets[0]?.amount) }} {{ unbondingAssets[0]?.denom?.toUpperCase() }}
-              </div>
-              <div class="text-sm font-semibold flex gap-1 flex-col xl:flex-row" v-else>
+              <div
+                class="xl:text-sm text-xs font-semibold"
+                v-if="supportedAssets"
+              >
                 {{ formatNumber(unbondingAssets[0]?.amount) }}
-                <div class="flex gap-1 items-center hover:cursor-pointer" @click="copyWebsite(unbondingAssets[0]?.denom?.toUpperCase() || '')" >
-                  <span class="xl:text-sm text-xs font-semibold">{{ shortenDenom(unbondingAssets[0]?.denom?.toUpperCase()) }}</span>
-                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3"/>
+                {{ unbondingAssets[0]?.denom?.toUpperCase() }}
+              </div>
+              <div
+                class="text-sm font-semibold flex gap-1 flex-col xl:flex-row"
+                v-else
+              >
+                {{ formatNumber(unbondingAssets[0]?.amount) }}
+                <div
+                  class="flex gap-1 items-center hover:cursor-pointer"
+                  @click="
+                    copyWebsite(unbondingAssets[0]?.denom?.toUpperCase() || '')
+                  "
+                >
+                  <span class="xl:text-sm text-xs font-semibold">{{
+                    shortenDenom(unbondingAssets[0]?.denom?.toUpperCase())
+                  }}</span>
+                  <Icon icon="mdi:content-copy" class="cursor-pointer w-3" />
                 </div>
               </div>
               <div class="text-xs">
-                {{ formatNumber(((priceBySymbol[unbondingAssets[0]?.id] || 0) * unbondingAssets[0]?.amount) / totalValue *
-                100) }}%
+                {{
+                  formatNumber(
+                    (((priceBySymbol[unbondingAssets[0]?.id] || 0) *
+                      unbondingAssets[0]?.amount) /
+                      totalValue) *
+                      100
+                  )
+                }}%
               </div>
             </div>
-            <div class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2">
-              ${{ formatNumber((priceBySymbol[unbondingAssets[0]?.id] || 0) * unbondingAssets[0]?.amount) }}
+            <div
+              class="text-xs truncate relative py-1 px-3 rounded-full w-fit text-primary dark:text-link mr-2"
+            >
+              ${{
+                formatNumber(
+                  (priceBySymbol[unbondingAssets[0]?.id] || 0) *
+                    unbondingAssets[0]?.amount
+                )
+              }}
             </div>
           </div>
         </div>
-        <div class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right">
+        <div
+          class="mt-4 text-lg font-semibold mr-5 pl-5 border-t border-base-300 pt-4 text-right"
+        >
           {{ $t('account.total_value') }}: ${{
-          totalValue ? formatNumber(totalValue) : 0
+            totalValue ? formatNumber(totalValue) : 0
           }}
         </div>
       </div>

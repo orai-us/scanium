@@ -33,6 +33,18 @@
       "exponent": "12"
     },
     {
+      "type_asset": "cw20",
+      "symbol": "AIRI",
+      "exponent": 6,
+      "base": "orai10ldgzued6zjp0mkqwsv2mux3ml50l97c74x8sg"
+    },
+    {
+      "type_asset": "cw20",
+      "base": "orai1lus0f0rhx8s03gdllx2n6vhkmf0536dv57wfge",
+      "symbol": "ORAIX",
+      "exponent": 6
+    },
+    {
       "base": "factory/orai1wuvhex9xqs3r539mvc6mtm7n20fcj3qr2m0y9khx6n5vtlngfzes3k0rq9/obtc",
       "symbol": "BTC",
       "exponent": "14",

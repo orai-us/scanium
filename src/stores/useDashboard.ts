@@ -106,6 +106,7 @@ export interface LocalConfig {
     exponent: string;
     logo: string;
     symbol: string;
+    type_asset?: string;
   }[];
   chain_name: string;
   coin_type: string;
@@ -142,11 +143,12 @@ function apiConverter(api: any[]) {
 
 export function fromLocal(lc: LocalConfig, chainName: string): ChainConfig {
   const conf = {} as ChainConfig;
-  let assets = lc.assets.map((x) => ({
+  let assets: Asset[] = lc.assets.map((x) => ({
     name: x.base,
     base: x.base,
     display: x.symbol,
     symbol: x.symbol,
+    type_asset: x.type_asset,
     logo_URIs: { svg: x.logo },
     coingecko_id: x.coingecko_id,
     exponent: x.exponent,
@@ -242,28 +244,28 @@ export function getLogo(
   return undefined;
 }
 
-function createChainFromDirectory(source: DirectoryChain): Chain {
-  const conf: Chain = {} as Chain;
-  conf.apis = source.best_apis;
-  conf.bech32_prefix = source.bech32_prefix;
-  conf.chain_id = source.chain_id;
-  conf.chain_name = source.chain_name;
-  conf.explorers = source.explorers;
-  conf.pretty_name = source.pretty_name;
-  if (source.versions) {
-    conf.codebase = {
-      recommended_version: source.versions.application_version,
-      cosmos_sdk_version: source.versions.cosmos_sdk_version,
-      tendermint_version: source.versions.tendermint_version,
-    };
-  }
-  if (source.image) {
-    conf.logo_URIs = {
-      svg: source.image,
-    };
-  }
-  return conf;
-}
+// function createChainFromDirectory(source: DirectoryChain): Chain {
+//   const conf: Chain = {} as Chain;
+//   conf.apis = source.best_apis;
+//   conf.bech32_prefix = source.bech32_prefix;
+//   conf.chain_id = source.chain_id;
+//   conf.chain_name = source.chain_name;
+//   conf.explorers = source.explorers;
+//   conf.pretty_name = source.pretty_name;
+//   if (source.versions) {
+//     conf.codebase = {
+//       recommended_version: source.versions.application_version,
+//       cosmos_sdk_version: source.versions.cosmos_sdk_version,
+//       tendermint_version: source.versions.tendermint_version,
+//     };
+//   }
+//   if (source.image) {
+//     conf.logo_URIs = {
+//       svg: source.image,
+//     };
+//   }
+//   return conf;
+// }
 
 export enum LoadingStatus {
   Empty,

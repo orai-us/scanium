@@ -842,7 +842,7 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
           rewards: {
             rewards:
               rewards?.rewards?.filter((r) => {
-                return r.denom !== "aorai";
+                return r.denom !== 'aorai';
               }) ?? [],
           },
         };
@@ -955,16 +955,16 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
       //   return res as ExtraQueryProposalsResponse;
       // }
       const resV1 = await this.queryClient.extra.proposalsV1(status, page);
-        return {
-          // @ts-ignore
-          proposals: resV1.proposals.map((v) => {
-            return {
-              ...v,
-              proposalId: v.id,
-            };
-          }),
-          pagination: resV1.pagination,
-        };
+      return {
+        // @ts-ignore
+        proposals: resV1.proposals.map((v) => {
+          return {
+            ...v,
+            proposalId: v.id,
+          };
+        }),
+        pagination: resV1.pagination,
+      };
     } catch (ex) {
       console.log(ex);
       return {
@@ -978,9 +978,12 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
   async getGovProposal1(proposal_id: string) {
     let resRegistry: any, resQueryClient: any;
     try {
-      resRegistry = await this.request(this.registry.gov_proposals_proposal_id, {
-        proposal_id,
-      });
+      resRegistry = await this.request(
+        this.registry.gov_proposals_proposal_id,
+        {
+          proposal_id,
+        }
+      );
     } catch (error) {}
 
     try {
@@ -994,13 +997,23 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
       title: proposalRegistry?.title,
       content: proposalRegistry?.messages[0],
       summary: proposalRegistry?.summary,
-      status: ProposalStatus[proposalRegistry?.status] as unknown as ProposalStatus,
-      submitTime: proposalQueryClient?.submitTime || proposalRegistry?.submit_time,
-      depositEndTime: proposalQueryClient?.depositEndTime || proposalRegistry?.deposit_end_time,
-      votingStartTime: proposalQueryClient?.votingStartTime || proposalRegistry?.voting_start_time,
-      votingEndTime: proposalQueryClient?.votingEndTime || proposalRegistry?.voting_end_time,
-      finalTallyResult: proposalQueryClient?.finalTallyResult || proposalRegistry?.final_tally_result,
-      contentProto: proposalQueryClient?.content || proposalRegistry?.content
+      status: ProposalStatus[
+        proposalRegistry?.status
+      ] as unknown as ProposalStatus,
+      submitTime:
+        proposalQueryClient?.submitTime || proposalRegistry?.submit_time,
+      depositEndTime:
+        proposalQueryClient?.depositEndTime ||
+        proposalRegistry?.deposit_end_time,
+      votingStartTime:
+        proposalQueryClient?.votingStartTime ||
+        proposalRegistry?.voting_start_time,
+      votingEndTime:
+        proposalQueryClient?.votingEndTime || proposalRegistry?.voting_end_time,
+      finalTallyResult:
+        proposalQueryClient?.finalTallyResult ||
+        proposalRegistry?.final_tally_result,
+      contentProto: proposalQueryClient?.content || proposalRegistry?.content,
     };
 
     return result;
@@ -1476,8 +1489,8 @@ export class CosmosRestClient extends BaseRestClient<RequestRegistry> {
       }
     } catch (ex) {
       console.log({ ex });
-      const res = await axios(`https://rpc.orai.io/tx?hash=0x${hash}`)
-      if(res?.data?.result){
+      const res = await axios(`https://rpc.orai.io/tx?hash=0x${hash}`);
+      if (res?.data?.result) {
         const result = res.data.result;
         const tx = Tx.decode(fromBase64(result.tx));
         return {
