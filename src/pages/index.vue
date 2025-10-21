@@ -38,6 +38,7 @@ const featured = computed(() => {
     // 'noble',
     'Oraichain',
     'Oraichain-Fork',
+    'LFG',
     // 'OraiBtcMainnet',
     'OraiBridge',
     'cosmos',

@@ -1,0 +1,30 @@
+{
+    "chain_name": "LFG",
+    "api": [
+      {
+        "address": "https://lcd-lfg-testnet.orai.network",
+        "provider": "LFG Testnet"
+      }
+    ],
+    "rpc": [
+      {
+        "address": "https://rpc-lfg-testnet.orai.network",
+        "provider": "LFG Testnet"
+      }
+    ],
+    "sdk_version": "0.46.1",
+    "coin_type": "118",
+    "min_tx_fee": "5000",
+    "addr_prefix": "lfg",
+    "logo": "/logos/lfg-black.png",
+    "assets": [
+      {
+        "base": "alfg",
+        "symbol": "LFG",
+        "exponent": "18",
+        "coingecko_id": "lfg",
+        "logo": "/logos/lfg-black.png"
+      }
+    ],
+    "cosmwasm_enabled": false
+  }
