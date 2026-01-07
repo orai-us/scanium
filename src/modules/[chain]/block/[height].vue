@@ -37,7 +37,7 @@ const isFutureBlock = computed({
 
 watchEffect(async () => {
   const blockDetail = await BlocksService.getBlockDetail(props.chain, props.height);
-  current.value = blockDetail.blocks;  
+  current.value = blockDetail.blocks;
   sumAggregates.value = blockDetail.sumAggregates;
 })
 
@@ -72,22 +72,22 @@ watch((current), () => {
     blockInformation.value = {
       'Time': format.toLocaleDate(time.toString()),
       'Chain': chainId,
-      'Block Hash': blockHash,
+      'Block Hash': blockHash.toUpperCase(),
       'Round': round,
       'TX Counts': txCount,
       'Proposer': proposer,
-      'Gas Used / Wanted': "-" 
+      'Gas Used / Wanted': "-"
     };
   } else {
     const block = current.value;
     blockInformation.value = {
       'Time': format.toLocaleDate(parseInt(block.time)),
       'Chain': block.chainId,
-      'Block Hash': block.id,
+      'Block Hash': block.id.toUpperCase(),
       'Round': block.round,
       'TX Counts': block.txCount,
       'Proposer': block?.proposerAddress,
-      'Gas Used / Wanted': "-" 
+      'Gas Used / Wanted': "-"
     };
   }
 })

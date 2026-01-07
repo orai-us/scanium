@@ -359,7 +359,10 @@
     "price": "Giá",
     "holders": "Người nắm giữ",
     "decimals": "Số thập phân",
-    "amount": "Số lượng"
+    "amount": "Số lượng",
+    "transfers": "lượt chuyển",
+    "from": "Từ",
+    "to": "Đến"
   },
   "wallet": {
     "wallet": "Ví",

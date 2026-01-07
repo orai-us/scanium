@@ -359,7 +359,10 @@
     "price": "Harga",
     "holders": "Pemilik",
     "decimals": "Desimal",
-    "amount": "Jumlah"
+    "amount": "Jumlah",
+    "transfers": "transfer",
+    "from": "Dari",
+    "to": "Ke"
   },
   "wallet": {
     "wallet": "Dompet",
