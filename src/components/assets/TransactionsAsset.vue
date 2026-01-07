@@ -1,18 +1,17 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
 
-import TransactionTable from "../TransactionTable.vue";
+import AssetTransferTable from "./AssetTransferTable.vue";
+
 import { formatNumber } from '@/utils';
 import { useRoute, useRouter } from 'vue-router';
-import { countTxsByDenom, getListTxByTxHashes, getTxsByDenom, mergeTxsOptimalAndIndexer, ParamsGetTx } from '@/service/transactionsService';
+import { countTokenTransfersByDenom, getListTxByTxHashes, getTokenTransfersByDenom, mergeTxsOptimalAndIndexer, ParamsGetTx } from '@/service/transactionsService';
 
 const props = defineProps(['denom', 'chain']);
 
 const route = useRoute();
 const router = useRouter();
-const transactions = ref();
+const tokenTransfers = ref();
 const totalCount = ref(0);
 const txByTxHashes = ref([] as Array<any>);
 const pagination = computed(() => {
@@ -30,11 +29,11 @@ const denom = computed(() => {
 })
 const loadingCountTxs = ref(true);
 
-async function fetchTxs(pagination: ParamsGetTx) {
+async function fetchTokenTransfers(pagination: ParamsGetTx) {
   try {
-    const res = await getTxsByDenom(encodeURIComponent(denom.value), pagination);
+    const res = await getTokenTransfersByDenom(encodeURIComponent(denom.value), pagination);
     if (res) {
-      transactions.value = res.data;
+      tokenTransfers.value = res.data;
     }
 
   } catch (error) {
@@ -45,7 +44,7 @@ async function fetchTxs(pagination: ParamsGetTx) {
 async function fetchCountTxs() {
   try {
     loadingCountTxs.value = true;
-    const res = await countTxsByDenom(encodeURIComponent(denom.value));
+    const res = await countTokenTransfersByDenom(encodeURIComponent(denom.value));
     if (res) {
       totalCount.value = res.data;
     }
@@ -60,7 +59,7 @@ onMounted(() => {
 });
 
 watchEffect(() => {
-  fetchTxs(pagination.value);
+  fetchTokenTransfers(pagination.value);
 });
 
 function handlePagination(page: number) {
@@ -69,10 +68,10 @@ function handlePagination(page: number) {
 
 //Get message txs
 const txHashes = computed(() => {
-  return transactions.value?.map((tx: any) => tx.id);
+  return Array.from(new Set(tokenTransfers.value?.map((tx: any) => tx.transactionId)));
 });
 
-async function fetchListTxByTxHashes (txHashes: Array<any>){
+async function fetchListTxByTxHashes(txHashes: Array<any>) {
   try {
     const res = await getListTxByTxHashes(txHashes);
     if (Array.isArray(res?.data)) {
@@ -89,10 +88,14 @@ watch(() => txHashes.value, () => {
 })
 
 const txsMerge = computed(() => {
-  const txsOptimal = transactions.value;
-  const txsIndexer = txByTxHashes.value;
+  return tokenTransfers.value.map((tokenTransfer: any) => {
+    const tx = txByTxHashes.value.find((tx: any) => tx.id === tokenTransfer.transactionId);
 
-  return mergeTxsOptimalAndIndexer(txsOptimal, txsIndexer);
+    if (tx) {
+      tokenTransfer.messages = tx.transactionMessages;
+    }
+    return tokenTransfer;
+  });
 })
 
 </script>
@@ -100,11 +103,13 @@ const txsMerge = computed(() => {
 <template>
   <div>
     <div class="mb-3" v-if="!loadingCountTxs">
-      <span class="text-white font-bold">{{ $t('assets.total_assets') }} <span class="text-[#CBAEFF]">{{ formatNumber(totalCount || 0)
+      <span class="text-white font-bold">{{ $t('assets.total_assets') }} <span class="text-[#CBAEFF]">{{
+        formatNumber(totalCount || 0)
           }}</span>
-        {{ $t('account.transactions') }}</span>
+        {{ $t('assets.transfers') }}</span>
     </div>
-    <TransactionTable :transactions="txsMerge" :chain="chain" :txTotal="totalCount" :pagination="pagination"
-      :handlePagination="handlePagination" :page="pagination.page" />
+
+    <AssetTransferTable :transfers="txsMerge" :chain="chain" :txTotal="totalCount" :pagination="pagination"
+      :handlePagination="handlePagination" :page="pagination.page" :denom="denom" />
   </div>
 </template>

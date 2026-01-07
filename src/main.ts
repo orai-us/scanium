@@ -10,23 +10,24 @@ import VueAwesomePaginate from 'vue-awesome-paginate';
 import 'vue-awesome-paginate/dist/style.css';
 import router from './router';
 import { useBaseStore } from './stores/useBaseStore';
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
-import { DefaultApolloClient } from '@vue/apollo-composable';
+// import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
+// import { DefaultApolloClient } from '@vue/apollo-composable';
 import * as Sentry from "@sentry/vue";
-import { BASE_URL_INDEXER, DOMAIN_SCANIUM } from './config';
+import { DOMAIN_SCANIUM } from './config';
+// import { BASE_URL_INDEXER, DOMAIN_SCANIUM } from './config';
 
 // apollo
-const cache = new InMemoryCache();
+// const cache = new InMemoryCache();
 const sentryDns = import.meta.env.VITE_SENTRY_DNS;
 
-const httpLink = createHttpLink({
-  uri: BASE_URL_INDEXER
-})
+// const httpLink = createHttpLink({
+//   uri: BASE_URL_INDEXER
+// })
 
-export const apolloClient = new ApolloClient({
-  cache,
-  link: httpLink,
-});
+// export const apolloClient = new ApolloClient({
+//   cache,
+//   link: httpLink,
+// });
 
 // const apolloProvider = createApolloProvider({
 //   defaultClient: apolloClient,
@@ -34,9 +35,9 @@ export const apolloClient = new ApolloClient({
 
 // Create vue app
 const app = createApp({
-  setup() {
-    provide(DefaultApolloClient, apolloClient);
-  },
+  // setup() {
+  //   provide(DefaultApolloClient, apolloClient);
+  // },
   render: () => h(App),
 });
 
@@ -70,7 +71,7 @@ Sentry.init({
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
   tracePropagationTargets: [
     DOMAIN_SCANIUM,
-    BASE_URL_INDEXER
+    // BASE_URL_INDEXER
     // 'https://indexer.scanium.io',
     // /^https:\/\/rpc\.orai\.io$/,
     // /^https:\/\/api\.scan\.orai\.io$/,

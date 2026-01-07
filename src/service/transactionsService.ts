@@ -54,11 +54,11 @@ export const countTxsByAccount = async (
   return res?.data;
 };
 
-const urlTxsByDenom = '/v1/transaction/by-denom';
-export const getTxsByDenom = async (denom: string, params: ParamsGetTx) => {
+const urlTokenTransfersByDenom = '/v1/token-transfer/by-denom';
+export const getTokenTransfersByDenom = async (denom: string, params: ParamsGetTx) => {
   const config = {
     baseURL: baseUrlOptimalQueriesScanium,
-    url: `${urlTxsByDenom}/${denom}`,
+    url: `${urlTokenTransfersByDenom}/${denom}`,
     method: METHODS.GET,
     params,
   };
@@ -66,10 +66,10 @@ export const getTxsByDenom = async (denom: string, params: ParamsGetTx) => {
   return res?.data;
 };
 
-export const countTxsByDenom = async (denom: string) => {
+export const countTokenTransfersByDenom = async (denom: string) => {
   const config = {
     baseURL: baseUrlOptimalQueriesScanium,
-    url: `${urlTxsByDenom}/${denom}/count`,
+    url: `${urlTokenTransfersByDenom}/${denom}/count`,
     method: METHODS.GET,
   };
   const res = await api.request(config);

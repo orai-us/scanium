@@ -61,7 +61,7 @@ watch([() => props.address, () => pagination.value.page], () => {
 })
 
 const txHashes = computed(() => {
-  return tokenTransfers.value?.map((tx: any) => tx.transactionId);
+  return Array.from(new Set(tokenTransfers.value?.map((tx: any) => tx.transactionId)));
 });
 
 async function fetchListTxByTxHashes (txHashes: Array<any>){
@@ -175,7 +175,7 @@ function handlePagination(page: number) {
         <tr v-for="(v, index) in transactions" :key="v.uniqKey">
           <td class="truncate py-3" style="max-width: 200px">
             <RouterLink :to="`/${chain}/tx/${v.txhash}`" class="text-primary dark:text-link">
-              {{ shortenTxHash(v.txhash) }}
+              {{ shortenTxHash(v.txhash).toUpperCase() }}
             </RouterLink>
           </td>
           <td class="text-sm py-3" :class="`${v.result === 'Success' ? 'text-[#39DD47]' : 'text-error'

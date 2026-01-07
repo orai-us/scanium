@@ -375,7 +375,10 @@
     "price": "Price",
     "holders": "Holders",
     "decimals": "Decimals",
-    "amount": "Amount"
+    "amount": "Amount",
+    "transfers": "transfers",
+    "from": "From",
+    "to": "To"
   },
   "wallet": {
     "wallet": "Wallet",

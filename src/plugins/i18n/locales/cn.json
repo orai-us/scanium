@@ -361,7 +361,10 @@
     "price": "价格",
     "holders": "持有人",
     "decimals": "小数位",
-    "amount": "数量"
+    "amount": "数量",
+    "transfers": "转账记录",
+    "from": "发件人",
+    "to": "接受者"
   },
   "wallet": {
     "wallet": "钱包",

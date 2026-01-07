@@ -70,7 +70,7 @@ watchEffect(() => {
         <tr v-for="(v, index) in txs" :key="index">
           <td class="truncate py-3" style="max-width: 200px">
             <RouterLink :to="`/${chain}/tx/${v.txhash}`" class="text-primary dark:text-link">
-              {{ shortenTxHash(v.txhash) }}
+              {{ shortenTxHash(v.txhash).toUpperCase() }}
             </RouterLink>
           </td>
           <td class="text-sm py-3 !break-normal" :class="`${v.result === 'Success' ? 'text-[#39DD47]' : 'text-error'
