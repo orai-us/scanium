@@ -126,7 +126,7 @@ watch(transactions, (newTxs, oldTxs) => {
           <tr v-for="(item, index) in transactions" :index="item.hash" class="hover:bg-base-300">
             <td class="truncate text-link">
               <RouterLink :to="`/${props.chain}/tx/${item.hash}`">{{
-                shortenTxHash(item.hash)
+                shortenTxHash(item.hash).toUpperCase()
                 }}</RouterLink>
             </td>
             <td>
