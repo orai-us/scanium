@@ -6,6 +6,8 @@ on:
   push:
     tags:
       - v*
+    branches:
+      - feat/update-cicd
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -24,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.ref }}
+          ref: v1.9.8
           fetch-depth: 0
       - name: Install Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
